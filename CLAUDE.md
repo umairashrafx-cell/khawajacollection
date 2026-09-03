@@ -44,6 +44,16 @@ bun run dev        # local dev, http://localhost:8080
 bun run build      # must pass before any commit
 bun run lint
 npx tsc --noEmit   # must be clean
+npm run placeholders   # regenerate public/placeholders/*.svg
+npm run catalogue      # catalogue summary + example repository queries
+```
+
+To measure a real production page load, build with the node preset and run the
+output directly — the default `cloudflare-module` preset needs wrangler, and
+`vite preview` cannot serve a nitro build:
+
+```
+NITRO_PRESET=node-server npm run build && node .output/server/index.mjs
 ```
 
 ## Hard rules
@@ -59,6 +69,8 @@ npx tsc --noEmit   # must be clean
    only the LCP hero is eager/preloaded.
 7. No new dependency without asking first.
 8. Mobile layout is designed separately, not scaled down from desktop.
+   Never let a `.jsx` and a `.tsx` share a basename: Vite resolves `.jsx`
+   first, so the old file silently wins and the import comes back undefined.
 9. Do not invent social media URLs, phone numbers, addresses, prices, delivery
    timelines or refund windows. Use the `PLACEHOLDER` constants in
    `src/config/site.ts` and say so in the summary.
@@ -90,7 +102,7 @@ image load, no invented business facts.
 - [x] **Phase 0** — Foundation: tokens, fonts, types, config, format helpers, folder structure
 - [x] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
 - [x] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
-- [ ] **Phase 3** — ProductCard + homepage (12 sections)
+- [x] **Phase 3** — ProductCard + homepage (12 sections)
 - [ ] **Phase 4** — PLP, filters, sorting, pagination
 - [ ] **Phase 5** — PDP
 - [ ] **Phase 6** — Cart, wishlist, search
@@ -113,5 +125,8 @@ phase by phase:
   `zustand` is **not installed** — `src/store/ui-store.ts` is the same contract
   on `useSyncExternalStore`. Ask before adding the dependency.
 - `src/components/shop/*` → splits into `product/`, `catalog/`, `cart/`, `search/`
+  (`product/` now exists and is the target; `shop/` still backs the prototype)
+- `src/lib/legacy-shop-adapter.ts` maps a spec `Product` onto ShopContext's
+  cart/wishlist shape — delete it with ShopContext in Phase 6
 - `src/routes/category.$slug.jsx`, `product.$slug.jsx` → Phase 4/5 spec routes
   (`/women`, `/men`, `/products/$slug`, …), with 301s from the old paths

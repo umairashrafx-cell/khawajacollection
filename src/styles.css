@@ -5,6 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
+ * Hover-capable pointers only. A product card's image cross-fade and its quick
+ * add bar must never trigger from a tap: on touch, `:hover` sticks after the
+ * first tap and the card ends up stuck in its hover state.
+ */
+@custom-variant can-hover (@media (hover: hover) and (pointer: fine));
+
+/*
  * Khawaja Collection design system — see docs/BUILD-SPEC.pdf Section 6.
  *
  * Two layers of tokens:

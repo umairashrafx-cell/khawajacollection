@@ -77,3 +77,25 @@ export function formatOrderNumber(sequence: number, year = new Date().getFullYea
 export function resolvePrice(product: { price: number; salePrice?: number }): number {
   return product.salePrice ?? product.price;
 }
+
+/** Words that stay lower-case inside a title derived from a slug. */
+const MINOR_WORDS = new Set(["to", "and", "of", "the", "in", "on", "a"]);
+
+/**
+ * Turns a taxonomy slug into a display label without importing the taxonomy:
+ * `women-ready-to-wear` with parent `women` reads "Ready to Wear".
+ *
+ * Used for the category eyebrow on a product card, which must not reach into
+ * the data layer for a single string (Hard Rule 1).
+ */
+export function labelFromSlug(slug: string, parentSlug?: string): string {
+  const trimmed =
+    parentSlug && slug.startsWith(`${parentSlug}-`) ? slug.slice(parentSlug.length + 1) : slug;
+
+  return trimmed
+    .split("-")
+    .map((word, index) =>
+      index > 0 && MINOR_WORDS.has(word) ? word : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(" ");
+}

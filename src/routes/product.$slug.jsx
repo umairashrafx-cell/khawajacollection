@@ -6,7 +6,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import ProductGallery from "@/components/shop/ProductGallery";
 import ProductAccordions from "@/components/shop/ProductAccordions";
 import ProductGrid from "@/components/shop/ProductGrid";
-import SectionHeader from "@/components/home/SectionHeader";
+import { SectionHeader } from "@/components/home/SectionHeader";
 import { getProduct, getRelated } from "@/services/catalogService";
 import { useShop } from "@/context/ShopContext";
 import { formatPrice, discountPercent } from "@/lib/format";
