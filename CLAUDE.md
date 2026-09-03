@@ -108,7 +108,11 @@ image load, no invented business facts.
 - [x] **Phase 5** — PDP
 - [x] **Phase 6** — Cart, wishlist, search
 - [x] **Phase 7** — Checkout, orders, tracking
-- [ ] **Phase 8** — Supabase migration
+- [~] **Phase 8** — Supabase migration. Schema + RLS done
+      (`supabase/migrations/`). Client, repository, seed and auth BLOCKED:
+      no KC Supabase project exists yet (the only one on the account is
+      Al-Madina-Jewellers, a different business), and `@supabase/supabase-js`
+      is not installed — ask before adding it.
 - [ ] **Phase 9** — SEO, performance, a11y, launch
 
 ## Known debt from the Lovable prototype
