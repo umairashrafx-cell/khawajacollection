@@ -98,7 +98,9 @@ export default function SearchOverlay() {
               >
                 <img src={p.images[0]} alt="" loading="lazy" className="h-16 w-12 object-cover" />
                 <span className="text-sm">{p.name}</span>
-                <span className="ml-auto text-sm text-muted-foreground">{formatPrice(p.price)}</span>
+                <span className="ml-auto text-sm text-muted-foreground">
+                  {formatPrice(p.price)}
+                </span>
               </Link>
             </li>
           ))}

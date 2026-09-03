@@ -9,7 +9,10 @@ export default function CartDrawer() {
   const totals = quote(cart, null);
 
   return (
-    <div className={`fixed inset-0 z-50 ${cartOpen ? "" : "pointer-events-none"}`} aria-hidden={!cartOpen}>
+    <div
+      className={`fixed inset-0 z-50 ${cartOpen ? "" : "pointer-events-none"}`}
+      aria-hidden={!cartOpen}
+    >
       <div
         className={`absolute inset-0 bg-foreground/40 transition-opacity duration-300 ${cartOpen ? "opacity-100" : "opacity-0"}`}
         onClick={() => setCartOpen(false)}
@@ -85,7 +88,9 @@ export default function CartDrawer() {
                 <span>{formatPrice(totals.subtotal)}</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                {totals.shipping === 0 ? "Free delivery applied" : `Delivery ${formatPrice(totals.shipping)}`}
+                {totals.shipping === 0
+                  ? "Free delivery applied"
+                  : `Delivery ${formatPrice(totals.shipping)}`}
               </p>
               <Link
                 to="/checkout"

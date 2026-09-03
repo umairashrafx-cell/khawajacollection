@@ -43,17 +43,17 @@ Components stay small (under ~150 lines) and read data through the services laye
 
 ## Routes
 
-| Path | Screen |
-| --- | --- |
-| `/` | Home: hero, categories, new arrivals, trending, editorials, sale, social, newsletter |
-| `/category/$slug` | Product listing with size/colour/fabric/price filters and sort |
-| `/product/$slug` | Product page: gallery, sizes, accordions, sticky mobile add-to-bag |
-| `/search?q=` | Search results (header overlay gives live suggestions) |
-| `/wishlist` | Guest wishlist stored on device, auth-ready |
-| `/cart`, `/checkout` | Bag and mock checkout (COD / card / bank transfer) |
-| `/track-order?id=` | Order status timeline |
-| `/account` | Order history, wishlist summary, sign-in placeholder |
-| `/sitemap.xml` | Generated from the catalogue |
+| Path                 | Screen                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| `/`                  | Home: hero, categories, new arrivals, trending, editorials, sale, social, newsletter |
+| `/category/$slug`    | Product listing with size/colour/fabric/price filters and sort                       |
+| `/product/$slug`     | Product page: gallery, sizes, accordions, sticky mobile add-to-bag                   |
+| `/search?q=`         | Search results (header overlay gives live suggestions)                               |
+| `/wishlist`          | Guest wishlist stored on device, auth-ready                                          |
+| `/cart`, `/checkout` | Bag and mock checkout (COD / card / bank transfer)                                   |
+| `/track-order?id=`   | Order status timeline                                                                |
+| `/account`           | Order history, wishlist summary, sign-in placeholder                                 |
+| `/sitemap.xml`       | Generated from the catalogue                                                         |
 
 ## Data model (ready for a backend)
 

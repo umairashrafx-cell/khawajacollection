@@ -41,7 +41,9 @@ export function ShopProvider({ children }) {
     setCart((prev) => {
       const found = prev.find((l) => l.lineId === lineId);
       if (found)
-        return prev.map((l) => (l.lineId === lineId ? { ...l, quantity: l.quantity + quantity } : l));
+        return prev.map((l) =>
+          l.lineId === lineId ? { ...l, quantity: l.quantity + quantity } : l,
+        );
       return [
         ...prev,
         {
@@ -85,7 +87,13 @@ export function ShopProvider({ children }) {
       toast.success("Saved to wishlist", { description: product.name });
       return [
         ...prev,
-        { id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images[0] },
+        {
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+        },
       ];
     });
   }, []);
@@ -107,7 +115,18 @@ export function ShopProvider({ children }) {
       isWishlisted: (id) => wishlist.some((w) => w.id === id),
       cartCount: cart.reduce((n, l) => n + l.quantity, 0),
     }),
-    [cart, wishlist, hydrated, cartOpen, searchOpen, addToCart, updateQuantity, removeFromCart, clearCart, toggleWishlist],
+    [
+      cart,
+      wishlist,
+      hydrated,
+      cartOpen,
+      searchOpen,
+      addToCart,
+      updateQuantity,
+      removeFromCart,
+      clearCart,
+      toggleWishlist,
+    ],
   );
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

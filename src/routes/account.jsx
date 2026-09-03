@@ -9,9 +9,15 @@ export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
       { title: "My Account — Khawaja Collection" },
-      { name: "description", content: "View your Khawaja Collection orders, saved pieces and delivery details." },
+      {
+        name: "description",
+        content: "View your Khawaja Collection orders, saved pieces and delivery details.",
+      },
       { property: "og:title", content: "My Account — Khawaja Collection" },
-      { property: "og:description", content: "View your Khawaja Collection orders, saved pieces and delivery details." },
+      {
+        property: "og:description",
+        content: "View your Khawaja Collection orders, saved pieces and delivery details.",
+      },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/account" }],
@@ -70,7 +76,10 @@ function AccountPage() {
           <div className="bg-sand p-6">
             <h2 className="text-sm uppercase tracking-[0.2em]">Wishlist</h2>
             <p className="mt-3 text-sm text-muted-foreground">{wishlist.length} saved piece(s)</p>
-            <Link to="/wishlist" className="mt-4 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]">
+            <Link
+              to="/wishlist"
+              className="mt-4 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]"
+            >
               View wishlist
             </Link>
           </div>

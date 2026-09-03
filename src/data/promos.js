@@ -51,6 +51,10 @@ export const shippingConfig = {
   paymentMethods: [
     { id: "cod", label: "Cash on Delivery", note: "Pay the courier when your parcel arrives." },
     { id: "card", label: "Debit / Credit Card", note: "Demo only — no payment is processed." },
-    { id: "bank", label: "Bank Transfer", note: "Demo only — account details shown after checkout." },
+    {
+      id: "bank",
+      label: "Bank Transfer",
+      note: "Demo only — account details shown after checkout.",
+    },
   ],
 };

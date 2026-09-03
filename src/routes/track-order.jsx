@@ -10,9 +10,17 @@ export const Route = createFileRoute("/track-order")({
   head: () => ({
     meta: [
       { title: "Track Your Order — Khawaja Collection" },
-      { name: "description", content: "Enter your Khawaja Collection order reference to see its current delivery status." },
+      {
+        name: "description",
+        content:
+          "Enter your Khawaja Collection order reference to see its current delivery status.",
+      },
       { property: "og:title", content: "Track Your Order — Khawaja Collection" },
-      { property: "og:description", content: "Enter your Khawaja Collection order reference to see its current delivery status." },
+      {
+        property: "og:description",
+        content:
+          "Enter your Khawaja Collection order reference to see its current delivery status.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/track-order" },
     ],
@@ -39,7 +47,11 @@ function TrackOrderPage() {
 
   return (
     <PageContainer>
-      <PageHeading eyebrow="Support" title="Track your order" description="Your order reference was shown at checkout, e.g. KC12345678." />
+      <PageHeading
+        eyebrow="Support"
+        title="Track your order"
+        description="Your order reference was shown at checkout, e.g. KC12345678."
+      />
 
       <form
         onSubmit={(e) => {
@@ -48,7 +60,9 @@ function TrackOrderPage() {
         }}
         className="mb-12 flex max-w-md gap-3"
       >
-        <label htmlFor="order-id" className="sr-only">Order reference</label>
+        <label htmlFor="order-id" className="sr-only">
+          Order reference
+        </label>
         <input
           id="order-id"
           value={value}
@@ -56,7 +70,9 @@ function TrackOrderPage() {
           placeholder="Order reference"
           className="flex-1 border border-border px-4 py-3 text-sm outline-none focus:border-gold"
         />
-        <button className="bg-foreground px-6 text-[11px] uppercase tracking-[0.2em] text-background">Track</button>
+        <button className="bg-foreground px-6 text-[11px] uppercase tracking-[0.2em] text-background">
+          Track
+        </button>
       </form>
 
       {id && checked && !order && (
@@ -69,14 +85,20 @@ function TrackOrderPage() {
         <div className="grid gap-10 pb-20 lg:grid-cols-[1fr_340px]">
           <section>
             <p className="text-sm">Order {order.id}</p>
-            <p className="mt-1 text-xs text-muted-foreground">Placed {formatDate(order.createdAt)}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Placed {formatDate(order.createdAt)}
+            </p>
             <ol className="mt-8 space-y-6">
               {order.timeline.map((step) => (
                 <li key={step.label} className="flex items-center gap-4">
-                  <span className={`flex h-8 w-8 items-center justify-center rounded-full border ${step.done ? "border-gold bg-gold" : "border-border"}`}>
+                  <span
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border ${step.done ? "border-gold bg-gold" : "border-border"}`}
+                  >
                     {step.done && <Check className="h-4 w-4" />}
                   </span>
-                  <span className={`text-sm ${step.done ? "" : "text-muted-foreground"}`}>{step.label}</span>
+                  <span className={`text-sm ${step.done ? "" : "text-muted-foreground"}`}>
+                    {step.label}
+                  </span>
                 </li>
               ))}
             </ol>
@@ -86,7 +108,9 @@ function TrackOrderPage() {
             <ul className="mt-5 space-y-3 text-sm">
               {order.items.map((l) => (
                 <li key={l.lineId} className="flex justify-between gap-3">
-                  <span className="text-muted-foreground">{l.name} × {l.quantity}</span>
+                  <span className="text-muted-foreground">
+                    {l.name} × {l.quantity}
+                  </span>
                   <span>{formatPrice(l.price * l.quantity)}</span>
                 </li>
               ))}

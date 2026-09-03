@@ -8,9 +8,15 @@ export const Route = createFileRoute("/wishlist")({
   head: () => ({
     meta: [
       { title: "Wishlist — Khawaja Collection" },
-      { name: "description", content: "Pieces you have saved from the Khawaja Collection catalogue." },
+      {
+        name: "description",
+        content: "Pieces you have saved from the Khawaja Collection catalogue.",
+      },
       { property: "og:title", content: "Wishlist — Khawaja Collection" },
-      { property: "og:description", content: "Pieces you have saved from the Khawaja Collection catalogue." },
+      {
+        property: "og:description",
+        content: "Pieces you have saved from the Khawaja Collection catalogue.",
+      },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/wishlist" }],
@@ -45,7 +51,12 @@ function WishlistPage() {
           {wishlist.map((item) => (
             <article key={item.id} className="relative">
               <Link to="/product/$slug" params={{ slug: item.slug }} className="block bg-sand">
-                <img src={item.image} alt={item.name} loading="lazy" className="aspect-[3/4] w-full object-cover" />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  loading="lazy"
+                  className="aspect-[3/4] w-full object-cover"
+                />
               </Link>
               <button
                 onClick={() => toggleWishlist(item)}

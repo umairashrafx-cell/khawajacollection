@@ -9,9 +9,15 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "Search — Khawaja Collection" },
-      { name: "description", content: "Search the Khawaja Collection catalogue by piece, fabric or colour." },
+      {
+        name: "description",
+        content: "Search the Khawaja Collection catalogue by piece, fabric or colour.",
+      },
       { property: "og:title", content: "Search — Khawaja Collection" },
-      { property: "og:description", content: "Search the Khawaja Collection catalogue by piece, fabric or colour." },
+      {
+        property: "og:description",
+        content: "Search the Khawaja Collection catalogue by piece, fabric or colour.",
+      },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/search" }],
@@ -46,7 +52,9 @@ function SearchPage() {
         }}
         className="mb-10 flex max-w-lg gap-3"
       >
-        <label htmlFor="search-input" className="sr-only">Search</label>
+        <label htmlFor="search-input" className="sr-only">
+          Search
+        </label>
         <input
           id="search-input"
           value={value}

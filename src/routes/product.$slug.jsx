@@ -19,7 +19,13 @@ export const Route = createFileRoute("/product/$slug")({
   },
   head: ({ params, loaderData }) => {
     const p = loaderData?.product;
-    if (!p) return { meta: [{ title: "Product unavailable — Khawaja Collection" }, { name: "robots", content: "noindex" }] };
+    if (!p)
+      return {
+        meta: [
+          { title: "Product unavailable — Khawaja Collection" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     const title = `${p.name} — Khawaja Collection`;
     return {
       meta: [
@@ -66,7 +72,10 @@ function ProductPage() {
     return (
       <PageContainer className="py-24 text-center">
         <h1 className="font-serif text-2xl">This piece is no longer available</h1>
-        <Link to="/" className="mt-6 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]">
+        <Link
+          to="/"
+          className="mt-6 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]"
+        >
           Back home
         </Link>
       </PageContainer>
@@ -115,10 +124,14 @@ function ProductPage() {
                 </>
               )}
             </p>
-            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
 
             <div className="mt-7">
-              <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Size</p>
+              <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                Size
+              </p>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((s) => (
                   <button
@@ -127,7 +140,9 @@ function ProductPage() {
                     onClick={() => setSize(s.label)}
                     aria-pressed={size === s.label}
                     className={`min-w-12 border px-3 py-2 text-xs transition-colors disabled:opacity-35 ${
-                      size === s.label ? "border-foreground bg-foreground text-background" : "border-border hover:border-gold"
+                      size === s.label
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border hover:border-gold"
                     }`}
                   >
                     {s.label}
@@ -154,7 +169,8 @@ function ProductPage() {
 
             <ul className="mt-7 space-y-2 text-xs text-muted-foreground">
               <li className="flex items-center gap-2">
-                <Truck className="h-4 w-4" /> Free delivery over PKR 5,000 · Cash on delivery available
+                <Truck className="h-4 w-4" /> Free delivery over PKR 5,000 · Cash on delivery
+                available
               </li>
               <li className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" /> Easy 7-day exchange

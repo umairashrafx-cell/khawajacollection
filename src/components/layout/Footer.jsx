@@ -20,9 +20,15 @@ export default function Footer() {
             hand-finished detail, honest pricing.
           </p>
           <div className="mt-5 flex gap-4 text-muted-foreground">
-            <a href="/" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
-            <a href="/" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
-            <a href="/" aria-label="YouTube"><Youtube className="h-4 w-4" /></a>
+            <a href="/" aria-label="Instagram">
+              <Instagram className="h-4 w-4" />
+            </a>
+            <a href="/" aria-label="Facebook">
+              <Facebook className="h-4 w-4" />
+            </a>
+            <a href="/" aria-label="YouTube">
+              <Youtube className="h-4 w-4" />
+            </a>
           </div>
         </div>
 
@@ -44,14 +50,18 @@ export default function Footer() {
           <ul className="space-y-2 text-sm">
             {help.map((h) => (
               <li key={h.to}>
-                <Link to={h.to} className="hover:text-gold">{h.label}</Link>
+                <Link to={h.to} className="hover:text-gold">
+                  {h.label}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Studio</p>
+          <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            Studio
+          </p>
           <address className="space-y-2 text-sm not-italic text-muted-foreground">
             <p>Main Boulevard, Gulberg III, Lahore</p>
             <p>Mon–Sat, 11am – 9pm</p>

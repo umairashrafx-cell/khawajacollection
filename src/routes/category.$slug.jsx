@@ -109,7 +109,9 @@ function CategoryPage() {
             className="bg-transparent py-1 text-xs outline-none"
           >
             {SORTS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
             ))}
           </select>
         </label>

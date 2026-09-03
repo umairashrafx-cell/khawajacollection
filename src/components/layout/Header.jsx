@@ -58,7 +58,11 @@ export default function Header() {
           <Link to="/account" className="hidden p-2 sm:block" aria-label="Account">
             <User className="h-5 w-5" />
           </Link>
-          <button className="relative p-2" aria-label="Shopping bag" onClick={() => setCartOpen(true)}>
+          <button
+            className="relative p-2"
+            aria-label="Shopping bag"
+            onClick={() => setCartOpen(true)}
+          >
             <ShoppingBag className="h-5 w-5" />
             {cartCount > 0 && <Badge>{cartCount}</Badge>}
           </button>

@@ -9,9 +9,15 @@ export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
       { title: "Shopping Bag — Khawaja Collection" },
-      { name: "description", content: "Review the pieces in your Khawaja Collection shopping bag before checkout." },
+      {
+        name: "description",
+        content: "Review the pieces in your Khawaja Collection shopping bag before checkout.",
+      },
       { property: "og:title", content: "Shopping Bag — Khawaja Collection" },
-      { property: "og:description", content: "Review the pieces in your Khawaja Collection shopping bag before checkout." },
+      {
+        property: "og:description",
+        content: "Review the pieces in your Khawaja Collection shopping bag before checkout.",
+      },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/cart" }],
@@ -43,20 +49,35 @@ function CartPage() {
           <ul className="divide-y divide-border border-y border-border">
             {cart.map((line) => (
               <li key={line.lineId} className="flex gap-4 py-6">
-                <img src={line.image} alt="" loading="lazy" className="h-36 w-[104px] object-cover" />
+                <img
+                  src={line.image}
+                  alt=""
+                  loading="lazy"
+                  className="h-36 w-[104px] object-cover"
+                />
                 <div className="flex-1">
                   <Link to="/product/$slug" params={{ slug: line.slug }} className="text-sm">
                     {line.name}
                   </Link>
-                  {line.size && <p className="mt-1 text-xs text-muted-foreground">Size {line.size}</p>}
+                  {line.size && (
+                    <p className="mt-1 text-xs text-muted-foreground">Size {line.size}</p>
+                  )}
                   <p className="mt-2 text-sm">{formatPrice(line.price)}</p>
                   <div className="mt-4 flex items-center gap-4">
                     <div className="flex items-center border border-border">
-                      <button className="px-2.5 py-1.5" aria-label="Decrease quantity" onClick={() => updateQuantity(line.lineId, line.quantity - 1)}>
+                      <button
+                        className="px-2.5 py-1.5"
+                        aria-label="Decrease quantity"
+                        onClick={() => updateQuantity(line.lineId, line.quantity - 1)}
+                      >
                         <Minus className="h-3 w-3" />
                       </button>
                       <span className="w-8 text-center text-sm">{line.quantity}</span>
-                      <button className="px-2.5 py-1.5" aria-label="Increase quantity" onClick={() => updateQuantity(line.lineId, line.quantity + 1)}>
+                      <button
+                        className="px-2.5 py-1.5"
+                        aria-label="Increase quantity"
+                        onClick={() => updateQuantity(line.lineId, line.quantity + 1)}
+                      >
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
@@ -73,13 +94,23 @@ function CartPage() {
           <aside className="h-fit bg-sand p-6">
             <h2 className="text-sm uppercase tracking-[0.2em]">Order summary</h2>
             <dl className="mt-5 space-y-2 text-sm">
-              <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(totals.subtotal)}</dd></div>
-              <div className="flex justify-between"><dt>Delivery</dt><dd>{totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}</dd></div>
+              <div className="flex justify-between">
+                <dt>Subtotal</dt>
+                <dd>{formatPrice(totals.subtotal)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt>Delivery</dt>
+                <dd>{totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}</dd>
+              </div>
               <div className="flex justify-between border-t border-border pt-3 font-medium">
-                <dt>Total</dt><dd>{formatPrice(totals.total)}</dd>
+                <dt>Total</dt>
+                <dd>{formatPrice(totals.total)}</dd>
               </div>
             </dl>
-            <Link to="/checkout" className="mt-6 block bg-foreground py-3.5 text-center text-[11px] uppercase tracking-[0.2em] text-background">
+            <Link
+              to="/checkout"
+              className="mt-6 block bg-foreground py-3.5 text-center text-[11px] uppercase tracking-[0.2em] text-background"
+            >
               Proceed to checkout
             </Link>
           </aside>

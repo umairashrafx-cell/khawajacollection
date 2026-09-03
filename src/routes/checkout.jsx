@@ -11,9 +11,17 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Checkout — Khawaja Collection" },
-      { name: "description", content: "Complete your Khawaja Collection order with cash on delivery, card or bank transfer." },
+      {
+        name: "description",
+        content:
+          "Complete your Khawaja Collection order with cash on delivery, card or bank transfer.",
+      },
       { property: "og:title", content: "Checkout — Khawaja Collection" },
-      { property: "og:description", content: "Complete your Khawaja Collection order with cash on delivery, card or bank transfer." },
+      {
+        property: "og:description",
+        content:
+          "Complete your Khawaja Collection order with cash on delivery, card or bank transfer.",
+      },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/checkout" }],
@@ -53,7 +61,11 @@ function CheckoutPage() {
     return (
       <PageContainer className="py-24 text-center">
         <h1 className="font-serif text-2xl">Your bag is empty</h1>
-        <Link to="/category/$slug" params={{ slug: "women" }} className="mt-6 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]">
+        <Link
+          to="/category/$slug"
+          params={{ slug: "women" }}
+          className="mt-6 inline-block border-b border-foreground pb-1 text-xs uppercase tracking-[0.2em]"
+        >
           Continue shopping
         </Link>
       </PageContainer>
@@ -62,7 +74,11 @@ function CheckoutPage() {
 
   return (
     <PageContainer>
-      <PageHeading eyebrow="Secure checkout" title="Checkout" description="This is a demo checkout — no payment is processed and no card details are stored." />
+      <PageHeading
+        eyebrow="Secure checkout"
+        title="Checkout"
+        description="This is a demo checkout — no payment is processed and no card details are stored."
+      />
       <form onSubmit={submit} className="grid gap-12 pb-20 lg:grid-cols-[1fr_340px]">
         <div className="space-y-10">
           <section>
@@ -136,12 +152,24 @@ function CheckoutPage() {
             </p>
           )}
           <dl className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
-            <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(totals.subtotal)}</dd></div>
+            <div className="flex justify-between">
+              <dt>Subtotal</dt>
+              <dd>{formatPrice(totals.subtotal)}</dd>
+            </div>
             {totals.discount > 0 && (
-              <div className="flex justify-between"><dt>Discount</dt><dd>−{formatPrice(totals.discount)}</dd></div>
+              <div className="flex justify-between">
+                <dt>Discount</dt>
+                <dd>−{formatPrice(totals.discount)}</dd>
+              </div>
             )}
-            <div className="flex justify-between"><dt>Delivery</dt><dd>{totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}</dd></div>
-            <div className="flex justify-between border-t border-border pt-3 font-medium"><dt>Total</dt><dd>{formatPrice(totals.total)}</dd></div>
+            <div className="flex justify-between">
+              <dt>Delivery</dt>
+              <dd>{totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}</dd>
+            </div>
+            <div className="flex justify-between border-t border-border pt-3 font-medium">
+              <dt>Total</dt>
+              <dd>{formatPrice(totals.total)}</dd>
+            </div>
           </dl>
           <button
             type="submit"
