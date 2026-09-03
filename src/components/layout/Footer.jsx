@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube } from "lucide-react";
-import { categories } from "@/data/categories";
+import { categories } from "@/data/legacy/categories";
 
 const help = [
   { label: "Track Order", to: "/track-order" },

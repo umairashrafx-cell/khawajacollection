@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { X } from "lucide-react";
-import { categories } from "@/data/categories";
+import { categories } from "@/data/legacy/categories";
 
 const utility = [
   { to: "/wishlist", label: "Wishlist" },

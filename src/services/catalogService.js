@@ -1,7 +1,7 @@
 // Data access layer. Every screen reads the catalogue through these functions,
 // so swapping the mock arrays for a real database or admin API is a one-file change.
-import { products } from "@/data/products";
-import { categories } from "@/data/categories";
+import { products } from "@/data/legacy/products";
+import { categories } from "@/data/legacy/categories";
 
 const delay = (ms = 220) => new Promise((r) => setTimeout(r, ms));
 

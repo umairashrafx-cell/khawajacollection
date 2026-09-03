@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { allProducts } from "@/services/catalogService";
-import { categories } from "@/data/categories";
+import { categories } from "@/data/legacy/categories";
 
 function buildXml(origin) {
   const urls = [

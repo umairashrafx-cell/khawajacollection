@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import men from "@/assets/cat-men.jpg";
 import formals from "@/assets/cat-formals.jpg";
-import { editorials } from "@/data/promos";
+import { editorials } from "@/data/legacy/promos";
 
 const images = { men, formals };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, Search, Heart, ShoppingBag, User } from "lucide-react";
-import { categories } from "@/data/categories";
+import { categories } from "@/data/legacy/categories";
 import { useShop } from "@/context/ShopContext";
 import MegaMenu from "./MegaMenu";
 import MobileNav from "./MobileNav";

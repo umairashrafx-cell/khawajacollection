@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { announcements } from "@/data/promos";
+import { announcements } from "@/data/legacy/promos";
 
 export default function AnnouncementBar() {
   const [index, setIndex] = useState(0);

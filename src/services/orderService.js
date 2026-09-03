@@ -1,6 +1,6 @@
 // Mock order + customer service. Ready to be pointed at a real backend:
 // each function is async and returns plain serialisable objects.
-import { shippingConfig, promoCodes } from "@/data/promos";
+import { shippingConfig, promoCodes } from "@/data/legacy/promos";
 
 const STORE_KEY = "kc_orders_v1";
 

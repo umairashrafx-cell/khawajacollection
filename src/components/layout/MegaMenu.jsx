@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { megaMenu } from "@/data/categories";
+import { megaMenu } from "@/data/legacy/categories";
 
 export default function MegaMenu({ activeSlug, onClose }) {
   const menu = megaMenu.find((m) => m.slug === activeSlug);

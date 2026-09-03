@@ -2,7 +2,7 @@ import women from "@/assets/hero-women.jpg";
 import men from "@/assets/cat-men.jpg";
 import unstitched from "@/assets/cat-unstitched.jpg";
 import formals from "@/assets/cat-formals.jpg";
-import { socialPosts } from "@/data/promos";
+import { socialPosts } from "@/data/legacy/promos";
 
 const images = [women, unstitched, men, formals];
 

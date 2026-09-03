@@ -50,6 +50,13 @@ export interface Product {
   isBestSeller: boolean;
   isOnSale: boolean;
   createdAt: string; // ISO
+
+  /**
+   * Addendum to Section 8.1. Section 16 and Phase 5 both require a
+   * made-to-order flag — bridal pieces swap Add to Cart for "Enquire on
+   * WhatsApp" — but the interface above never declares one.
+   */
+  isMadeToOrder?: boolean;
 }
 
 export interface Category {

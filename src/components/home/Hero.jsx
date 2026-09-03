@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import hero from "@/assets/hero-women.jpg";
-import { heroSlide } from "@/data/promos";
+import { heroSlide } from "@/data/legacy/promos";
 
 export default function Hero() {
   return (

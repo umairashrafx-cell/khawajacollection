@@ -5,7 +5,7 @@ import PageContainer, { PageHeading } from "@/components/layout/PageContainer";
 import { useShop } from "@/context/ShopContext";
 import { formatPrice } from "@/lib/format";
 import { quote, placeOrder } from "@/services/orderService";
-import { shippingConfig } from "@/data/promos";
+import { shippingConfig } from "@/data/legacy/promos";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
