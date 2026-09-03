@@ -72,9 +72,8 @@ export function findVariant(
 ): ProductVariant | null {
   if (!colorName || !size) return null;
   return (
-    product.variants.find(
-      (variant) => variant.colorName === colorName && variant.size === size,
-    ) ?? null
+    product.variants.find((variant) => variant.colorName === colorName && variant.size === size) ??
+    null
   );
 }
 

@@ -27,8 +27,9 @@ TypeScript strict / Tailwind v4 / shadcn-ui / Supabase (Phase 8) / Vercel or Clo
 > - **`next/image`** → we hand-roll a responsive `<Image>` component with
 >   explicit width/height, `srcset`, `sizes` and AVIF/WebP sources (Phase 3).
 > - **ISR** → nitro route cache rules / stale-while-revalidate headers (Phase 9).
-> - **`generateStaticParams`** → TanStack prerender config over
->   `productRepository.getAllSlugs()` (Phase 5).
+> - **`generateStaticParams`** → TanStack prerender in `vite.config.ts`
+>   (done in Phase 5). It crawls from `/` and writes 88 static HTML files,
+>   including all 60 PDPs.
 > - **`next/font`** → fonts are on the Google CDN with `display: swap` today;
 >   self-host and subset to latin in Phase 9.
 >
@@ -104,7 +105,7 @@ image load, no invented business facts.
 - [x] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
 - [x] **Phase 3** — ProductCard + homepage (12 sections)
 - [x] **Phase 4** — PLP, filters, sorting, pagination
-- [ ] **Phase 5** — PDP
+- [x] **Phase 5** — PDP
 - [ ] **Phase 6** — Cart, wishlist, search
 - [ ] **Phase 7** — Checkout, orders, tracking
 - [ ] **Phase 8** — Supabase migration
@@ -131,6 +132,8 @@ phase by phase:
 - `src/routes/category.$slug.tsx` is now redirect-only: every legacy
   `/category/<slug>` 301s to its Phase 4 home. Delete it once the old URLs
   stop appearing in Search Console.
-- `src/routes/product.$slug.jsx` → Phase 5 `/products/$slug`, with a 301 from
-  the old path. Until then, product cards link to a route that does not exist.
+- `src/routes/product.$slug.tsx` is now redirect-only: `/product/<slug>` 301s
+  to `/products/<slug>`. Delete it once the old URLs leave Search Console.
+- `src/components/shop/ProductGallery.jsx` and `ProductAccordions.jsx` are
+  orphaned by the Phase 5 PDP; delete with the rest of `shop/` in Phase 6.
 - `src/routes/search.jsx` → Phase 6 rebuild on the PLP grid and filters

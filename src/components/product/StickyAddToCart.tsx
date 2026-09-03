@@ -41,8 +41,11 @@ export function StickyAddToCart({
       const target = watchRef.current;
       if (!target) return;
       const rect = target.getBoundingClientRect();
-      // Off screen means fully above the viewport or fully below it.
-      setVisible(rect.bottom < 0 || rect.top > window.innerHeight);
+      // Only once the CTA has been scrolled PAST, not while it is still below
+      // the fold on the way down — the spec says "appears once the main Add to
+      // Cart scrolls out of view", and showing it before the reader has even
+      // reached the real button duplicates it for the whole page.
+      setVisible(rect.bottom < 0);
     };
 
     read();
