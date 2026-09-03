@@ -142,3 +142,63 @@ export type OrderStatus =
   | "out_for_delivery"
   | "delivered"
   | "cancelled";
+
+/* ------------------------------------------------------------------ */
+/* Orders — Section 8.3 (the `orders` and `order_items` tables)        */
+/* ------------------------------------------------------------------ */
+
+export interface OrderItem {
+  productId: string;
+  variantId: string;
+  /** Snapshot: what the product was called when the order was placed. */
+  nameSnapshot: string;
+  slug: string;
+  size: string;
+  colorName: string;
+  /** Integer PKR, recomputed server-side at order time. */
+  unitPrice: number;
+  quantity: number;
+}
+
+export interface ShippingAddress {
+  name: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  province: Province;
+  /** Optional — Section 16: many Pakistani customers do not know theirs. */
+  postalCode?: string;
+  notes?: string;
+}
+
+export interface OrderTotals {
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+}
+
+export interface Order {
+  id: string;
+  /** Section 16 — human-readable and phone-friendly: KC-2026-00042. */
+  orderNumber: string;
+  email?: string;
+  /** Normalised to +92 before storing (Section 16). */
+  phone: string;
+  shipping: ShippingAddress;
+  items: OrderItem[];
+  totals: OrderTotals;
+  paymentMethod: PaymentMethodId;
+  paymentStatus: "pending" | "paid" | "failed";
+  status: OrderStatus;
+  createdAt: string;
+}
+
+/** What the client sends. Prices are deliberately absent — see the orders route. */
+export interface OrderDraft {
+  email?: string;
+  phone: string;
+  shipping: ShippingAddress;
+  items: { productId: string; variantId: string; quantity: number }[];
+  paymentMethod: PaymentMethodId;
+}

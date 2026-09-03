@@ -57,6 +57,7 @@ function searchIndex(product: Product): string {
 }
 
 const SEARCH_INDEX = new Map(products.map((p) => [p.id, searchIndex(p)]));
+const BY_ID = new Map(products.map((p) => [p.id, p]));
 
 /**
  * Does this product satisfy the query?
@@ -228,6 +229,10 @@ export class MockProductRepository implements ProductRepository {
 
   async getBySlug(slug: string): Promise<Product | null> {
     return products.find((p) => p.slug === slug) ?? null;
+  }
+
+  async getById(id: string): Promise<Product | null> {
+    return BY_ID.get(id) ?? null;
   }
 
   async getAllSlugs(): Promise<string[]> {

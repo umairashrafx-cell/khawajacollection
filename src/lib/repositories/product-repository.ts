@@ -53,6 +53,12 @@ export interface ProductListResult {
 export interface ProductRepository {
   list(query: ProductQuery): Promise<ProductListResult>;
   getBySlug(slug: string): Promise<Product | null>;
+  /**
+   * Addendum to Section 8.2. Checkout receives ids, not slugs, and pricing an
+   * order by scanning every slug is absurd — Section 8.3 makes `id` the
+   * products table's primary key, so this is a lookup Supabase gives for free.
+   */
+  getById(id: string): Promise<Product | null>;
   getAllSlugs(): Promise<string[]>;
   related(product: Product, limit: number): Promise<Product[]>;
 }

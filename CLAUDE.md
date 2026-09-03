@@ -107,7 +107,7 @@ image load, no invented business facts.
 - [x] **Phase 4** — PLP, filters, sorting, pagination
 - [x] **Phase 5** — PDP
 - [x] **Phase 6** — Cart, wishlist, search
-- [ ] **Phase 7** — Checkout, orders, tracking
+- [x] **Phase 7** — Checkout, orders, tracking
 - [ ] **Phase 8** — Supabase migration
 - [ ] **Phase 9** — SEO, performance, a11y, launch
 
@@ -120,9 +120,16 @@ Phase 6 removed the prototype data/state layer entirely: `src/context/ShopContex
 - `src/data/legacy/*.js` (16 products, no variants) still backs
   `src/services/catalogService.js`, which now only serves `sitemap[.]xml.jsx`.
   Phase 9 rebuilds the sitemap from the repository and both can go.
-- `src/routes/checkout.jsx`, `account.jsx`, `track-order.jsx` are still
-  Lovable-era JavaScript. They read the typed stores now, but Phase 7 rebuilds
-  checkout and tracking properly.
+- Phase 7 rebuilt checkout, account, tracking and order confirmation in
+  TypeScript and deleted `src/services/orderService.js`. The only Lovable-era
+  JavaScript left is `src/services/catalogService.js` and `src/data/legacy/`,
+  which now serve `sitemap[.]xml.jsx` alone.
+
+⚠ **ORDERS ARE IN-MEMORY UNTIL PHASE 8.** `MockOrderRepository` holds orders in
+a module-level Map. That is fine locally and useless in production: on Vercel
+or Cloudflare the next request may hit a different isolate, so a placed order
+will usually be invisible to tracking. **Do not take real orders before Phase 8
+replaces it with Supabase.**
 - `src/routes/category.$slug.tsx` and `product.$slug.tsx` are redirect-only,
   301ing every legacy URL to its new home. Delete once the old URLs stop
   appearing in Search Console.

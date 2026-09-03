@@ -25,12 +25,15 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccessoriesIndexRouteImport } from './routes/accessories/index'
 import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories/$subcategory'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
+import { Route as ApiOrdersRouteImport } from './routes/api/orders'
 import { Route as ApiProductRouteImport } from './routes/api/product'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
+import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as MenIndexRouteImport } from './routes/men/index'
 import { Route as MenSubcategoryRouteImport } from './routes/men/$subcategory'
+import { Route as OrdersOrderNumberRouteImport } from './routes/orders/$orderNumber'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
 import { Route as WomenIndexRouteImport } from './routes/women/index'
@@ -116,6 +119,11 @@ const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
   path: '/api/newsletter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOrdersRoute = ApiOrdersRouteImport.update({
+  id: '/api/orders',
+  path: '/api/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProductRoute = ApiProductRouteImport.update({
   id: '/api/product',
   path: '/api/product',
@@ -124,6 +132,11 @@ const ApiProductRoute = ApiProductRouteImport.update({
 const ApiSearchRoute = ApiSearchRouteImport.update({
   id: '/api/search',
   path: '/api/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
+  id: '/api/track-order',
+  path: '/api/track-order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -144,6 +157,11 @@ const MenIndexRoute = MenIndexRouteImport.update({
 const MenSubcategoryRoute = MenSubcategoryRouteImport.update({
   id: '/men/$subcategory',
   path: '/men/$subcategory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersOrderNumberRoute = OrdersOrderNumberRouteImport.update({
+  id: '/orders/$orderNumber',
+  path: '/orders/$orderNumber',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
@@ -183,11 +201,14 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
+  '/orders/$orderNumber': typeof OrdersOrderNumberRoute
   '/product/$slug': typeof ProductSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
@@ -211,11 +232,14 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
+  '/orders/$orderNumber': typeof OrdersOrderNumberRoute
   '/product/$slug': typeof ProductSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
@@ -240,11 +264,14 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
+  '/orders/$orderNumber': typeof OrdersOrderNumberRoute
   '/product/$slug': typeof ProductSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
@@ -270,11 +297,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/orders'
     | '/api/product'
     | '/api/search'
+    | '/api/track-order'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
+    | '/orders/$orderNumber'
     | '/product/$slug'
     | '/products/$slug'
     | '/women/$subcategory'
@@ -298,11 +328,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/orders'
     | '/api/product'
     | '/api/search'
+    | '/api/track-order'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
+    | '/orders/$orderNumber'
     | '/product/$slug'
     | '/products/$slug'
     | '/women/$subcategory'
@@ -326,11 +359,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/orders'
     | '/api/product'
     | '/api/search'
+    | '/api/track-order'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
+    | '/orders/$orderNumber'
     | '/product/$slug'
     | '/products/$slug'
     | '/women/$subcategory'
@@ -355,11 +391,14 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   AccessoriesSubcategoryRoute: typeof AccessoriesSubcategoryRoute
   ApiNewsletterRoute: typeof ApiNewsletterRoute
+  ApiOrdersRoute: typeof ApiOrdersRoute
   ApiProductRoute: typeof ApiProductRoute
   ApiSearchRoute: typeof ApiSearchRoute
+  ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   MenSubcategoryRoute: typeof MenSubcategoryRoute
+  OrdersOrderNumberRoute: typeof OrdersOrderNumberRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   WomenSubcategoryRoute: typeof WomenSubcategoryRoute
@@ -482,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/orders': {
+      id: '/api/orders'
+      path: '/api/orders'
+      fullPath: '/api/orders'
+      preLoaderRoute: typeof ApiOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/product': {
       id: '/api/product'
       path: '/api/product'
@@ -494,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/api/search'
       fullPath: '/api/search'
       preLoaderRoute: typeof ApiSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/track-order': {
+      id: '/api/track-order'
+      path: '/api/track-order'
+      fullPath: '/api/track-order'
+      preLoaderRoute: typeof ApiTrackOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -522,6 +575,13 @@ declare module '@tanstack/react-router' {
       path: '/men/$subcategory'
       fullPath: '/men/$subcategory'
       preLoaderRoute: typeof MenSubcategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/$orderNumber': {
+      id: '/orders/$orderNumber'
+      path: '/orders/$orderNumber'
+      fullPath: '/orders/$orderNumber'
+      preLoaderRoute: typeof OrdersOrderNumberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$slug': {
@@ -571,11 +631,14 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   AccessoriesSubcategoryRoute: AccessoriesSubcategoryRoute,
   ApiNewsletterRoute: ApiNewsletterRoute,
+  ApiOrdersRoute: ApiOrdersRoute,
   ApiProductRoute: ApiProductRoute,
   ApiSearchRoute: ApiSearchRoute,
+  ApiTrackOrderRoute: ApiTrackOrderRoute,
   CategorySlugRoute: CategorySlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   MenSubcategoryRoute: MenSubcategoryRoute,
+  OrdersOrderNumberRoute: OrdersOrderNumberRoute,
   ProductSlugRoute: ProductSlugRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   WomenSubcategoryRoute: WomenSubcategoryRoute,

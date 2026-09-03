@@ -12,12 +12,14 @@ import {
   MockCategoryRepository,
   MockCollectionRepository,
 } from "./mock/mock-taxonomy-repositories";
+import { MockOrderRepository } from "./mock/mock-order-repository";
 import { MockProductRepository } from "./mock/mock-product-repository";
 import type {
   CategoryRepository,
   CollectionRepository,
   ProductRepository,
 } from "./product-repository";
+import type { OrderRepository } from "./order-repository";
 
 const implementation = import.meta.env["VITE_PRODUCT_REPOSITORY"] ?? "mock";
 
@@ -33,6 +35,12 @@ if (implementation !== "mock") {
 export const productRepository: ProductRepository = new MockProductRepository();
 export const categoryRepository: CategoryRepository = new MockCategoryRepository();
 export const collectionRepository: CollectionRepository = new MockCollectionRepository();
+/**
+ * ⚠ In-memory until Phase 8 — see mock-order-repository.ts. Orders do not
+ * survive a server restart, and on serverless they very likely do not survive
+ * the next request either.
+ */
+export const orderRepository: OrderRepository = new MockOrderRepository();
 
 export type {
   CategoryNode,
@@ -42,3 +50,4 @@ export type {
   ProductQuery,
   ProductRepository,
 } from "./product-repository";
+export type { CreateOrderInput, OrderRepository } from "./order-repository";
