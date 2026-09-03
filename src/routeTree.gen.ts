@@ -11,15 +11,27 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as BridalRouteImport } from './routes/bridal'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
+import { Route as ReadyToWearRouteImport } from './routes/ready-to-wear'
+import { Route as SaleRouteImport } from './routes/sale'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TrackOrderRouteImport } from './routes/track-order'
+import { Route as UnstitchedRouteImport } from './routes/unstitched'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as AccessoriesIndexRouteImport } from './routes/accessories/index'
+import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories/$subcategory'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
+import { Route as MenIndexRouteImport } from './routes/men/index'
+import { Route as MenSubcategoryRouteImport } from './routes/men/$subcategory'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as WomenIndexRouteImport } from './routes/women/index'
+import { Route as WomenSubcategoryRouteImport } from './routes/women/$subcategory'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +43,11 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BridalRoute = BridalRouteImport.update({
+  id: '/bridal',
+  path: '/bridal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
@@ -39,6 +56,21 @@ const CartRoute = CartRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewArrivalsRoute = NewArrivalsRouteImport.update({
+  id: '/new-arrivals',
+  path: '/new-arrivals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadyToWearRoute = ReadyToWearRouteImport.update({
+  id: '/ready-to-wear',
+  path: '/ready-to-wear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SaleRoute = SaleRouteImport.update({
+  id: '/sale',
+  path: '/sale',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -56,9 +88,24 @@ const TrackOrderRoute = TrackOrderRouteImport.update({
   path: '/track-order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnstitchedRoute = UnstitchedRouteImport.update({
+  id: '/unstitched',
+  path: '/unstitched',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessoriesIndexRoute = AccessoriesIndexRouteImport.update({
+  id: '/accessories/',
+  path: '/accessories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessoriesSubcategoryRoute = AccessoriesSubcategoryRouteImport.update({
+  id: '/accessories/$subcategory',
+  path: '/accessories/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
@@ -71,106 +118,215 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/collections/$slug',
+  path: '/collections/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MenIndexRoute = MenIndexRouteImport.update({
+  id: '/men/',
+  path: '/men/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MenSubcategoryRoute = MenSubcategoryRouteImport.update({
+  id: '/men/$subcategory',
+  path: '/men/$subcategory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WomenIndexRoute = WomenIndexRouteImport.update({
+  id: '/women/',
+  path: '/women/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WomenSubcategoryRoute = WomenSubcategoryRouteImport.update({
+  id: '/women/$subcategory',
+  path: '/women/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
+  '/ready-to-wear': typeof ReadyToWearRoute
+  '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track-order': typeof TrackOrderRoute
+  '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
+  '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/women/$subcategory': typeof WomenSubcategoryRoute
+  '/accessories/': typeof AccessoriesIndexRoute
+  '/men/': typeof MenIndexRoute
+  '/women/': typeof WomenIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
+  '/ready-to-wear': typeof ReadyToWearRoute
+  '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track-order': typeof TrackOrderRoute
+  '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
+  '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/women/$subcategory': typeof WomenSubcategoryRoute
+  '/accessories': typeof AccessoriesIndexRoute
+  '/men': typeof MenIndexRoute
+  '/women': typeof WomenIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/new-arrivals': typeof NewArrivalsRoute
+  '/ready-to-wear': typeof ReadyToWearRoute
+  '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track-order': typeof TrackOrderRoute
+  '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
+  '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/women/$subcategory': typeof WomenSubcategoryRoute
+  '/accessories/': typeof AccessoriesIndexRoute
+  '/men/': typeof MenIndexRoute
+  '/women/': typeof WomenIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/account'
+    | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/new-arrivals'
+    | '/ready-to-wear'
+    | '/sale'
     | '/search'
     | '/sitemap.xml'
     | '/track-order'
+    | '/unstitched'
     | '/wishlist'
+    | '/accessories/$subcategory'
     | '/api/newsletter'
     | '/category/$slug'
+    | '/collections/$slug'
+    | '/men/$subcategory'
     | '/product/$slug'
+    | '/women/$subcategory'
+    | '/accessories/'
+    | '/men/'
+    | '/women/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
+    | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/new-arrivals'
+    | '/ready-to-wear'
+    | '/sale'
     | '/search'
     | '/sitemap.xml'
     | '/track-order'
+    | '/unstitched'
     | '/wishlist'
+    | '/accessories/$subcategory'
     | '/api/newsletter'
     | '/category/$slug'
+    | '/collections/$slug'
+    | '/men/$subcategory'
     | '/product/$slug'
+    | '/women/$subcategory'
+    | '/accessories'
+    | '/men'
+    | '/women'
   id:
     | '__root__'
     | '/'
     | '/account'
+    | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/new-arrivals'
+    | '/ready-to-wear'
+    | '/sale'
     | '/search'
     | '/sitemap.xml'
     | '/track-order'
+    | '/unstitched'
     | '/wishlist'
+    | '/accessories/$subcategory'
     | '/api/newsletter'
     | '/category/$slug'
+    | '/collections/$slug'
+    | '/men/$subcategory'
     | '/product/$slug'
+    | '/women/$subcategory'
+    | '/accessories/'
+    | '/men/'
+    | '/women/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  BridalRoute: typeof BridalRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  NewArrivalsRoute: typeof NewArrivalsRoute
+  ReadyToWearRoute: typeof ReadyToWearRoute
+  SaleRoute: typeof SaleRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackOrderRoute: typeof TrackOrderRoute
+  UnstitchedRoute: typeof UnstitchedRoute
   WishlistRoute: typeof WishlistRoute
+  AccessoriesSubcategoryRoute: typeof AccessoriesSubcategoryRoute
   ApiNewsletterRoute: typeof ApiNewsletterRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
+  MenSubcategoryRoute: typeof MenSubcategoryRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  WomenSubcategoryRoute: typeof WomenSubcategoryRoute
+  AccessoriesIndexRoute: typeof AccessoriesIndexRoute
+  MenIndexRoute: typeof MenIndexRoute
+  WomenIndexRoute: typeof WomenIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -189,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bridal': {
+      id: '/bridal'
+      path: '/bridal'
+      fullPath: '/bridal'
+      preLoaderRoute: typeof BridalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cart': {
       id: '/cart'
       path: '/cart'
@@ -201,6 +364,27 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new-arrivals': {
+      id: '/new-arrivals'
+      path: '/new-arrivals'
+      fullPath: '/new-arrivals'
+      preLoaderRoute: typeof NewArrivalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ready-to-wear': {
+      id: '/ready-to-wear'
+      path: '/ready-to-wear'
+      fullPath: '/ready-to-wear'
+      preLoaderRoute: typeof ReadyToWearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sale': {
+      id: '/sale'
+      path: '/sale'
+      fullPath: '/sale'
+      preLoaderRoute: typeof SaleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -224,11 +408,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unstitched': {
+      id: '/unstitched'
+      path: '/unstitched'
+      fullPath: '/unstitched'
+      preLoaderRoute: typeof UnstitchedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wishlist': {
       id: '/wishlist'
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accessories/': {
+      id: '/accessories/'
+      path: '/accessories'
+      fullPath: '/accessories/'
+      preLoaderRoute: typeof AccessoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accessories/$subcategory': {
+      id: '/accessories/$subcategory'
+      path: '/accessories/$subcategory'
+      fullPath: '/accessories/$subcategory'
+      preLoaderRoute: typeof AccessoriesSubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/newsletter': {
@@ -245,11 +450,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/men/': {
+      id: '/men/'
+      path: '/men'
+      fullPath: '/men/'
+      preLoaderRoute: typeof MenIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/men/$subcategory': {
+      id: '/men/$subcategory'
+      path: '/men/$subcategory'
+      fullPath: '/men/$subcategory'
+      preLoaderRoute: typeof MenSubcategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/women/': {
+      id: '/women/'
+      path: '/women'
+      fullPath: '/women/'
+      preLoaderRoute: typeof WomenIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/women/$subcategory': {
+      id: '/women/$subcategory'
+      path: '/women/$subcategory'
+      fullPath: '/women/$subcategory'
+      preLoaderRoute: typeof WomenSubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -258,15 +498,27 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  BridalRoute: BridalRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  NewArrivalsRoute: NewArrivalsRoute,
+  ReadyToWearRoute: ReadyToWearRoute,
+  SaleRoute: SaleRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackOrderRoute: TrackOrderRoute,
+  UnstitchedRoute: UnstitchedRoute,
   WishlistRoute: WishlistRoute,
+  AccessoriesSubcategoryRoute: AccessoriesSubcategoryRoute,
   ApiNewsletterRoute: ApiNewsletterRoute,
   CategorySlugRoute: CategorySlugRoute,
+  CollectionsSlugRoute: CollectionsSlugRoute,
+  MenSubcategoryRoute: MenSubcategoryRoute,
   ProductSlugRoute: ProductSlugRoute,
+  WomenSubcategoryRoute: WomenSubcategoryRoute,
+  AccessoriesIndexRoute: AccessoriesIndexRoute,
+  MenIndexRoute: MenIndexRoute,
+  WomenIndexRoute: WomenIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,9 +1,9 @@
 /**
  * UI store — which overlay is open. See docs/BUILD-SPEC.pdf Section 12.
  *
- * Exactly one of the cart drawer, search modal and mobile nav may be open at a
- * time, so the open overlay is a single value rather than three booleans that
- * can disagree.
+ * Exactly one of the cart drawer, search modal, mobile nav and filter drawer
+ * may be open at a time, so the open overlay is a single value rather than four
+ * booleans that can disagree.
  *
  * NOTE ON ZUSTAND. Section 12 specifies Zustand for this store. `zustand` is
  * not installed and Hard Rule 7 forbids adding a dependency without asking, so
@@ -14,7 +14,7 @@
 
 import { useSyncExternalStore } from "react";
 
-export type Overlay = "cart" | "search" | "mobile-nav";
+export type Overlay = "cart" | "search" | "mobile-nav" | "filters";
 
 let current: Overlay | null = null;
 const listeners = new Set<() => void>();

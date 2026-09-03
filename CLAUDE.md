@@ -103,7 +103,7 @@ image load, no invented business facts.
 - [x] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
 - [x] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
 - [x] **Phase 3** — ProductCard + homepage (12 sections)
-- [ ] **Phase 4** — PLP, filters, sorting, pagination
+- [x] **Phase 4** — PLP, filters, sorting, pagination
 - [ ] **Phase 5** — PDP
 - [ ] **Phase 6** — Cart, wishlist, search
 - [ ] **Phase 7** — Checkout, orders, tracking
@@ -128,5 +128,9 @@ phase by phase:
   (`product/` now exists and is the target; `shop/` still backs the prototype)
 - `src/lib/legacy-shop-adapter.ts` maps a spec `Product` onto ShopContext's
   cart/wishlist shape — delete it with ShopContext in Phase 6
-- `src/routes/category.$slug.jsx`, `product.$slug.jsx` → Phase 4/5 spec routes
-  (`/women`, `/men`, `/products/$slug`, …), with 301s from the old paths
+- `src/routes/category.$slug.tsx` is now redirect-only: every legacy
+  `/category/<slug>` 301s to its Phase 4 home. Delete it once the old URLs
+  stop appearing in Search Console.
+- `src/routes/product.$slug.jsx` → Phase 5 `/products/$slug`, with a 301 from
+  the old path. Until then, product cards link to a route that does not exist.
+- `src/routes/search.jsx` → Phase 6 rebuild on the PLP grid and filters
