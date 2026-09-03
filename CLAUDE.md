@@ -88,7 +88,7 @@ image load, no invented business facts.
 ## Phase status
 
 - [x] **Phase 0** — Foundation: tokens, fonts, types, config, format helpers, folder structure
-- [ ] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
+- [x] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
 - [ ] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
 - [ ] **Phase 3** — ProductCard + homepage (12 sections)
 - [ ] **Phase 4** — PLP, filters, sorting, pagination
@@ -105,8 +105,10 @@ The prototype under `src/components/{home,shop}`, `src/context/ShopContext.jsx`,
 reference and component donor, not the target architecture. It gets replaced
 phase by phase:
 
-- `src/data/*.js` (16 products, no variants) → Phase 1 rebuild to the spec shape
-- `src/services/catalogService.js` → Phase 1 `ProductRepository`
+- `src/data/legacy/*.js` (16 products, no variants) → superseded by `src/data/*.ts`;
+  delete once no prototype file imports it
+- `src/services/catalogService.js` → superseded by `src/lib/repositories/`;
+  still backs the prototype routes until Phases 2-6 rewrite them
 - `src/context/ShopContext.jsx` (Context API) → Phase 6 Zustand stores
   (`zustand` is **not installed yet** — ask before adding it)
 - `src/components/shop/*` → splits into `product/`, `catalog/`, `cart/`, `search/`
