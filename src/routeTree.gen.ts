@@ -30,6 +30,7 @@ import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as MenIndexRouteImport } from './routes/men/index'
 import { Route as MenSubcategoryRouteImport } from './routes/men/$subcategory'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
 import { Route as WomenIndexRouteImport } from './routes/women/index'
 import { Route as WomenSubcategoryRouteImport } from './routes/women/$subcategory'
 
@@ -138,6 +139,11 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WomenIndexRoute = WomenIndexRouteImport.update({
   id: '/women/',
   path: '/women/',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
   '/men/': typeof MenIndexRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories': typeof AccessoriesIndexRoute
   '/men': typeof MenIndexRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
   '/men/': typeof MenIndexRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/men/$subcategory'
     | '/product/$slug'
+    | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories/'
     | '/men/'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/men/$subcategory'
     | '/product/$slug'
+    | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories'
     | '/men'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/men/$subcategory'
     | '/product/$slug'
+    | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories/'
     | '/men/'
@@ -323,6 +335,7 @@ export interface RootRouteChildren {
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   MenSubcategoryRoute: typeof MenSubcategoryRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  ProductsSlugRoute: typeof ProductsSlugRoute
   WomenSubcategoryRoute: typeof WomenSubcategoryRoute
   AccessoriesIndexRoute: typeof AccessoriesIndexRoute
   MenIndexRoute: typeof MenIndexRoute
@@ -478,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/women/': {
       id: '/women/'
       path: '/women'
@@ -515,6 +535,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsSlugRoute: CollectionsSlugRoute,
   MenSubcategoryRoute: MenSubcategoryRoute,
   ProductSlugRoute: ProductSlugRoute,
+  ProductsSlugRoute: ProductsSlugRoute,
   WomenSubcategoryRoute: WomenSubcategoryRoute,
   AccessoriesIndexRoute: AccessoriesIndexRoute,
   MenIndexRoute: MenIndexRoute,

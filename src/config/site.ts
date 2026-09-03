@@ -62,6 +62,17 @@ export const commerce = {
   flatShippingRate: null as number | null,
   /** Section 16 — human-readable, phone-friendly: KC-2026-00042. */
   orderNumberPrefix: "KC",
+  /**
+   * TODO(Umair): the real delivery window, e.g. "3-5 working days".
+   * Section 11.3 puts a delivery estimate in the PDP trust row, but Guardrail 2
+   * forbids inventing a timeline, so the row omits that line until this is set.
+   */
+  deliveryEstimate: null as string | null,
+  /**
+   * TODO(Umair): the real exchange window, e.g. "7 days from delivery".
+   * Same rule — the copy says "easy exchange" and no number until this is set.
+   */
+  exchangeWindow: null as string | null,
 } as const;
 
 /** Section 16 — the seven shipping regions, in the order the select renders. */
