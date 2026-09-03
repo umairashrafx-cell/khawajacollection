@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import PageContainer, { PageHeading } from "@/components/layout/PageContainer";
-import { useShop } from "@/context/ShopContext";
+import { clearCart, useCartHydrated, useCartLines } from "@/store/cart-store";
 import { formatPrice } from "@/lib/format";
 import { quote, placeOrder } from "@/services/orderService";
 import { shippingConfig } from "@/data/legacy/promos";
@@ -39,7 +39,8 @@ const FIELDS = [
 ];
 
 function CheckoutPage() {
-  const { cart, clearCart, hydrated } = useShop();
+  const cart = useCartLines();
+  const hydrated = useCartHydrated();
   const navigate = useNavigate();
   const [customer, setCustomer] = useState({});
   const [payment, setPayment] = useState("cod");

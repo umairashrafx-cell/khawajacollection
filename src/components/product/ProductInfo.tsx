@@ -12,12 +12,11 @@
 
 import { useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Banknote, Heart, MessageCircle, RefreshCw, Star, Truck } from "lucide-react";
 
 import { commerce, contact, PLACEHOLDER, site } from "@/config/site";
-import { useShop } from "@/context/ShopContext";
 import { formatPKR, labelFromSlug } from "@/lib/format";
-import { toLegacyShopProduct } from "@/lib/legacy-shop-adapter";
 import {
   colorOptions,
   defaultColor,
@@ -25,22 +24,20 @@ import {
   findVariant,
   sizesForColor,
 } from "@/lib/product-variants";
+import { announce } from "@/store/announcer";
+import { addToCart } from "@/store/cart-store";
+import { openOverlay } from "@/store/ui-store";
+import { toggleWishlist, useIsWishlisted, useWishlistHydrated } from "@/store/wishlist-store";
 import type { Product } from "@/types";
 import { PriceBlock } from "./PriceBlock";
 import { SizeGuideDialog } from "./SizeGuideDialog";
 import { StickyAddToCart } from "./StickyAddToCart";
 import { ColorSelector, QuantityStepper, SizeSelector } from "./VariantSelectors";
 
-interface ShopSnapshot {
-  hydrated: boolean;
-  addToCart: (product: unknown, options?: { size?: string; quantity?: number }) => void;
-  toggleWishlist: (product: unknown) => void;
-  isWishlisted: (id: string) => boolean;
-}
-
 export function ProductInfo({ product }: { product: Product }) {
-  const shop = useShop() as unknown as ShopSnapshot;
   const navigate = useNavigate();
+  const wishlistHydrated = useWishlistHydrated();
+  const wishlisted = useIsWishlisted(product.id);
 
   const colors = colorOptions(product);
   const [color, setColor] = useState<string | null>(() => defaultColor(product));
@@ -62,7 +59,7 @@ export function ProductInfo({ product }: { product: Product }) {
     product.subcategorySlug ?? product.categorySlug,
     product.categorySlug,
   );
-  const saved = shop.hydrated && shop.isWishlisted(product.id);
+  const saved = wishlistHydrated && wishlisted;
   const whatsapp: string = contact.whatsapp;
   const whatsappReady = whatsapp !== PLACEHOLDER;
 
@@ -83,11 +80,13 @@ export function ProductInfo({ product }: { product: Product }) {
       setError("Choose a size first.");
       return false;
     }
-    if (!canBuy) return false;
-    shop.addToCart(toLegacyShopProduct(product), {
-      ...(size ? { size } : {}),
-      quantity,
-    });
+    if (!canBuy || !variant) return false;
+    addToCart(product, variant, quantity);
+    announce(
+      `${product.name}${size ? `, size ${size}` : ""}, added to your bag. Quantity ${quantity}.`,
+    );
+    toast.success("Added to bag", { description: product.name });
+    openOverlay("cart");
     setError(null);
     return true;
   }
@@ -165,7 +164,14 @@ export function ProductInfo({ product }: { product: Product }) {
 
         <button
           type="button"
-          onClick={() => shop.toggleWishlist(toLegacyShopProduct(product))}
+          onClick={() => {
+            const nowSaved = toggleWishlist(product);
+            announce(
+              nowSaved
+                ? `${product.name} saved to your wishlist.`
+                : `${product.name} removed from your wishlist.`,
+            );
+          }}
           aria-pressed={saved}
           className="flex min-h-11 items-center gap-2 text-sm text-kc-charcoal hover:text-kc-ink"
         >

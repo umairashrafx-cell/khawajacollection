@@ -13,8 +13,9 @@ import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
 
 import { accountNav, primaryNav } from "@/config/nav";
 import { site } from "@/config/site";
-import { useShop } from "@/context/ShopContext";
 import { useHeaderChrome } from "@/hooks/useHeaderChrome";
+import { useCartCount, useCartHydrated } from "@/store/cart-store";
+import { useWishlistCount } from "@/store/wishlist-store";
 import { openOverlay } from "@/store/ui-store";
 import MegaMenu from "./MegaMenu";
 import MobileNav from "./MobileNav";
@@ -24,18 +25,10 @@ import { AppLink } from "./AppLink";
 const HOVER_INTENT_MS = 120;
 const HOVER_CLOSE_MS = 180;
 
-/**
- * ShopContext is still the Lovable-era JavaScript provider; Phase 6 replaces it
- * with typed stores. Until then this is the shape the header depends on.
- */
-interface ShopSnapshot {
-  cartCount: number;
-  wishlist: unknown[];
-  hydrated: boolean;
-}
-
 export default function Header() {
-  const shop = useShop() as unknown as ShopSnapshot;
+  const cartCount = useCartCount();
+  const wishlistCount = useWishlistCount();
+  const hydrated = useCartHydrated();
   const { solid, hidden } = useHeaderChrome();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isHome = pathname === "/";
@@ -175,7 +168,7 @@ export default function Header() {
               className="relative flex h-11 w-11 items-center justify-center"
             >
               <Heart className="h-5 w-5" aria-hidden="true" />
-              <CountBadge value={shop.hydrated ? shop.wishlist.length : 0} label="saved items" />
+              <CountBadge value={hydrated ? wishlistCount : 0} label="saved items" />
             </AppLink>
 
             <button
@@ -185,7 +178,7 @@ export default function Header() {
               className="relative -mr-2 flex h-11 w-11 items-center justify-center"
             >
               <ShoppingBag className="h-5 w-5" aria-hidden="true" />
-              <CountBadge value={shop.hydrated ? shop.cartCount : 0} label="items in bag" />
+              <CountBadge value={hydrated ? cartCount : 0} label="items in bag" />
             </button>
           </div>
         </div>

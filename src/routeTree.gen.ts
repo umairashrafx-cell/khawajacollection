@@ -25,6 +25,8 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccessoriesIndexRouteImport } from './routes/accessories/index'
 import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories/$subcategory'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
+import { Route as ApiProductRouteImport } from './routes/api/product'
+import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as MenIndexRouteImport } from './routes/men/index'
@@ -114,6 +116,16 @@ const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
   path: '/api/newsletter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProductRoute = ApiProductRouteImport.update({
+  id: '/api/product',
+  path: '/api/product',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSearchRoute = ApiSearchRouteImport.update({
+  id: '/api/search',
+  path: '/api/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -171,6 +183,8 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/product': typeof ApiProductRoute
+  '/api/search': typeof ApiSearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -197,6 +211,8 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/product': typeof ApiProductRoute
+  '/api/search': typeof ApiSearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -224,6 +240,8 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/api/newsletter': typeof ApiNewsletterRoute
+  '/api/product': typeof ApiProductRoute
+  '/api/search': typeof ApiSearchRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -252,6 +270,8 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/product'
+    | '/api/search'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -278,6 +298,8 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/product'
+    | '/api/search'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -304,6 +326,8 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/api/newsletter'
+    | '/api/product'
+    | '/api/search'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -331,6 +355,8 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   AccessoriesSubcategoryRoute: typeof AccessoriesSubcategoryRoute
   ApiNewsletterRoute: typeof ApiNewsletterRoute
+  ApiProductRoute: typeof ApiProductRoute
+  ApiSearchRoute: typeof ApiSearchRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   MenSubcategoryRoute: typeof MenSubcategoryRoute
@@ -456,6 +482,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/product': {
+      id: '/api/product'
+      path: '/api/product'
+      fullPath: '/api/product'
+      preLoaderRoute: typeof ApiProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/search': {
+      id: '/api/search'
+      path: '/api/search'
+      fullPath: '/api/search'
+      preLoaderRoute: typeof ApiSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -531,6 +571,8 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   AccessoriesSubcategoryRoute: AccessoriesSubcategoryRoute,
   ApiNewsletterRoute: ApiNewsletterRoute,
+  ApiProductRoute: ApiProductRoute,
+  ApiSearchRoute: ApiSearchRoute,
   CategorySlugRoute: CategorySlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   MenSubcategoryRoute: MenSubcategoryRoute,

@@ -7,17 +7,23 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "../components/ui/sonner";
-import { ShopProvider } from "../context/ShopContext";
 import AnnouncementBar from "../components/layout/AnnouncementBar";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
-import CartDrawer from "../components/shop/CartDrawer";
-import SearchOverlay from "../components/shop/SearchOverlay";
+import { Announcer } from "../components/a11y/Announcer";
+import { useSearchHotkey } from "../hooks/useSearchHotkey";
+import { useOverlay } from "../store/ui-store";
+
+// Phase 6 requires these two to be dynamically imported: neither is on screen
+// at first paint, and together they pull in the cart, the search panel and
+// their toasts. They load the first time an overlay is opened.
+const CartDrawer = lazy(() => import("../components/cart/CartDrawer"));
+const SearchModal = lazy(() => import("../components/search/SearchModal"));
 
 function NotFoundComponent() {
   return (
@@ -130,21 +136,28 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const overlay = useOverlay();
+  useSearchHotkey();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ShopProvider>
-        <AnnouncementBar />
-        <Header />
-        <main>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <Footer />
-        <CartDrawer />
-        <SearchOverlay />
-        <Toaster position="bottom-right" />
-      </ShopProvider>
+      <AnnouncementBar />
+      <Header />
+      <main>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </main>
+      <Footer />
+
+      {/* Mounted only while open, so the chunk is never fetched for a visitor
+          who does not touch the bag or the search field. */}
+      <Suspense fallback={null}>
+        {overlay === "cart" ? <CartDrawer /> : null}
+        {overlay === "search" ? <SearchModal /> : null}
+      </Suspense>
+
+      <Announcer />
+      <Toaster position="bottom-right" />
     </QueryClientProvider>
   );
 }

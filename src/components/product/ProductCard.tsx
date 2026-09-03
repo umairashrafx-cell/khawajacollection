@@ -13,7 +13,7 @@
 import { Image } from "@/components/media/Image";
 import { AppLink } from "@/components/layout/AppLink";
 import { labelFromSlug } from "@/lib/format";
-import { isSoldOut } from "@/lib/legacy-shop-adapter";
+import { isSoldOut } from "@/lib/product-variants";
 import type { Product } from "@/types";
 import { PriceBlock } from "./PriceBlock";
 import { ProductBadgeStack } from "./ProductBadge";

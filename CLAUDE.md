@@ -106,34 +106,37 @@ image load, no invented business facts.
 - [x] **Phase 3** — ProductCard + homepage (12 sections)
 - [x] **Phase 4** — PLP, filters, sorting, pagination
 - [x] **Phase 5** — PDP
-- [ ] **Phase 6** — Cart, wishlist, search
+- [x] **Phase 6** — Cart, wishlist, search
 - [ ] **Phase 7** — Checkout, orders, tracking
 - [ ] **Phase 8** — Supabase migration
 - [ ] **Phase 9** — SEO, performance, a11y, launch
 
 ## Known debt from the Lovable prototype
 
-The prototype under `src/components/{home,shop}`, `src/context/ShopContext.jsx`,
-`src/data/*.js` and `src/services/*.js` predates the spec. It is a visual
-reference and component donor, not the target architecture. It gets replaced
-phase by phase:
+Phase 6 removed the prototype data/state layer entirely: `src/context/ShopContext.jsx`,
+`src/components/shop/`, `src/lib/legacy-shop-adapter.ts` and the prototype
+`cart` / `wishlist` / `search` routes are all deleted. What is left:
 
-- `src/data/legacy/*.js` (16 products, no variants) → superseded by `src/data/*.ts`;
-  delete once no prototype file imports it
-- `src/services/catalogService.js` → superseded by `src/lib/repositories/`;
-  still backs the prototype routes until Phases 2-6 rewrite them
-- `src/context/ShopContext.jsx` (Context API) → Phase 6 Zustand stores.
-  `zustand` is **not installed** — `src/store/ui-store.ts` is the same contract
-  on `useSyncExternalStore`. Ask before adding the dependency.
-- `src/components/shop/*` → splits into `product/`, `catalog/`, `cart/`, `search/`
-  (`product/` now exists and is the target; `shop/` still backs the prototype)
-- `src/lib/legacy-shop-adapter.ts` maps a spec `Product` onto ShopContext's
-  cart/wishlist shape — delete it with ShopContext in Phase 6
-- `src/routes/category.$slug.tsx` is now redirect-only: every legacy
-  `/category/<slug>` 301s to its Phase 4 home. Delete it once the old URLs
-  stop appearing in Search Console.
-- `src/routes/product.$slug.tsx` is now redirect-only: `/product/<slug>` 301s
-  to `/products/<slug>`. Delete it once the old URLs leave Search Console.
-- `src/components/shop/ProductGallery.jsx` and `ProductAccordions.jsx` are
-  orphaned by the Phase 5 PDP; delete with the rest of `shop/` in Phase 6.
-- `src/routes/search.jsx` → Phase 6 rebuild on the PLP grid and filters
+- `src/data/legacy/*.js` (16 products, no variants) still backs
+  `src/services/catalogService.js`, which now only serves `sitemap[.]xml.jsx`.
+  Phase 9 rebuilds the sitemap from the repository and both can go.
+- `src/routes/checkout.jsx`, `account.jsx`, `track-order.jsx` are still
+  Lovable-era JavaScript. They read the typed stores now, but Phase 7 rebuilds
+  checkout and tracking properly.
+- `src/routes/category.$slug.tsx` and `product.$slug.tsx` are redirect-only,
+  301ing every legacy URL to its new home. Delete once the old URLs stop
+  appearing in Search Console.
+
+## State management
+
+`zustand` is **not installed**. Section 12 specifies it; Hard Rule 7 forbids
+adding a dependency unasked, so `src/store/` implements the same contract on
+`useSyncExternalStore`:
+
+- `persisted-store.ts` — subscribe/snapshot/persist, with the empty state as
+  the server snapshot and a one-time read after mount
+- `cart-store.ts` (`kc-cart-v1`), `wishlist-store.ts` (`kc-wishlist-v1`),
+  `ui-store.ts` (one overlay at a time), `announcer.ts` (the polite live region)
+
+Every read is gated behind a hydration flag, so no persisted value ever reaches
+the first render. Swapping Zustand in means rewriting `persisted-store.ts` only.

@@ -16,17 +16,27 @@
  * control keeps its contrast.
  */
 
+import { Suspense, lazy } from "react";
+
 import { Container } from "@/components/layout/Container";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { usePlpNavigate, usePlpSearch } from "@/hooks/usePlpSearch";
 import { crumbsFor, type CatalogData, type CatalogDescriptor } from "@/lib/catalog-page";
 import { clearedSearch, hasActiveFilters } from "@/lib/plp-search";
+import { useIsOverlayOpen } from "@/store/ui-store";
 import { ActiveFilters } from "./ActiveFilters";
 import { Breadcrumbs } from "./Breadcrumbs";
-import { FilterDrawer, MobileFilterBar } from "./FilterDrawer";
+import { MobileFilterBar } from "./FilterDrawer";
 import { FilterPanel } from "./FilterPanel";
 import { Pagination } from "./Pagination";
 import { SortDropdown } from "./SortDropdown";
+
+// Phase 6 requires the filter drawer to be dynamically imported. It is mobile
+// only and closed on arrival, so its chunk loads the first time Filter is
+// tapped and never for a desktop visitor.
+const FilterDrawer = lazy(() =>
+  import("./FilterDrawer").then((module) => ({ default: module.FilterDrawer })),
+);
 
 export interface CatalogPageProps {
   descriptor: CatalogDescriptor;
@@ -43,6 +53,7 @@ export function CatalogPage({ descriptor, data }: CatalogPageProps) {
     ...(descriptor.base.collection ? (["collection"] as const) : []),
   ];
 
+  const filtersOpen = useIsOverlayOpen("filters");
   const activeCount = countActive(search);
   // Clamped so the range can never read backwards even if a stale page number
   // somehow survives the loader's redirect.
@@ -128,11 +139,15 @@ export function CatalogPage({ descriptor, data }: CatalogPageProps) {
       </Container>
 
       <MobileFilterBar activeCount={activeCount} />
-      <FilterDrawer
-        facets={data.facets}
-        total={data.total}
-        {...(lockedGroups.length ? { lockedGroups } : {})}
-      />
+      {filtersOpen ? (
+        <Suspense fallback={null}>
+          <FilterDrawer
+            facets={data.facets}
+            total={data.total}
+            {...(lockedGroups.length ? { lockedGroups } : {})}
+          />
+        </Suspense>
+      ) : null}
     </>
   );
 }

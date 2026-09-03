@@ -94,6 +94,11 @@ export function defaultSize(product: Product, colorName: string | null): string 
   return null;
 }
 
+/** True when no variant has any stock left. */
+export function isSoldOut(product: Product): boolean {
+  return product.variants.every((variant) => variant.stock <= 0);
+}
+
 export function totalStock(product: Product): number {
   return product.variants.reduce((sum, variant) => sum + variant.stock, 0);
 }

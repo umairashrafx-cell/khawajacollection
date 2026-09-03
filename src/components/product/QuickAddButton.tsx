@@ -10,26 +10,27 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
-import { useShop } from "@/context/ShopContext";
-import { isSoldOut, sizeOptions, toLegacyShopProduct } from "@/lib/legacy-shop-adapter";
+import { findVariant, sizesForColor, defaultColor } from "@/lib/product-variants";
+import { announce } from "@/store/announcer";
+import { addToCart } from "@/store/cart-store";
+import { openOverlay } from "@/store/ui-store";
 import type { Product } from "@/types";
-
-interface ShopSnapshot {
-  addToCart: (product: unknown, options?: { size?: string; quantity?: number }) => void;
-}
 
 export interface QuickAddButtonProps {
   product: Product;
 }
 
 export function QuickAddButton({ product }: QuickAddButtonProps) {
-  const shop = useShop() as unknown as ShopSnapshot;
   const [picking, setPicking] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const sizes = sizeOptions(product);
-  const soldOut = isSoldOut(product);
+  // Quick add always uses the product's default colour; choosing a colour is
+  // the PDP's job, not a grid cell's.
+  const color = defaultColor(product);
+  const sizes = sizesForColor(product, color);
+  const soldOut = sizes.every((option) => !option.inStock);
 
   useEffect(() => {
     if (!picking) return;
@@ -53,8 +54,14 @@ export function QuickAddButton({ product }: QuickAddButtonProps) {
   };
 
   const add = (size: string) => {
-    shop.addToCart(toLegacyShopProduct(product), { size, quantity: 1 });
+    const variant = findVariant(product, color, size);
+    if (!variant) return;
+    addToCart(product, variant, 1);
+    announce(`${product.name}, size ${size}, added to your bag.`);
+    toast.success("Added to bag", { description: product.name });
     setPicking(false);
+    // Section 6.5 — adding opens the bag so the change is visible.
+    openOverlay("cart");
   };
 
   if (soldOut) {

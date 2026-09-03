@@ -59,11 +59,10 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "/" },
-      // The hero is the LCP element, so the browser learns about it from the
-      // document head rather than after the CSS resolves (Section 14).
-      // React 19 wants the camelCase prop here; the lowercase HTML attribute
-      // name is rejected as an invalid DOM property and the hint is dropped.
-      { rel: "preload", as: "image", href: hero.image.src, fetchPriority: "high" },
+      // No hand-written hero preload. React 19 hoists one automatically for
+      // the Image component's `priority` path, and its version also carries
+      // `imagesizes`, so writing one here only duplicated the hint with less
+      // information — and tripped an invalid-DOM-property warning doing it.
     ],
     scripts: [
       {

@@ -12,15 +12,9 @@
 import { useCallback, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { useShop } from "@/context/ShopContext";
-import { toLegacyShopProduct } from "@/lib/legacy-shop-adapter";
+import { announce } from "@/store/announcer";
+import { toggleWishlist, useIsWishlisted, useWishlistHydrated } from "@/store/wishlist-store";
 import type { Product } from "@/types";
-
-interface ShopSnapshot {
-  hydrated: boolean;
-  isWishlisted: (id: string) => boolean;
-  toggleWishlist: (product: unknown) => void;
-}
 
 export interface WishlistButtonProps {
   product: Product;
@@ -28,23 +22,30 @@ export interface WishlistButtonProps {
 }
 
 export function WishlistButton({ product, className = "" }: WishlistButtonProps) {
-  const shop = useShop() as unknown as ShopSnapshot;
+  const hydrated = useWishlistHydrated();
+  const wishlisted = useIsWishlisted(product.id);
   const [pulsing, setPulsing] = useState(false);
 
   // Reads false until the persisted store hydrates, so the server and client
   // render the same heart and nothing flickers or mismatches.
-  const saved = shop.hydrated && shop.isWishlisted(product.id);
+  const saved = hydrated && wishlisted;
 
   const onClick = useCallback(
     (event: React.MouseEvent) => {
       // The whole card is a link; this button sits on top of it.
       event.preventDefault();
       event.stopPropagation();
-      shop.toggleWishlist(toLegacyShopProduct(product));
+      const nowSaved = toggleWishlist(product);
+      announce(
+        nowSaved
+          ? `${product.name} saved to your wishlist.`
+          : `${product.name} removed from your wishlist.`,
+      );
+      // Section 6.5 — a single 180ms scale pulse.
       setPulsing(true);
       window.setTimeout(() => setPulsing(false), 180);
     },
-    [product, shop],
+    [product],
   );
 
   return (

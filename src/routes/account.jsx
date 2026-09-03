@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import PageContainer, { PageHeading } from "@/components/layout/PageContainer";
 import { listOrders } from "@/services/orderService";
 import { formatPrice, formatDate } from "@/lib/format";
-import { useShop } from "@/context/ShopContext";
+import { useWishlist } from "@/store/wishlist-store";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/account")({
 
 function AccountPage() {
   const [orders, setOrders] = useState([]);
-  const { wishlist } = useShop();
+  const wishlist = useWishlist();
 
   useEffect(() => {
     listOrders().then(setOrders);
