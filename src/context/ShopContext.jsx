@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { toast } from "sonner";
 
+import { closeOverlay, openOverlay, useOverlay } from "@/store/ui-store";
+
 const ShopContext = createContext(null);
 
 const CART_KEY = "kc_cart_v1";
@@ -18,9 +20,16 @@ function load(key, fallback) {
 export function ShopProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+
+  // Drawer state lives in the UI store so only one overlay can ever be open
+  // (spec Section 12). This provider keeps its old boolean API so the
+  // prototype cart and search surfaces need no change until Phase 6.
+  const overlay = useOverlay();
+  const cartOpen = overlay === "cart";
+  const searchOpen = overlay === "search";
+  const setCartOpen = useCallback((open) => (open ? openOverlay("cart") : closeOverlay()), []);
+  const setSearchOpen = useCallback((open) => (open ? openOverlay("search") : closeOverlay()), []);
 
   useEffect(() => {
     setCart(load(CART_KEY, []));
@@ -58,7 +67,7 @@ export function ShopProvider({ children }) {
         },
       ];
     });
-    setCartOpen(true);
+    openOverlay("cart");
     toast.success("Added to bag", { description: product.name });
   }, []);
 
@@ -121,6 +130,8 @@ export function ShopProvider({ children }) {
       hydrated,
       cartOpen,
       searchOpen,
+      setCartOpen,
+      setSearchOpen,
       addToCart,
       updateQuantity,
       removeFromCart,

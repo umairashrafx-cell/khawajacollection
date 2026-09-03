@@ -89,7 +89,7 @@ image load, no invented business facts.
 
 - [x] **Phase 0** — Foundation: tokens, fonts, types, config, format helpers, folder structure
 - [x] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
-- [ ] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
+- [x] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
 - [ ] **Phase 3** — ProductCard + homepage (12 sections)
 - [ ] **Phase 4** — PLP, filters, sorting, pagination
 - [ ] **Phase 5** — PDP
@@ -109,8 +109,9 @@ phase by phase:
   delete once no prototype file imports it
 - `src/services/catalogService.js` → superseded by `src/lib/repositories/`;
   still backs the prototype routes until Phases 2-6 rewrite them
-- `src/context/ShopContext.jsx` (Context API) → Phase 6 Zustand stores
-  (`zustand` is **not installed yet** — ask before adding it)
+- `src/context/ShopContext.jsx` (Context API) → Phase 6 Zustand stores.
+  `zustand` is **not installed** — `src/store/ui-store.ts` is the same contract
+  on `useSyncExternalStore`. Ask before adding the dependency.
 - `src/components/shop/*` → splits into `product/`, `catalog/`, `cart/`, `search/`
 - `src/routes/category.$slug.jsx`, `product.$slug.jsx` → Phase 4/5 spec routes
   (`/women`, `/men`, `/products/$slug`, …), with 301s from the old paths
