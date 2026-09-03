@@ -14,6 +14,7 @@ import {
 } from "./mock/mock-taxonomy-repositories";
 import { MockOrderRepository } from "./mock/mock-order-repository";
 import { MockProductRepository } from "./mock/mock-product-repository";
+import { SupabaseProductRepository } from "./supabase/supabase-product-repository";
 import type {
   CategoryRepository,
   CollectionRepository,
@@ -21,18 +22,24 @@ import type {
 } from "./product-repository";
 import type { OrderRepository } from "./order-repository";
 
+/**
+ * Phase 8 item 6 — flip the implementation with an env var, and keep BOTH
+ * valid. The mock is not dead code: it is what makes the app runnable with no
+ * database at all, and every page must keep working under it.
+ */
 const implementation = import.meta.env["VITE_PRODUCT_REPOSITORY"] ?? "mock";
 
-if (implementation !== "mock") {
-  // Phase 8 adds the Supabase implementations here. Failing loudly beats
-  // silently serving mock data from a deployment that believes it is live.
+if (implementation !== "mock" && implementation !== "supabase") {
+  // Failing loudly beats silently serving mock data from a deployment that
+  // believes it is live.
   throw new Error(
-    `VITE_PRODUCT_REPOSITORY="${implementation}" is not implemented yet. ` +
-      `Only "mock" exists until Phase 8.`,
+    `VITE_PRODUCT_REPOSITORY="${implementation}" is not a known repository. ` +
+      `Use "mock" or "supabase".`,
   );
 }
 
-export const productRepository: ProductRepository = new MockProductRepository();
+export const productRepository: ProductRepository =
+  implementation === "supabase" ? new SupabaseProductRepository() : new MockProductRepository();
 export const categoryRepository: CategoryRepository = new MockCategoryRepository();
 export const collectionRepository: CollectionRepository = new MockCollectionRepository();
 /**
