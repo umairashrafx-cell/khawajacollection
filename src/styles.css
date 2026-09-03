@@ -5,22 +5,34 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * Khawaja Collection design system — see docs/BUILD-SPEC.pdf Section 6.
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
+ * Two layers of tokens:
  *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
+ * 1. KC brand tokens (--kc-*) are the source of truth. Hex values, taken
+ *    verbatim from Section 6.1. Never write a raw hex in a component.
+ * 2. shadcn semantic tokens (--background, --primary, ...) are mapped onto
+ *    the KC tokens so every ui/ primitive inherits the brand automatically.
  *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * The @theme inline block exposes both as Tailwind utilities
+ * (--color-kc-ink -> bg-kc-ink / text-kc-ink).
+ *
+ * Token usage rules (Section 6.1):
+ *   --kc-gold  micro-accents only: active nav underline, badge borders, focus
+ *              ring, small rule marks. Never a full button fill.
+ *   --kc-sale  sale price text and discount badges. Nothing else.
+ *   --kc-ink   primary buttons, headings, body text.
+ *   --kc-sand  alternating section backgrounds.
  */
 
 @theme inline {
-  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  /* Section 6.2 — display serif for headlines, neutral grotesque for UI. */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-serif: var(--font-display);
+
+  /* Section 6.3 — radius is deliberately small. 0 on imagery and cards,
+     4px on buttons and inputs, 8px on drawers and modals. */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -28,11 +40,27 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --color-gold: var(--gold);
-  --color-sand: var(--sand);
-  --color-charcoal: var(--charcoal);
-  --color-background: var(--background);
 
+  /* KC brand palette */
+  --color-kc-white: var(--kc-white);
+  --color-kc-paper: var(--kc-paper);
+  --color-kc-sand: var(--kc-sand);
+  --color-kc-line: var(--kc-line);
+  --color-kc-ink: var(--kc-ink);
+  --color-kc-charcoal: var(--kc-charcoal);
+  --color-kc-muted: var(--kc-muted);
+  --color-kc-gold: var(--kc-gold);
+  --color-kc-gold-soft: var(--kc-gold-soft);
+  --color-kc-sale: var(--kc-sale);
+  --color-kc-success: var(--kc-success);
+
+  /* Legacy aliases kept so existing components keep compiling. */
+  --color-gold: var(--kc-gold);
+  --color-sand: var(--kc-sand);
+  --color-charcoal: var(--kc-charcoal);
+
+  /* shadcn semantic tokens */
+  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -68,82 +96,99 @@
 }
 
 :root {
-  --radius: 0.125rem;
-  --gold: oklch(0.78 0.075 82);
-  --sand: oklch(0.965 0.008 85);
-  --charcoal: oklch(0.28 0.006 60);
-  --background: oklch(0.992 0.003 85);
-  --foreground: oklch(0.22 0.005 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.005 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.005 60);
-  --primary: oklch(0.22 0.005 60);
-  --primary-foreground: oklch(0.98 0.004 85);
-  --secondary: oklch(0.955 0.008 85);
-  --secondary-foreground: oklch(0.22 0.005 60);
-  --muted: oklch(0.945 0.008 85);
-  --muted-foreground: oklch(0.53 0.01 70);
-  --accent: oklch(0.93 0.02 85);
-  --accent-foreground: oklch(0.22 0.005 60);
-  --destructive: oklch(0.55 0.18 27);
-  --destructive-foreground: oklch(0.98 0.004 85);
-  --border: oklch(0.9 0.008 80);
-  --input: oklch(0.9 0.008 80);
-  --ring: oklch(0.78 0.075 82);
+  /* Section 6.1 — brand palette, verbatim. */
+  --kc-white: #ffffff;
+  --kc-paper: #faf9f7; /* off-white page background */
+  --kc-sand: #f1ece4; /* soft beige section blocks */
+  --kc-line: #e4e0d9; /* hairline borders */
+  --kc-ink: #14110f; /* near-black, primary text */
+  --kc-charcoal: #3a3633; /* secondary text */
+  --kc-muted: #8a837c; /* tertiary text, meta */
+  --kc-gold: #b08d3f; /* accent — used sparingly */
+  --kc-gold-soft: #e8dcc2;
+  --kc-sale: #a32e2e; /* sale price + discount badge only */
+  --kc-success: #2c7a4b;
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  /* Section 6.3 — 4px on buttons and inputs. */
+  --radius: 0.25rem;
+
+  /* Section 6.3 — one soft shadow, for drawers and sticky bars only. */
+  --shadow-kc: 0 8px 32px rgb(20 17 15 / 0.08);
+
+  /* shadcn semantics mapped onto the brand palette. */
+  --background: var(--kc-paper);
+  --foreground: var(--kc-ink);
+  --card: var(--kc-white);
+  --card-foreground: var(--kc-ink);
+  --popover: var(--kc-white);
+  --popover-foreground: var(--kc-ink);
+  --primary: var(--kc-ink);
+  --primary-foreground: var(--kc-white);
+  --secondary: var(--kc-sand);
+  --secondary-foreground: var(--kc-ink);
+  --muted: var(--kc-sand);
+  --muted-foreground: var(--kc-muted);
+  --accent: var(--kc-gold-soft);
+  --accent-foreground: var(--kc-ink);
+  --destructive: var(--kc-sale);
+  --destructive-foreground: var(--kc-white);
+  --border: var(--kc-line);
+  --input: var(--kc-line);
+  --ring: var(--kc-gold);
+
+  --chart-1: var(--kc-gold);
+  --chart-2: var(--kc-charcoal);
+  --chart-3: var(--kc-muted);
+  --chart-4: var(--kc-gold-soft);
+  --chart-5: var(--kc-success);
+  --sidebar: var(--kc-white);
+  --sidebar-foreground: var(--kc-ink);
+  --sidebar-primary: var(--kc-ink);
+  --sidebar-primary-foreground: var(--kc-white);
+  --sidebar-accent: var(--kc-sand);
+  --sidebar-accent-foreground: var(--kc-ink);
+  --sidebar-border: var(--kc-line);
+  --sidebar-ring: var(--kc-gold);
 }
 
+/*
+ * The storefront ships light-only — the brand is an editorial off-white.
+ * These values exist so shadcn primitives stay legible if a `.dark` scope is
+ * ever introduced; no toggle renders one today.
+ */
 .dark {
-  --gold: oklch(0.78 0.075 82);
-  --sand: oklch(0.24 0.006 60);
-  --charcoal: oklch(0.2 0.005 60);
-  --background: oklch(0.16 0.004 60);
-  --foreground: oklch(0.96 0.004 85);
+  --kc-paper: #14110f;
+  --kc-sand: #1e1a17;
+  --kc-line: #2e2925;
+  --kc-ink: #faf9f7;
+  --kc-charcoal: #d7d1c9;
+  --kc-muted: #9a938b;
 
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --background: var(--kc-paper);
+  --foreground: var(--kc-ink);
+  --card: var(--kc-sand);
+  --card-foreground: var(--kc-ink);
+  --popover: var(--kc-sand);
+  --popover-foreground: var(--kc-ink);
+  --primary: var(--kc-ink);
+  --primary-foreground: #14110f;
+  --secondary: var(--kc-sand);
+  --secondary-foreground: var(--kc-ink);
+  --muted: var(--kc-sand);
+  --muted-foreground: var(--kc-muted);
+  --accent: var(--kc-sand);
+  --accent-foreground: var(--kc-ink);
+  --border: var(--kc-line);
+  --input: var(--kc-line);
+  --ring: var(--kc-gold);
+  --sidebar: var(--kc-sand);
+  --sidebar-foreground: var(--kc-ink);
+  --sidebar-primary: var(--kc-gold);
+  --sidebar-primary-foreground: #14110f;
+  --sidebar-accent: var(--kc-line);
+  --sidebar-accent-foreground: var(--kc-ink);
+  --sidebar-border: var(--kc-line);
+  --sidebar-ring: var(--kc-gold);
 }
 
 @layer base {
@@ -155,14 +200,58 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 0.875rem; /* 14px mobile body, Section 6.2 */
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 0.9375rem; /* 15px desktop body */
+    }
   }
 
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  /* Section 15 — visible focus ring in gold at 2px offset. */
+  :focus-visible {
+    outline: 2px solid var(--kc-gold);
+    outline-offset: 2px;
+  }
+
+  /* Prices are tabular so columns of figures line up. */
+  .kc-price {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Section 6.2 — editorial eyebrow. */
+  .kc-eyebrow {
+    font-size: 0.6875rem;
     font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .kc-eyebrow {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Section 6.5 — respect prefers-reduced-motion, disable all transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
-
