@@ -75,6 +75,20 @@ export const commerce = {
   exchangeWindow: null as string | null,
 } as const;
 
+/**
+ * Whether `product.rating` and `product.reviewCount` come from real customers.
+ *
+ * They do not. They are generated values from the Phase 1 mock catalogue that
+ * were carried into Postgres by the seed script, and Google treats
+ * AggregateRating markup that is not backed by real reviews as fabricated
+ * review content — a manual action, not a ranking nudge. So the PDP omits the
+ * aggregateRating block entirely while this is false, and shows no star rating.
+ *
+ * Flip it to true only when reviews are genuinely collected from buyers. The
+ * markup and the UI both come back on their own.
+ */
+export const hasRealReviews = false;
+
 /** Section 16 — the seven shipping regions, in the order the select renders. */
 export const provinces: readonly Province[] = [
   "Punjab",

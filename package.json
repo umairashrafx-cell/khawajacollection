@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "placeholders": "node scripts/generate-placeholders.mjs",
-    "catalogue": "node scripts/catalogue-report.mjs"
+    "catalogue": "node scripts/catalogue-report.mjs",
+    "og-image": "node scripts/generate-og-image.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

@@ -5,12 +5,12 @@
  * column with a full-bleed gallery on mobile. Everything is loaded in the
  * route loader, server side, through the repository seam.
  *
- * AGGREGATE RATING WARNING. Section 11.3 and Phase 5 both ask for
- * AggregateRating in the Product JSON-LD, and it is emitted below. The ratings
- * in src/data/products.ts are generated mock values: shipping them as
- * structured data on a live site would be a fabricated-review markup
- * violation. Either wire real reviews before launch or drop the
- * `aggregateRating` block — this is on the Phase 9 launch checklist.
+ * ON THE MISSING AggregateRating. Section 11.3 and Phase 5 both ask for it,
+ * and it is deliberately absent until `hasRealReviews` in src/config/site.ts
+ * is true. The ratings in the catalogue are generated values, and structured
+ * data is a claim made directly to a search engine — an invented one is
+ * fabricated review markup. Phase 9 resolved this by gating rather than
+ * deleting, so real reviews switch it back on with one boolean.
  */
 
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -23,7 +23,7 @@ import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { RecentlyViewed } from "@/components/product/RecentlyViewed";
-import { site } from "@/config/site";
+import { hasRealReviews, site } from "@/config/site";
 import { absoluteUrl, type Crumb } from "@/lib/catalog-page";
 import { labelFromSlug, resolvePrice } from "@/lib/format";
 import { totalStock } from "@/lib/product-variants";
@@ -113,12 +113,18 @@ function productHead(product: Product) {
             availability,
             itemCondition: "https://schema.org/NewCondition",
           },
-          // See the AGGREGATE RATING WARNING at the top of this file.
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: product.rating,
-            reviewCount: product.reviewCount,
-          },
+          // Omitted while `hasRealReviews` is false — see src/config/site.ts.
+          // Emitting AggregateRating over generated ratings is fabricated
+          // review markup, which is a manual action rather than a ranking risk.
+          ...(hasRealReviews
+            ? {
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: product.rating,
+                  reviewCount: product.reviewCount,
+                },
+              }
+            : {}),
         }),
       },
       {

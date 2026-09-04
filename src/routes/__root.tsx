@@ -19,6 +19,7 @@ import { Announcer } from "../components/a11y/Announcer";
 import { useAccountSync } from "@/hooks/useAccountSync";
 import { useSearchHotkey } from "../hooks/useSearchHotkey";
 import { useOverlay } from "../store/ui-store";
+import { OG_IMAGE, organizationAndWebsiteJsonLd } from "@/lib/site-jsonld";
 
 // Phase 6 requires these two to be dynamically imported: neither is on screen
 // at first paint, and together they pull in the cart, the search panel and
@@ -100,6 +101,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Khawaja Collection" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      // A site-wide default so a route that forgets Open Graph still shares
+      // as a card rather than a bare link. Every route that matters overrides
+      // it through seoHead().
+      { property: "og:image", content: OG_IMAGE.path },
+      { property: "og:image:width", content: String(OG_IMAGE.width) },
+      { property: "og:image:height", content: String(OG_IMAGE.height) },
+      { property: "og:image:alt", content: OG_IMAGE.alt },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -113,6 +121,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(organizationAndWebsiteJsonLd()),
+      },
     ],
   }),
   shellComponent: RootShell,

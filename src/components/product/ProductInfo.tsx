@@ -15,7 +15,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Banknote, Heart, MessageCircle, RefreshCw, Star, Truck } from "lucide-react";
 
-import { commerce, contact, PLACEHOLDER, site } from "@/config/site";
+import { PLACEHOLDER, commerce, contact, hasRealReviews, site } from "@/config/site";
 import { formatPKR, labelFromSlug } from "@/lib/format";
 import {
   colorOptions,
@@ -98,12 +98,18 @@ export function ProductInfo({ product }: { product: Product }) {
         {product.name}
       </h1>
 
-      <div className="mt-3 flex items-center gap-2">
-        <Stars rating={product.rating} />
-        <span className="text-xs text-kc-charcoal">
-          {product.rating.toFixed(1)} ({product.reviewCount} reviews)
-        </span>
-      </div>
+      {/* Hidden while `hasRealReviews` is false. The same reasoning as the
+          JSON-LD on the PDP route: these ratings are generated, and telling a
+          shopper "4.6 (23 reviews)" when no customer has reviewed anything is
+          the same fabrication, just aimed at a person instead of a crawler. */}
+      {hasRealReviews ? (
+        <div className="mt-3 flex items-center gap-2">
+          <Stars rating={product.rating} />
+          <span className="text-xs text-kc-charcoal">
+            {product.rating.toFixed(1)} ({product.reviewCount} reviews)
+          </span>
+        </div>
+      ) : null}
 
       <PriceBlock product={product} size="lg" className="mt-4" />
 
