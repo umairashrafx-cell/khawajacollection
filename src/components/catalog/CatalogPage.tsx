@@ -123,6 +123,15 @@ export function CatalogPage({ descriptor, data }: CatalogPageProps) {
             ) : (
               <>
                 <div className="mt-6">
+                  {/*
+                    The product grid is a section, and its cards are h3. On
+                    desktop the "Filter" h2 in the sidebar sits between the h1
+                    and those h3s, but that sidebar is display:none below lg —
+                    so on mobile the document went h1 straight to h3 and axe
+                    reported heading-order. This h2 names the section for a
+                    screen reader and closes the gap at every breakpoint.
+                  */}
+                  <h2 className="sr-only">Products</h2>
                   <ProductGrid
                     products={data.items}
                     columns={{ mobile: 2, tablet: 3, desktop: 4 }}

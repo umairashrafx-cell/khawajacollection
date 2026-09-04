@@ -46,7 +46,7 @@ function readable(message: string): string {
 
 export async function signIn(email: string, password: string): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { ok: false, error: UNCONFIGURED };
-  const { error } = await browserClient().auth.signInWithPassword({ email, password });
+  const { error } = await (await browserClient()).auth.signInWithPassword({ email, password });
   return error ? { ok: false, error: readable(error.message) } : { ok: true };
 }
 
@@ -57,7 +57,9 @@ export async function register(
 ): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { ok: false, error: UNCONFIGURED };
 
-  const { data, error } = await browserClient().auth.signUp({
+  const { data, error } = await (
+    await browserClient()
+  ).auth.signUp({
     email,
     password,
     options: {
@@ -75,13 +77,15 @@ export async function register(
 
 export async function signOut(): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  await browserClient().auth.signOut();
+  await (await browserClient()).auth.signOut();
 }
 
 export async function requestPasswordReset(email: string): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { ok: false, error: UNCONFIGURED };
 
-  await browserClient().auth.resetPasswordForEmail(email, {
+  await (
+    await browserClient()
+  ).auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
   });
 
@@ -92,6 +96,6 @@ export async function requestPasswordReset(email: string): Promise<AuthResult> {
 /** Called from /reset-password, where the emailed link has already signed the visitor in. */
 export async function updatePassword(password: string): Promise<AuthResult> {
   if (!isSupabaseConfigured()) return { ok: false, error: UNCONFIGURED };
-  const { error } = await browserClient().auth.updateUser({ password });
+  const { error } = await (await browserClient()).auth.updateUser({ password });
   return error ? { ok: false, error: readable(error.message) } : { ok: true };
 }

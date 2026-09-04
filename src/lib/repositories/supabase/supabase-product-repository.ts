@@ -135,7 +135,7 @@ let names: Map<string, string> | null = null;
 
 async function taxonomyNames(): Promise<Map<string, string>> {
   if (names) return names;
-  const supabase = browserClient();
+  const supabase = await browserClient();
   const [categories, collections] = await Promise.all([
     supabase.from("categories").select("slug, name"),
     supabase.from("collections").select("slug, name"),
@@ -152,7 +152,7 @@ async function taxonomyNames(): Promise<Map<string, string>> {
 }
 
 async function fetchAll(): Promise<Product[]> {
-  const { data, error } = await browserClient().from("products").select(SELECT);
+  const { data, error } = await (await browserClient()).from("products").select(SELECT);
   if (error) throw new Error(`Supabase products query failed: ${error.message}`);
   return ((data ?? []) as unknown as Row[]).map(toProduct);
 }
@@ -175,7 +175,9 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async getBySlug(slug: string): Promise<Product | null> {
-    const { data, error } = await browserClient()
+    const { data, error } = await (
+      await browserClient()
+    )
       .from("products")
       .select(SELECT)
       .eq("slug", slug)
@@ -195,7 +197,9 @@ export class SupabaseProductRepository implements ProductRepository {
     // implementations disagreed and only the Supabase one 500'd.
     if (!UUID.test(id)) return null;
 
-    const { data, error } = await browserClient()
+    const { data, error } = await (
+      await browserClient()
+    )
       .from("products")
       .select(SELECT)
       .eq("id", id)
@@ -206,7 +210,7 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async getAllSlugs(): Promise<string[]> {
-    const { data, error } = await browserClient().from("products").select("slug");
+    const { data, error } = await (await browserClient()).from("products").select("slug");
     if (error) throw new Error(`Supabase slug query failed: ${error.message}`);
     return ((data ?? []) as { slug: string }[]).map((row) => row.slug);
   }

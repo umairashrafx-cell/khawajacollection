@@ -1,5 +1,6 @@
 /**
- * Supabase clients. See docs/BUILD-SPEC.pdf Section 4.3 and Phase 8.
+ * Supabase clients. See docs/BUILD-SPEC.pdf Section 4.3, Phase 8, and the
+ * Section 14 performance budget.
  *
  * Two clients, and the difference between them is the whole security story:
  *
@@ -16,9 +17,31 @@
  * never reaches a bundle. Vite inlines anything beginning with `VITE_` into
  * client code — that prefix is the boundary, and the service key stays on the
  * far side of it.
+ *
+ * BOTH ACCESSORS ARE ASYNC, AND THAT IS A PERFORMANCE DECISION. Phase 9
+ * measured the homepage at 210 KB of gzipped JavaScript against a 180 KB
+ * budget, and 53 KB of that — 29% of the whole budget — was
+ * `@supabase/supabase-js`, dragged onto the critical path of every page by a
+ * static import here. A shopper browsing the catalogue never needs it: pages
+ * are server-rendered, and the library only does anything once someone signs
+ * in or opens an account page.
+ *
+ * So it is `import()`ed on first use. Every call site was already inside an
+ * async function, so this cost nothing at any of them. `import type` is erased
+ * at compile time and does not pull the runtime in.
  */
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+type SupabaseModule = typeof import("@supabase/supabase-js");
+
+/** One in-flight import, shared. Two callers must not fetch the chunk twice. */
+let modulePromise: Promise<SupabaseModule> | null = null;
+
+function loadSupabase(): Promise<SupabaseModule> {
+  modulePromise ??= import("@supabase/supabase-js");
+  return modulePromise;
+}
 
 function requireEnv(value: string | undefined, name: string): string {
   if (!value) {
@@ -30,7 +53,7 @@ function requireEnv(value: string | undefined, name: string): string {
 }
 
 export function supabaseUrl(): string {
-  return requireEnv(import.meta.env["VITE_SUPABASE_URL"], "VITE_SUPABASE_URL");
+  return requireEnv(import.meta.env.VITE_SUPABASE_URL, "VITE_SUPABASE_URL");
 }
 
 /**
@@ -40,9 +63,12 @@ export function supabaseUrl(): string {
  * whole site, and a mock deployment has no Supabase credentials. Anything that
  * would otherwise throw on a missing key — the account pages, sign-in — asks
  * this first and says so plainly instead of white-screening.
+ *
+ * Synchronous and cheap: it reads values Vite inlined at build time and never
+ * loads the library, so it is safe to call during render.
  */
 export function isSupabaseConfigured(): boolean {
-  return Boolean(import.meta.env["VITE_SUPABASE_URL"] && import.meta.env["VITE_SUPABASE_ANON_KEY"]);
+  return Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 }
 
 /**
@@ -51,11 +77,19 @@ export function isSupabaseConfigured(): boolean {
  */
 let browser: SupabaseClient | null = null;
 
-export function browserClient(): SupabaseClient {
+export async function browserClient(): Promise<SupabaseClient> {
   if (browser) return browser;
+
+  const { createClient } = await loadSupabase();
+
+  // Checked again after the await: two concurrent callers can both pass the
+  // guard above before either finishes importing, and two clients would mean
+  // two competing auth listeners fighting over one stored session.
+  if (browser) return browser;
+
   browser = createClient(
     supabaseUrl(),
-    requireEnv(import.meta.env["VITE_SUPABASE_ANON_KEY"], "VITE_SUPABASE_ANON_KEY"),
+    requireEnv(import.meta.env.VITE_SUPABASE_ANON_KEY, "VITE_SUPABASE_ANON_KEY"),
     {
       auth: {
         persistSession: true,
@@ -73,7 +107,7 @@ export function browserClient(): SupabaseClient {
  * needs does not exist in the browser, so it will throw there rather than
  * leak.
  */
-export function serviceClient(): SupabaseClient {
+export async function serviceClient(): Promise<SupabaseClient> {
   const key = typeof process !== "undefined" ? process.env["SUPABASE_SERVICE_ROLE_KEY"] : undefined;
 
   if (!key) {
@@ -82,6 +116,7 @@ export function serviceClient(): SupabaseClient {
     );
   }
 
+  const { createClient } = await loadSupabase();
   return createClient(supabaseUrl(), key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });

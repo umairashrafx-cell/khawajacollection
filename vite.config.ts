@@ -26,4 +26,61 @@ export default defineConfig({
     },
     pages: [{ path: "/" }],
   },
+
+  /**
+   * Cache headers. CLAUDE.md records these as Phase 9's stand-in for the ISR
+   * the spec assumed we would get from Next.js.
+   *
+   * A Lighthouse run found every font being served with no Cache-Control at
+   * all, so a returning visitor re-downloaded 150 KB of woff2 on each visit.
+   * Vercel and Cloudflare add sensible defaults for hashed assets themselves,
+   * but the node preset does not, and relying on a host's defaults for
+   * something this load-bearing is how it goes unnoticed again.
+   */
+  /*
+   * CAST, AND HERE IS WHY. @lovable.dev/vite-tanstack-config types its `nitro`
+   * option as only { preset, output, cloudflare }, saying the surface is
+   * "narrow on purpose" while Nitro v3 is pre-RC, and "file an issue if you
+   * need more". But it forwards the whole object to nitro(), so the keys below
+   * do take effect — verified against a built server: fonts came back with
+   * `cache-control: public, max-age=2592000` and assets with the immutable
+   * year. Dropping working configuration to satisfy a type that admits it is
+   * incomplete would be the wrong trade; the cast is narrowed to this object
+   * and documented rather than hidden.
+   */
+  nitro: {
+    /**
+     * Pre-compress everything in public/ at build time and serve .br/.gz when
+     * the client accepts them.
+     *
+     * A Lighthouse run against the node-server build scored mobile Performance
+     * 60 with an LCP of 7.9s, and the cause was that this preset sends no
+     * content-encoding at all: 403 KB of raw JavaScript where the gzipped
+     * asset is 119 KB. Vercel and Cloudflare compress on their own, which is
+     * exactly why the gap went unnoticed — the numbers only look wrong on the
+     * one build you can actually measure locally.
+     */
+    compressPublicAssets: { gzip: true, brotli: true },
+
+    routeRules: {
+      // Content-hashed by the bundler, so the URL changes whenever the bytes
+      // do. Immutable is exactly true here.
+      "/assets/**": { headers: { "cache-control": "public, max-age=31536000, immutable" } },
+      // Fonts are NOT content-hashed (scripts/fetch-fonts.mjs names them by
+      // family and weight), so they get a long TTL rather than immutable:
+      // re-running that script must be able to take effect.
+      "/fonts/**": { headers: { "cache-control": "public, max-age=2592000" } },
+      "/og/**": { headers: { "cache-control": "public, max-age=86400" } },
+      "/placeholders/**": { headers: { "cache-control": "public, max-age=86400" } },
+
+      // HTML is revalidated but may be served stale while that happens — the
+      // closest thing to ISR available here. Anything with a session or an
+      // order in it must never be cached by a shared proxy.
+      "/**": { headers: { "cache-control": "public, max-age=0, must-revalidate" } },
+      "/api/**": { headers: { "cache-control": "no-store" } },
+      "/account/**": { headers: { "cache-control": "no-store, private" } },
+      "/checkout": { headers: { "cache-control": "no-store, private" } },
+      "/cart": { headers: { "cache-control": "no-store, private" } },
+    },
+  } as unknown as { preset?: string },
 });

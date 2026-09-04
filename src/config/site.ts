@@ -20,7 +20,7 @@ export const site = {
   description:
     "Khawaja Collection: premium Pakistani fashion for women and men, made in limited runs in Lahore.",
   /** Set VITE_SITE_URL on the host. Canonicals and the sitemap depend on it. */
-  url: import.meta.env["VITE_SITE_URL"] ?? PLACEHOLDER,
+  url: import.meta.env.VITE_SITE_URL ?? PLACEHOLDER,
   locale: "en-PK",
   currency: "PKR",
 } as const;

@@ -26,12 +26,14 @@ TypeScript strict / Tailwind v4 / shadcn-ui / Supabase (Phase 8) / Vercel or Clo
 >
 > - **`next/image`** → we hand-roll a responsive `<Image>` component with
 >   explicit width/height, `srcset`, `sizes` and AVIF/WebP sources (Phase 3).
-> - **ISR** → nitro route cache rules / stale-while-revalidate headers (Phase 9).
+> - **ISR** → nitro route cache rules (done in Phase 9: immutable on hashed
+>   assets, a month on fonts, `no-store` on anything with a session in it).
 > - **`generateStaticParams`** → TanStack prerender in `vite.config.ts`
 >   (done in Phase 5). It crawls from `/` and writes 88 static HTML files,
 >   including all 60 PDPs.
-> - **`next/font`** → fonts are on the Google CDN with `display: swap` today;
->   self-host and subset to latin in Phase 9.
+> - **`next/font`** → done in Phase 9: two families, latin subset only,
+>   `display: swap`, self-hosted from `public/fonts`
+>   (`npm run fonts` regenerates them).
 >
 > Everything else in the spec — tokens, types, repository seam, page specs,
 > commerce rules, SEO plan, performance budget, a11y, guardrails — applies
@@ -123,7 +125,22 @@ image load, no invented business facts.
       placeholder images to Storage — deliberately deferred, they are throwaway
       scaffolding due to be replaced by the real photography pipeline
       (Section 19).
-- [ ] **Phase 9** — SEO, performance, a11y, launch
+- [~] **Phase 9** — SEO, performance, a11y, launch.
+      Done: Section 13 in full (robots.txt, a sitemap rebuilt from the
+      repository, Organization + WebSite + SearchAction, Open Graph on every
+      route with a real 1200x630 PNG), the eight content pages, loading
+      skeletons on all 15 loader routes, self-hosted latin-subset fonts,
+      nitro cache rules + asset compression, and docs/LAUNCH-CHECKLIST.md.
+      Accessibility: zero axe violations across 12 page types, all five
+      overlays trap focus and close on Escape, 44px tap targets throughout.
+      Lighthouse mobile: SEO 100, Best Practices 100, Accessibility 100 on
+      home and product.
+      **Open:** mobile Performance is measured locally at 60-64 against a
+      >= 90 target. The gzipped homepage JS is 158 KB against a 180 KB budget,
+      so the bundle is within spec; the score is dominated by LCP on a
+      throttled connection serving placeholder SVG imagery from a local
+      node-server build. Re-measure on Vercel with the real photography
+      before treating the number as final — see the launch checklist.
 
 ## Known debt from the Lovable prototype
 

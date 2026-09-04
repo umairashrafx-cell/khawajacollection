@@ -54,7 +54,47 @@ function publish(session: Session | null, ready = true): void {
 /**
  * Starts listening on the first subscriber, after mount. Doing this at module
  * scope would run it during SSR, where there is neither storage nor a window.
+ *
+ * MOST VISITORS NEVER LOAD SUPABASE AT ALL, AND THAT IS THE POINT. The library
+ * is 53 KB gzipped — 29% of the whole Section 14 budget — and a signed-out
+ * shopper browsing the catalogue gains nothing from it: every page is
+ * server-rendered and nothing on it is behind auth. So before importing
+ * anything, this looks for the evidence a session could exist:
+ *
+ *   - a `sb-<ref>-auth-token` key in localStorage, which is where supabase-js
+ *     persists a session;
+ *   - an auth fragment in the URL, which is how a confirmation or
+ *     password-reset link arrives and is the one case where a session exists
+ *     with nothing yet in storage.
+ *
+ * Neither present means signed out, which we can report immediately and
+ * correctly without a single byte of Supabase. Either present and the library
+ * is imported on the spot.
  */
+
+/** supabase-js namespaces its storage key by project ref: `sb-<ref>-auth-token`. */
+function hasStoredSession(): boolean {
+  try {
+    for (let i = 0; i < window.localStorage.length; i += 1) {
+      const key = window.localStorage.key(i);
+      if (key?.startsWith("sb-") && key.endsWith("-auth-token")) return true;
+    }
+  } catch {
+    // Private mode, or storage blocked. Treat as signed out rather than throw.
+  }
+  return false;
+}
+
+/**
+ * A magic link or password-reset link puts the tokens in the fragment, and
+ * `detectSessionInUrl` is what turns them into a session. Storage is empty at
+ * that moment, so the check above would wrongly say signed out.
+ */
+function hasAuthFragment(): boolean {
+  const hash = window.location.hash;
+  return hash.includes("access_token=") || hash.includes("error_description=");
+}
+
 function start(): void {
   if (started || typeof window === "undefined") return;
   started = true;
@@ -64,12 +104,18 @@ function start(): void {
     return;
   }
 
-  const supabase = browserClient();
+  if (!hasStoredSession() && !hasAuthFragment()) {
+    // Signed out, and we know it without loading anything.
+    publish(null);
+    return;
+  }
 
-  // getSession resolves from storage; onAuthStateChange then keeps it current
-  // through refreshes, sign-outs and other tabs.
-  void supabase.auth.getSession().then(({ data }) => publish(data.session ?? null));
-  supabase.auth.onAuthStateChange((_event, session) => publish(session ?? null));
+  void browserClient().then((supabase) => {
+    // getSession resolves from storage; onAuthStateChange then keeps it current
+    // through refreshes, sign-outs and other tabs.
+    void supabase.auth.getSession().then(({ data }) => publish(data.session ?? null));
+    supabase.auth.onAuthStateChange((_event, session) => publish(session ?? null));
+  });
 }
 
 function subscribe(listener: () => void): () => void {

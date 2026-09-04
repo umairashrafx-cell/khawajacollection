@@ -22,6 +22,7 @@ import { ProductCarousel } from "@/components/product/ProductCarousel";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { edits, featuredCollection, hero, sale, socialSection } from "@/config/home";
 import { site } from "@/config/site";
+import { seoHead } from "@/lib/seo";
 import { productRepository } from "@/lib/repositories";
 
 const title = "Khawaja Collection — Premium Pakistani Fashion";
@@ -47,24 +48,13 @@ export const Route = createFileRoute("/")({
     };
   },
 
+  // Built from seoHead like every other route. It used to hand-write its own
+  // meta, and drifted: a relative canonical and og:url (Lighthouse scored SEO
+  // 92 and reported "no valid rel=canonical"), and an og:image pointing at an
+  // SVG placeholder, which Facebook and X both drop silently — the markup
+  // looks right and the card comes out blank.
   head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "/" },
-      { property: "og:image", content: "/placeholders/og-16x9.svg" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "canonical", href: "/" },
-      // No hand-written hero preload. React 19 hoists one automatically for
-      // the Image component's `priority` path, and its version also carries
-      // `imagesizes`, so writing one here only duplicated the hint with less
-      // information — and tripped an invalid-DOM-property warning doing it.
-    ],
+    ...seoHead({ title, description, path: "/" }),
     scripts: [
       {
         type: "application/ld+json",

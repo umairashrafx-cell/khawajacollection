@@ -52,7 +52,9 @@ function ProfilePage() {
     // user_metadata, not a profiles table: Section 8.3 does not define one, and
     // a whole table for a single display name would be a schema the spec did
     // not ask for. If profiles grow beyond this, that is the moment to add it.
-    const { error: updateError } = await browserClient().auth.updateUser({
+    const { error: updateError } = await (
+      await browserClient()
+    ).auth.updateUser({
       data: { full_name: name.trim() },
     });
 

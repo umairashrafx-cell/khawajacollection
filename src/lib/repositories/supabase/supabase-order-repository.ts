@@ -75,7 +75,7 @@ async function slugsFor(productIds: string[]): Promise<Map<string, string>> {
   const ids = [...new Set(productIds)].filter(Boolean);
   if (ids.length === 0) return new Map();
 
-  const { data } = await serviceClient().from("products").select("id, slug").in("id", ids);
+  const { data } = await (await serviceClient()).from("products").select("id, slug").in("id", ids);
   return new Map(((data ?? []) as { id: string; slug: string }[]).map((r) => [r.id, r.slug]));
 }
 
@@ -135,7 +135,7 @@ function tidy(orderNumber: string): string {
 
 export class SupabaseOrderRepository implements OrderRepository {
   async create(input: CreateOrderInput): Promise<Order> {
-    const supabase = serviceClient();
+    const supabase = await serviceClient();
     const { draft, items, totals } = input;
 
     // order_number is omitted: the column defaults to next_order_number(), so
@@ -209,7 +209,9 @@ export class SupabaseOrderRepository implements OrderRepository {
 
   async findForTracking(orderNumber: string, contact: string): Promise<Order | null> {
     // `ilike` with no wildcards is an exact comparison that ignores case.
-    const { data, error } = await serviceClient()
+    const { data, error } = await (
+      await serviceClient()
+    )
       .from("orders")
       .select(SELECT)
       .ilike("order_number", tidy(orderNumber))
@@ -234,7 +236,9 @@ export class SupabaseOrderRepository implements OrderRepository {
   }
 
   async listForUser(userId: string): Promise<Order[]> {
-    const { data, error } = await serviceClient()
+    const { data, error } = await (
+      await serviceClient()
+    )
       .from("orders")
       .select(SELECT)
       .eq("user_id", userId)
@@ -247,7 +251,9 @@ export class SupabaseOrderRepository implements OrderRepository {
   async findForUser(userId: string, orderNumber: string): Promise<Order | null> {
     // Scoped by user_id as well as order number, so guessing a number that
     // belongs to someone else returns nothing rather than their address.
-    const { data, error } = await serviceClient()
+    const { data, error } = await (
+      await serviceClient()
+    )
       .from("orders")
       .select(SELECT)
       .eq("user_id", userId)

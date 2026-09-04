@@ -102,14 +102,26 @@ export default function Header() {
 
           {/* Mobile centres the short mark: the full wordmark collides with the
               action icons at 360px, and Section 1.3 gives KC as the short mark. */}
+          {/*
+            NO aria-label HERE, DELIBERATELY. It used to carry
+            aria-label={site.name} — "Khawaja Collection" — while the visible
+            text is "KC." or "KHAWAJA.". That is WCAG 2.5.3 Label in Name: an
+            accessible name that does not contain the visible text breaks
+            voice control, because saying "click KC" matches nothing. axe
+            flagged it as label-content-name-mismatch.
+
+            The name now comes from the content, so it starts with whatever is
+            visible at this breakpoint and the sr-only span appends the rest
+            for screen readers.
+          */}
           <Link
             to="/"
-            aria-label={site.name}
             className="inline-flex min-h-11 min-w-11 items-center justify-center font-display text-lg tracking-[0.16em] max-lg:absolute max-lg:left-1/2 max-lg:-translate-x-1/2 lg:text-xl"
           >
             <span className="lg:hidden">{site.shortMark}</span>
             <span className="hidden lg:inline">{site.name.split(" ")[0]?.toUpperCase()}</span>
             <span className="text-kc-gold">.</span>
+            <span className="sr-only">{site.name} — home</span>
           </Link>
 
           <nav className="ml-10 hidden lg:block" aria-label="Categories">

@@ -33,7 +33,7 @@ export async function userFromRequest(request: Request): Promise<VerifiedUser | 
   if (!token) return null;
 
   try {
-    const { data, error } = await serviceClient().auth.getUser(token);
+    const { data, error } = await (await serviceClient()).auth.getUser(token);
     if (error || !data.user) return null;
     return { id: data.user.id, email: data.user.email };
   } catch {

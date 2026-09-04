@@ -37,7 +37,9 @@ interface RemoteEntry {
 }
 
 async function remoteIds(userId: string): Promise<string[]> {
-  const { data, error } = await browserClient()
+  const { data, error } = await (
+    await browserClient()
+  )
     .from("wishlists")
     .select("product_id")
     .eq("user_id", userId);
@@ -60,7 +62,7 @@ async function hydrate(ids: string[]): Promise<WishlistEntry[]> {
 
 /** Replaces the account's rows with `ids`, in one round trip each way. */
 async function pushAll(userId: string, ids: string[]): Promise<void> {
-  const supabase = browserClient();
+  const supabase = await browserClient();
 
   if (ids.length > 0) {
     // Composite primary key (user_id, product_id), so re-saving something is a

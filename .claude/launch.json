@@ -4,14 +4,20 @@
     {
       "name": "kc-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 8080
     },
     {
       "name": "kc-prod",
       "runtimeExecutable": "node",
-      "runtimeArgs": [".output/server/index.mjs"],
-      "port": 3000
+      "runtimeArgs": [
+        ".output/server/index.mjs"
+      ],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

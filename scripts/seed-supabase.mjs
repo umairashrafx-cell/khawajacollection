@@ -101,7 +101,7 @@ try {
     console.log(`-- ${statements.length} statements`);
   } else {
     const { serviceClient } = await server.ssrLoadModule("/src/lib/supabase/client.ts");
-    const supabase = serviceClient();
+    const supabase = await serviceClient();
 
     const check = (label, { error }) => {
       if (error) {

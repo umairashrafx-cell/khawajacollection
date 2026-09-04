@@ -28,7 +28,7 @@ import type { OrderRepository } from "./order-repository";
  * valid. The mock is not dead code: it is what makes the app runnable with no
  * database at all, and every page must keep working under it.
  */
-const implementation = import.meta.env["VITE_PRODUCT_REPOSITORY"] ?? "mock";
+const implementation = import.meta.env.VITE_PRODUCT_REPOSITORY ?? "mock";
 
 if (implementation !== "mock" && implementation !== "supabase") {
   // Failing loudly beats silently serving mock data from a deployment that

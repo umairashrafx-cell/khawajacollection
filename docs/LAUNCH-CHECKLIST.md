@@ -103,6 +103,47 @@ is omitted entirely. Grep for `PLACEHOLDER` in `src/config/site.ts` and for
 - [ ] `hasRealReviews` in `src/config/site.ts` is `false`, which hides the PDP star rating and omits `AggregateRating` from the Product JSON-LD.
 - [ ] **Do not flip it to `true` until reviews are genuinely collected from buyers.** The ratings in the catalogue are generated values; publishing them as structured data is fabricated review markup, which earns a manual action rather than a ranking penalty.
 
+## 6b. Measured at the end of Phase 9
+
+Lighthouse 12, mobile preset, against a `node-server` production build on this
+machine. Reproduce with:
+
+```bash
+NITRO_PRESET=node-server npm run build && node .output/server/index.mjs
+```
+
+| Page | Performance | Accessibility | Best Practices | SEO | LCP |
+|---|---|---|---|---|---|
+| Home | 70 | 100 | 100 | 100 | 5.2s |
+| `/women` | 74 | 100 | 100 | 100 | 4.6s |
+| Product | 86 | 100 | 100 | 100 | 3.4s |
+
+Section 14 budget, measured from the build output:
+
+- Homepage JS, gzipped: **158 KB** against a 180 KB budget — within spec.
+- CLS: **0.001 / 0 / 0** against a 0.05 budget — within spec.
+- Hero image transferred: **111 KB** against a 180 KB budget — within spec on
+  bytes, but it is a JPEG with no AVIF/WebP variants and no responsive srcset.
+
+### Performance is short of the >= 90 target, and this is why
+
+LCP is the binding constraint on all three pages, and on every one of them the
+LCP element is **placeholder imagery** — a stock hero JPEG on the homepage,
+generated SVGs in the product grids. Section 14 asks for AVIF/WebP with a
+responsive srcset; the `<Image>` component already accepts `sources` and
+`srcSet` and passes neither today, because the placeholders have no raster
+variants to offer.
+
+Producing those variants needs an image-processing dependency (`sharp` or
+equivalent), which Hard Rule 7 forbids adding without asking. **This is a
+decision for Umair**, and it is bundled with the real photography anyway:
+
+- [ ] Decide whether to add `sharp` and generate AVIF/WebP + srcset at build time
+- [ ] Re-run Lighthouse after the real photography lands and after deploying to
+      Vercel — a CDN with HTTP/2, edge caching and real latency is not the same
+      measurement as a local Node server, and the numbers above should not be
+      treated as final until it is repeated there
+
 ## 7. Pre-flight verification
 
 Run against the production build (`NITRO_PRESET=node-server npm run build && node .output/server/index.mjs`), not the dev server.

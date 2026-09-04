@@ -75,7 +75,9 @@ function AddressesPage() {
     queryFn: async (): Promise<AddressRow[]> => {
       // No `.eq("user_id", …)`: RLS already scopes this to the caller, and a
       // filter here would imply the row is reachable without one.
-      const { data: rows, error } = await browserClient()
+      const { data: rows, error } = await (
+        await browserClient()
+      )
         .from("addresses")
         .select("id, label, name, phone, line1, line2, city, province, postal_code, is_default")
         .order("is_default", { ascending: false })
@@ -97,22 +99,20 @@ function AddressesPage() {
         throw new Error("Name, address and city are all needed.");
       }
 
-      const { error } = await browserClient()
-        .from("addresses")
-        .insert({
-          user_id: userId,
-          label: draft.label.trim() || null,
-          name: draft.name.trim(),
-          phone,
-          line1: draft.line1.trim(),
-          line2: draft.line2.trim() || null,
-          city: draft.city.trim(),
-          province: draft.province,
-          postal_code: draft.postalCode.trim() || null,
-          // The first address saved becomes the default; after that the
-          // customer chooses. A partial unique index keeps it to one.
-          is_default: (data?.length ?? 0) === 0,
-        });
+      const { error } = await (await browserClient()).from("addresses").insert({
+        user_id: userId,
+        label: draft.label.trim() || null,
+        name: draft.name.trim(),
+        phone,
+        line1: draft.line1.trim(),
+        line2: draft.line2.trim() || null,
+        city: draft.city.trim(),
+        province: draft.province,
+        postal_code: draft.postalCode.trim() || null,
+        // The first address saved becomes the default; after that the
+        // customer chooses. A partial unique index keeps it to one.
+        is_default: (data?.length ?? 0) === 0,
+      });
 
       if (error) throw new Error(error.message);
     },
@@ -126,7 +126,7 @@ function AddressesPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await browserClient().from("addresses").delete().eq("id", id);
+      const { error } = await (await browserClient()).from("addresses").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
     onSuccess: invalidate,
@@ -134,7 +134,7 @@ function AddressesPage() {
 
   const makeDefault = useMutation({
     mutationFn: async (id: string) => {
-      const supabase = browserClient();
+      const supabase = await browserClient();
       // Cleared first: the partial unique index rejects a second default, so
       // setting before clearing would fail rather than swap.
       const { error: clearError } = await supabase
