@@ -24,7 +24,15 @@ import {
 } from "lucide-react";
 
 import { footerNav } from "@/config/nav";
-import { PLACEHOLDER, commerce, contact, paymentMethods, site, social } from "@/config/site";
+import {
+  PLACEHOLDER,
+  builtBy,
+  commerce,
+  contact,
+  paymentMethods,
+  site,
+  social,
+} from "@/config/site";
 import { formatPKR } from "@/lib/format";
 import { AppLink } from "./AppLink";
 
@@ -163,6 +171,24 @@ export default function Footer() {
             © {new Date().getFullYear()} {site.name}. All rights reserved.
           </p>
           <p>Cash on delivery available across Pakistan</p>
+          {/*
+            An external link, so it carries rel="noreferrer" — without it the
+            target learns which page of this shop sent the visitor, and a build
+            credit has no business leaking that. target="_blank" because losing
+            a shopper out of a checkout funnel to a credit link would be a poor
+            trade for the agency and for the shop.
+          */}
+          <p>
+            Built by{" "}
+            <a
+              href={builtBy.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block py-1 text-kc-charcoal underline-offset-4 transition-colors hover:text-kc-ink hover:underline"
+            >
+              {builtBy.name}
+            </a>
+          </p>
         </div>
       </div>
     </footer>

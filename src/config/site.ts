@@ -25,6 +25,19 @@ export const site = {
   currency: "PKR",
 } as const;
 
+/**
+ * The build credit in the footer. Supplied by Umair on 2026-09-05.
+ *
+ * Config rather than a link written into Footer.tsx, for the same reason every
+ * other link on this site is: nav.ts states the rule as "no hardcoded nav
+ * links in JSX, ever". Changing the agency, or dropping the credit, should be
+ * one line here.
+ */
+export const builtBy = {
+  name: "Automa8",
+  url: "https://www.automa8.co",
+} as const;
+
 /** Section 11.1 item 1 — max three, rotating, dismissible for the session. */
 export const announcements = [
   "Free delivery across Pakistan on orders over PKR 5,000",
