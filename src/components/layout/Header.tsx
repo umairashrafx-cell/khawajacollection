@@ -105,7 +105,7 @@ export default function Header() {
           <Link
             to="/"
             aria-label={site.name}
-            className="font-display text-lg tracking-[0.16em] max-lg:absolute max-lg:left-1/2 max-lg:-translate-x-1/2 lg:text-xl"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center font-display text-lg tracking-[0.16em] max-lg:absolute max-lg:left-1/2 max-lg:-translate-x-1/2 lg:text-xl"
           >
             <span className="lg:hidden">{site.shortMark}</span>
             <span className="hidden lg:inline">{site.name.split(" ")[0]?.toUpperCase()}</span>

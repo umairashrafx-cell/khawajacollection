@@ -87,7 +87,7 @@ export function SizeSelector({
         <button
           type="button"
           onClick={onOpenGuide}
-          className="text-xs text-kc-charcoal underline underline-offset-4 hover:text-kc-ink"
+          className="inline-flex min-h-11 items-center text-xs text-kc-charcoal underline underline-offset-4 hover:text-kc-ink lg:min-h-0"
         >
           Size Guide
         </button>

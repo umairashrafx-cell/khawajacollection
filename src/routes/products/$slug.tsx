@@ -15,6 +15,7 @@
 
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
+import { ProductSkeleton } from "@/components/skeletons/Skeletons";
 import { Container, Section } from "@/components/layout/Container";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
@@ -41,6 +42,8 @@ export const Route = createFileRoute("/products/$slug")({
     if (!loaderData) return { meta: [{ title: "Product not found | Khawaja Collection" }] };
     return productHead(loaderData.product);
   },
+
+  pendingComponent: ProductSkeleton,
 
   component: ProductPage,
 });

@@ -71,7 +71,7 @@ export function ProductGallery({ images, name }: { images: ProductImage[]; name:
         </div>
 
         {images.length > 1 ? (
-          <div className="mt-3 flex justify-center gap-1.5">
+          <div className="mt-1 flex justify-center">
             {images.map((image, index) => (
               <button
                 key={`dot-${image.url}-${index}`}
@@ -82,10 +82,19 @@ export function ProductGallery({ images, name }: { images: ProductImage[]; name:
                 }}
                 aria-label={`Show image ${index + 1} of ${images.length}`}
                 aria-current={index === active}
-                className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                  index === active ? "bg-kc-ink" : "bg-kc-line"
-                }`}
-              />
+                // The DOT stays 6px; the BUTTON is 44px. Section 15 wants a
+                // 44px target on mobile and these were 6x6 — the smallest
+                // thing on the site and the one people jab at repeatedly.
+                // Padding grows the hit area without changing the design.
+                className="grid h-11 w-11 place-items-center"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`block h-1.5 w-1.5 rounded-full transition-colors ${
+                    index === active ? "bg-kc-ink" : "bg-kc-line"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         ) : null}

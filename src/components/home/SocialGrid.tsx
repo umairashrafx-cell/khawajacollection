@@ -54,7 +54,7 @@ export function SocialGrid() {
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-flex items-center gap-2 border border-kc-line bg-kc-white px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-kc-ink transition-colors hover:border-kc-gold"
+                className="inline-flex min-h-11 items-center gap-2 border border-kc-line bg-kc-white px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-kc-ink transition-colors hover:border-kc-gold"
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
                 {label}

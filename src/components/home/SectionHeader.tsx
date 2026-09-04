@@ -53,7 +53,7 @@ export function SectionHeader({
       {action ? (
         <AppLink
           href={action.href}
-          className={`border-b pb-0.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors ${
+          className={`inline-flex min-h-11 items-center border-b pb-0.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors lg:min-h-0 ${
             inverse
               ? "border-kc-paper/40 text-kc-paper hover:border-kc-paper"
               : "border-kc-ink text-kc-ink hover:border-kc-gold"

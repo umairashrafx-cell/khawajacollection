@@ -9,6 +9,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { PageSkeleton } from "@/components/skeletons/Skeletons";
 import { AppLink } from "@/components/layout/AppLink";
 import { Container, Section } from "@/components/layout/Container";
 import { EditorialBanner, EditorialSplit } from "@/components/home/EditorialBanner";
@@ -81,6 +82,8 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+
+  pendingComponent: PageSkeleton,
 
   component: HomePage,
 });

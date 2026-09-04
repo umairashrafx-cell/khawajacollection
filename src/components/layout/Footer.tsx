@@ -92,12 +92,18 @@ export default function Footer() {
           {footerNav.map((column) => (
             <nav key={column.heading} aria-label={column.heading}>
               <p className="kc-eyebrow text-kc-muted">{column.heading}</p>
-              <ul className="mt-5 space-y-2.5">
+              {/* space-y drops to nothing on mobile because each link now
+                  carries its own 44px touch height (Section 15). Keeping both
+                  would leave a footer of mostly gap. */}
+              <ul className="mt-3 lg:mt-5 lg:space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link.href}>
                     <AppLink
                       href={link.href}
-                      className="text-sm text-kc-charcoal transition-colors hover:text-kc-ink"
+                      // inline-flex + min-h-11 gives the 44px target Section 15
+                      // requires without changing how the text sits. Desktop
+                      // has a cursor, so it keeps the tighter rhythm.
+                      className="inline-flex min-h-11 min-w-11 items-center text-sm text-kc-charcoal transition-colors hover:text-kc-ink lg:min-h-0 lg:min-w-0"
                     >
                       {link.label}
                     </AppLink>

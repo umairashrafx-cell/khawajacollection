@@ -15,6 +15,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { SearchSkeleton } from "@/components/skeletons/Skeletons";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { catalogHead, loadCatalog, type CatalogDescriptor } from "@/lib/catalog-page";
 import { validatePlpSearch, type PlpSearch } from "@/lib/plp-search";
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/search")({
       meta: [...head.meta, { name: "robots", content: "noindex, follow" }],
     };
   },
+  pendingComponent: SearchSkeleton,
   component: SearchPage,
 });
 

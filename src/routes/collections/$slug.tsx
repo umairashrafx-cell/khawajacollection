@@ -4,6 +4,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { CatalogSkeleton } from "@/components/skeletons/Skeletons";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { catalogHead, loadCollectionListing } from "@/lib/catalog-page";
 import { validatePlpSearch } from "@/lib/plp-search";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/collections/$slug")({
     loaderData
       ? catalogHead(loaderData.descriptor, match.search, loaderData.data)
       : { meta: [{ title: "Not found | Khawaja Collection" }] },
+  pendingComponent: CatalogSkeleton,
   component: Page,
 });
 

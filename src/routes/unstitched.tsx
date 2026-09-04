@@ -6,6 +6,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { CatalogSkeleton } from "@/components/skeletons/Skeletons";
 import { CatalogPage } from "@/components/catalog/CatalogPage";
 import { unstitchedCatalog as descriptor } from "@/config/catalog-routes";
 import { catalogHead, loadCatalog } from "@/lib/catalog-page";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/unstitched")({
   loaderDeps: ({ search }) => search,
   loader: ({ deps }) => loadCatalog(descriptor, deps),
   head: ({ match, loaderData }) => catalogHead(descriptor, match.search, loaderData),
+  pendingComponent: CatalogSkeleton,
   component: Page,
 });
 

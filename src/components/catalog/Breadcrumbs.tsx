@@ -34,7 +34,13 @@ export function Breadcrumbs({
                   {crumb.label}
                 </span>
               ) : (
-                <AppLink href={crumb.href} className={`${muted} hover:underline`}>
+                <AppLink
+                  href={crumb.href}
+                  // Section 15 wants a 44px target on mobile. The row
+                  // itself stays visually compact because the extra
+                  // height is centred padding, not a taller line box.
+                  className={`${muted} inline-flex min-h-11 min-w-11 items-center hover:underline lg:min-h-0 lg:min-w-0`}
+                >
                   {crumb.label}
                 </AppLink>
               )}

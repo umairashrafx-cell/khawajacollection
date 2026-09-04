@@ -47,7 +47,7 @@ export function EditorialSplit({
           <p className="mt-4 text-sm text-kc-charcoal md:text-[15px]">{content.body}</p>
           <AppLink
             href={content.cta.href}
-            className="mt-7 inline-block border-b border-kc-ink pb-0.5 text-[11px] font-medium uppercase tracking-[0.08em] text-kc-ink transition-colors hover:border-kc-gold"
+            className="mt-7 inline-flex min-h-11 items-center border-b border-kc-ink pb-0.5 text-[11px] font-medium uppercase tracking-[0.08em] text-kc-ink transition-colors hover:border-kc-gold lg:min-h-0"
           >
             {content.cta.label}
           </AppLink>
