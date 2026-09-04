@@ -6,7 +6,7 @@
  * generated placeholders until the studio feed exists.
  */
 
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Music2, Youtube } from "lucide-react";
 
 import { Image } from "@/components/media/Image";
 import { PLACEHOLDER, site, social } from "@/config/site";
@@ -24,6 +24,8 @@ export function SocialGrid() {
   const channels: { label: string; href: string; Icon: typeof Facebook }[] = [
     { label: "Facebook", href: social.facebook, Icon: Facebook },
     { label: "Instagram", href: social.instagram, Icon: Instagram },
+    { label: "TikTok", href: social.tiktok, Icon: Music2 },
+    { label: "YouTube", href: social.youtube, Icon: Youtube },
   ];
   const live = channels.filter((c) => c.href !== "#" && c.href !== PLACEHOLDER);
 

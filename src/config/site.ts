@@ -32,24 +32,56 @@ export const announcements = [
   "Easy exchange on unworn pieces",
 ] as const;
 
+/**
+ * Supplied by Umair on 2026-09-04. All four are real and live.
+ *
+ * The TikTok handle is spelled `khuwaja`, not `khawaja` like the others. That
+ * is what he gave and it is not a typo to “correct” here — a silently
+ * “fixed” handle is a dead link.
+ */
 export const social = {
   facebook: "https://www.facebook.com/KCoffical",
-  /** PLACEHOLDER — do not invent. Section 1.3. */
-  instagram: "#",
-  /** PLACEHOLDER — do not invent. Section 1.3. */
-  tiktok: "#",
+  instagram: "https://www.instagram.com/khawaja_collection786",
+  tiktok: "https://www.tiktok.com/@khuwaja_collection786",
+  youtube: "https://www.youtube.com/@khawajacollection-e6l",
 } as const;
 
 export const contact = {
-  /** PLACEHOLDER — Section 16, floating WhatsApp button stays inert until set. */
-  whatsapp: PLACEHOLDER,
-  /** PLACEHOLDER — Section 19. */
+  /**
+   * Supplied 2026-09-04. Stored in the +92 form Section 16 normalises to, so
+   * it matches what the order repository writes. The wa.me links strip every
+   * non-digit, so the display format here is free to be readable.
+   */
+  whatsapp: "+923338757747",
+  phone: "+923338757747",
+
+  /** Still PLACEHOLDER — Section 19. Omitted from the footer and JSON-LD. */
   supportEmail: PLACEHOLDER,
-  /** PLACEHOLDER — Section 19. */
-  address: PLACEHOLDER,
-  /** PLACEHOLDER — Section 19. */
+
+  /**
+   * The shop. Structured rather than one string because the Organization
+   * JSON-LD needs a real schema.org PostalAddress — for a single-location
+   * business that is the difference between being a name and being a place
+   * Google can put on a map.
+   */
+  address: {
+    name: "Ameen Cloth House",
+    street: "Katchery Road, Main Sadar Bazar",
+    city: "Mandi Bahauddin",
+    region: "Punjab",
+    country: "PK",
+  },
+
+  /** Still PLACEHOLDER — opening hours. Shown on /contact when set. */
   hours: PLACEHOLDER,
 } as const;
+
+/** The shop address as display lines, in the order they should be read. */
+export const addressLines: readonly string[] = [
+  contact.address.name,
+  contact.address.street,
+  contact.address.city,
+];
 
 export const commerce = {
   /** Section 16 — free delivery above PKR 5,000. Integer PKR. */

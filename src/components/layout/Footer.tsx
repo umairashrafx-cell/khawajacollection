@@ -18,6 +18,7 @@ import {
   Instagram,
   Landmark,
   Music2,
+  Youtube,
   RefreshCw,
   Truck,
 } from "lucide-react";
@@ -34,13 +35,15 @@ const PAYMENT_ICON = {
 } as const;
 
 export default function Footer() {
-  // Instagram and TikTok are "#" until Umair supplies them, so they never
-  // reach the DOM. `href` is widened to string because these values become
-  // real URLs later, and comparing a literal type to "#" is not a real check.
+  // All four profiles are live as of 2026-09-04. The filter stays: it is what
+  // keeps a placeholder out of the DOM if one is ever added or emptied, and a
+  // social icon linking to "#" is worse than no icon. `href` is widened to
+  // string because comparing a literal type to "#" is not a real check.
   const allSocial: { label: string; href: string; Icon: typeof Facebook }[] = [
     { label: "Facebook", href: social.facebook, Icon: Facebook },
     { label: "Instagram", href: social.instagram, Icon: Instagram },
     { label: "TikTok", href: social.tiktok, Icon: Music2 },
+    { label: "YouTube", href: social.youtube, Icon: Youtube },
   ];
   const socialLinks = allSocial.filter((link) => link.href !== "#" && link.href !== PLACEHOLDER);
 

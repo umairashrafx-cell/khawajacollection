@@ -10,7 +10,8 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Bullets, ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
+import { Bullets, ContentPage, Inline, Section } from "@/components/content/ContentPage";
+import { contact } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
 const DESCRIPTION = pageDescription(
@@ -59,8 +60,9 @@ function AboutPage() {
 
       <Section heading="Where to find us">
         <p>
-          Our studio is at <TBC what="studio address" /> and you can reach us on{" "}
-          <TBC what="phone number" />. Full details, including opening hours, are on the{" "}
+          You can find us at {contact.address.name}, {contact.address.street},{" "}
+          {contact.address.city}, and reach us on {contact.whatsapp} — WhatsApp is usually the
+          fastest. Opening hours and everything else are on the{" "}
           <Inline href="/contact">contact page</Inline>.
         </p>
       </Section>

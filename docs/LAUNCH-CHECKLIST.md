@@ -63,10 +63,16 @@ is omitted entirely. Grep for `PLACEHOLDER` in `src/config/site.ts` and for
 `<TBC` in `src/routes/`.
 
 ### Contact — `src/config/site.ts`, `contact`
-- [ ] `whatsapp` — the floating WhatsApp button and the PDP "Enquire" CTA stay inert until this is real
-- [ ] `supportEmail` — omitted from the footer, contact page and PDP accordions
-- [ ] `address` — studio address, shown on `/contact` and `/about`
-- [ ] `hours` — opening hours
+- [x] `whatsapp` / `phone` — **+923338757747**, supplied 2026-09-04. The PDP
+      "Enquire on WhatsApp" CTA is now a live wa.me link with a prefilled
+      message, and the number is in the Organization JSON-LD.
+- [x] `address` — **Ameen Cloth House, Katchery Road, Main Sadar Bazar, Mandi
+      Bahauddin**, supplied 2026-09-04. Now a schema.org PostalAddress in the
+      Organization markup, which is what lets Google treat the shop as a place
+      rather than just a name.
+- [ ] `supportEmail` — still unset. Omitted from the footer, contact page and
+      PDP accordions rather than shown broken.
+- [ ] `hours` — opening hours. The last placeholder on `/contact`.
 
 ### Commerce — `src/config/site.ts`, `commerce`
 - [ ] `flatShippingRate` — **blocks orders under PKR 5,000** (blocker 0.2)
@@ -74,9 +80,13 @@ is omitted entirely. Grep for `PLACEHOLDER` in `src/config/site.ts` and for
 - [ ] `exchangeWindow` — e.g. `"7 days from delivery"`. Shown on `/returns` and `/faqs`
 
 ### Social — `src/config/site.ts`, `social`
-- [ ] `instagram` — currently `#`, so the link is filtered out of the footer and the social grid
-- [ ] `tiktok` — same
-- Facebook is already set and is the only live profile
+- [x] **All four profiles live** as of 2026-09-04 — Facebook, Instagram, TikTok
+      and YouTube. They render in the footer and the homepage social grid, and
+      all four are in the Organization `sameAs`, which is how a search engine
+      confirms the accounts belong to the same business.
+- Note: the TikTok handle is spelled `khuwaja_collection786`, not `khawaja`
+  like the others. That is what was supplied and is deliberately not
+  "corrected" in code — worth one click to confirm it resolves.
 
 ### Legal — the content pages
 - [ ] Registered business name and address (`/terms`, `/privacy`)

@@ -39,6 +39,19 @@ export function organizationAndWebsiteJsonLd(): unknown {
   const profiles = realSocialProfiles();
   const email = contact.supportEmail === PLACEHOLDER ? null : contact.supportEmail;
 
+  // Real as of 2026-09-04, so they belong in the markup. They were omitted
+  // while they were placeholders — an invented address in structured data is
+  // a claim made directly to a search engine, and for a single-location shop
+  // it is the claim that decides whether Google can place you on a map.
+  const postalAddress = {
+    "@type": "PostalAddress",
+    name: contact.address.name,
+    streetAddress: contact.address.street,
+    addressLocality: contact.address.city,
+    addressRegion: contact.address.region,
+    addressCountry: contact.address.country,
+  };
+
   const organization: Record<string, unknown> = {
     "@type": "Organization",
     "@id": `${hasRealOrigin() ? absoluteUrl("") : ""}/#organization`,
@@ -47,12 +60,15 @@ export function organizationAndWebsiteJsonLd(): unknown {
     ...(hasRealOrigin() ? { url: absoluteUrl("/") } : {}),
     logo: absoluteUrl("/og/khawaja-collection.png"),
     ...(profiles.length > 0 ? { sameAs: profiles } : {}),
+    address: postalAddress,
+    telephone: contact.phone,
     ...(email
       ? {
           contactPoint: {
             "@type": "ContactPoint",
             contactType: "customer support",
             email,
+            telephone: contact.phone,
             areaServed: "PK",
             availableLanguage: ["en", "ur"],
           },

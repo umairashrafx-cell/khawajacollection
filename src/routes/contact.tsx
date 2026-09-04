@@ -15,7 +15,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, MessageCircle, PackageSearch } from "lucide-react";
 
 import { ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
-import { PLACEHOLDER, contact } from "@/config/site";
+import { PLACEHOLDER, addressLines, contact } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
 const DESCRIPTION = pageDescription(
@@ -57,7 +57,19 @@ function ContactPage() {
             <span>
               <strong className="font-medium text-kc-ink">WhatsApp</strong>
               <br />
-              {isSet(contact.whatsapp) ? contact.whatsapp : <TBC what="WhatsApp number" />}
+              {isSet(contact.whatsapp) ? (
+                <a
+                  // wa.me wants digits only; the stored value carries a +.
+                  href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="underline underline-offset-4 hover:text-kc-gold"
+                >
+                  {contact.whatsapp}
+                </a>
+              ) : (
+                <TBC what="WhatsApp number" />
+              )}
               <br />
               <span className="text-xs text-kc-muted">
                 Best for sizing, fabric questions and made-to-order enquiries.
@@ -92,7 +104,11 @@ function ContactPage() {
             <span>
               <strong className="font-medium text-kc-ink">Studio</strong>
               <br />
-              {isSet(contact.address) ? contact.address : <TBC what="studio address" />}
+              {addressLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
               <br />
               {isSet(contact.hours) ? (
                 <span className="text-xs text-kc-muted">{contact.hours}</span>
