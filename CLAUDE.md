@@ -256,6 +256,28 @@ later step fails — a sold-out third line, unconfigured shipping, payment
 refusing, or the order write throwing. Without that a failed checkout silently
 eats stock nobody bought.
 
+## Cancelling an order restocks it
+
+The mirror of the reservation bug above, and found immediately after it: an
+order could be cancelled and the stock never came back. On a cash-on-delivery
+shop, where refused deliveries are ordinary, that drifts inventory downward
+forever until a piece reads sold out with a pile of it in the shop.
+
+`/api/admin/orders` now reads the order before writing it, because the right
+behaviour depends on the TRANSITION, not the destination:
+
+- into `cancelled` from anything else -> release every line's stock
+- out of `cancelled` -> RE-RESERVE first, and refuse the whole status change
+  with a 409 if any line cannot be taken. Reopening an order for goods that
+  have since sold is worse than refusing to reopen it.
+- `cancelled` -> `cancelled` -> nothing, so clicking twice cannot invent stock
+
+`cancelled` is the only status that touches stock, and the only one that
+safely can: it is the single point in the lifecycle where the goods are
+certainly still on the shelf. There is no `returned` status in
+`OrderStatus`; if one is ever added, returned goods should NOT auto-restock
+(they may come back damaged) — count them in by hand.
+
 ## Admin panel
 
 Not a spec phase — built on request, at `/admin`, behind the `admins` table

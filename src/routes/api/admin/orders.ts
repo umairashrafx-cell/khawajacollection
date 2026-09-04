@@ -18,7 +18,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { adminFromRequest } from "@/lib/auth/verify";
-import { orderRepository } from "@/lib/repositories";
+import { orderRepository, productRepository } from "@/lib/repositories";
 import { ORDER_STEPS } from "@/lib/order-steps";
 import type { Order, OrderStatus } from "@/types";
 
@@ -218,8 +218,75 @@ export const Route = createFileRoute("/api/admin/orders")({
           );
         }
 
+        /*
+         * CANCELLING PUTS THE STOCK BACK, and that is why this reads the order
+         * before writing it: what should happen depends on the TRANSITION, not
+         * on the destination. Cancelling an order that is already cancelled
+         * must not restock it a second time, or an admin clicking twice would
+         * invent inventory.
+         *
+         * "cancelled" is the only status that does this, and the only one that
+         * can: it is the single point in the lifecycle where the goods are
+         * certainly still on the shelf. Everything from "confirmed" to
+         * "delivered" is a step towards the customer having them.
+         *
+         * It matters more here than in most shops because this one is cash on
+         * delivery. Refused deliveries are ordinary, and without this every
+         * refusal would quietly shrink the count until a piece read as sold
+         * out while a pile of it sat in the shop.
+         */
+        const existing = await orderRepository.listAll({ q: orderNumber, perPage: 5 });
+        const before = existing.items.find(
+          (candidate) => candidate.orderNumber.toLowerCase() === orderNumber.trim().toLowerCase(),
+        );
+        if (!before) return json({ ok: false, error: "Order not found." }, 404);
+
+        const wasCancelled = before.status === "cancelled";
+        const willCancel = status === "cancelled";
+
+        /*
+         * Reopening a cancelled order takes stock back OFF the shelf, and that
+         * can fail — the pieces may have sold in the meantime. So it happens
+         * BEFORE the status moves, and a failure refuses the whole change
+         * rather than leaving an active order for goods that are gone.
+         */
+        const retaken: { variantId: string; quantity: number }[] = [];
+        if (wasCancelled && !willCancel) {
+          for (const item of before.items) {
+            const remaining = await productRepository.reserveStock(item.variantId, item.quantity);
+            if (remaining === null) {
+              for (const held of retaken) {
+                await productRepository.releaseStock(held.variantId, held.quantity);
+              }
+              return json(
+                {
+                  ok: false,
+                  error:
+                    `This order cannot be reopened: ${item.nameSnapshot} in size ${item.size} ` +
+                    "is out of stock again. Add stock for it first, then change the status.",
+                },
+                409,
+              );
+            }
+            retaken.push({ variantId: item.variantId, quantity: item.quantity });
+          }
+        }
+
         const updated = await orderRepository.updateStatus(orderNumber, status);
-        if (!updated) return json({ ok: false, error: "Order not found." }, 404);
+        if (!updated) {
+          for (const held of retaken) {
+            await productRepository.releaseStock(held.variantId, held.quantity);
+          }
+          return json({ ok: false, error: "Order not found." }, 404);
+        }
+
+        // After the status is safely recorded, not before: if that write had
+        // failed we would have restocked an order that is still live.
+        if (willCancel && !wasCancelled) {
+          for (const item of before.items) {
+            await productRepository.releaseStock(item.variantId, item.quantity);
+          }
+        }
 
         return json({ ok: true, order: toAdminOrder(updated) });
       },
