@@ -112,16 +112,17 @@ image load, no invented business facts.
       order repository, Auth, account pages and the wishlist merge are all
       built. 60 products / 425 variants / 174 images are in Postgres and both
       repositories produce byte-identical listings, facets and PDPs.
-      **Two things block calling it done:**
-      1. `supabase/migrations/0003_accounts.sql` is NOT APPLIED to the live
-         project. Until it is, `addresses` does not exist and `orders` has no
-         `order_number` default, so placing an order under `supabase` fails.
-      2. `SUPABASE_SERVICE_ROLE_KEY` is empty in `.env.local`, so every
-         server-side order path fails closed. The old key was pasted into a
-         chat transcript and must be rotated before it is used again.
-      Also still open: uploading placeholder images to Storage — deliberately
-      deferred, they are throwaway scaffolding due to be replaced by the real
-      photography pipeline (Section 19).
+      Migrations 0001–0003 are applied to the live project and Supabase's
+      security advisors are clean.
+      **One thing blocks calling it done:** `SUPABASE_SERVICE_ROLE_KEY` is
+      empty in `.env.local`, so every server-side order path fails closed and
+      order placement cannot be exercised end to end under `supabase`. The old
+      key was pasted into a chat transcript and must be rotated before use.
+      Also still open: the sign-up / wishlist-merge / order-history walkthrough
+      (needs a real account, which only Umair can create), and uploading
+      placeholder images to Storage — deliberately deferred, they are throwaway
+      scaffolding due to be replaced by the real photography pipeline
+      (Section 19).
 - [ ] **Phase 9** — SEO, performance, a11y, launch
 
 ## Known debt from the Lovable prototype

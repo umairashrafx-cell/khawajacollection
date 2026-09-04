@@ -23,12 +23,18 @@ create sequence if not exists order_number_seq;
 -- Matches formatOrderNumber() in src/lib/format.ts exactly: KC-2026-00042.
 -- Generating it here rather than in the application means two concurrent
 -- checkouts cannot be handed the same number, whatever the isolate count.
+-- `set search_path = ''` with everything schema-qualified. Without it the
+-- function resolves `to_char`, `lpad` and `nextval` through whatever
+-- search_path its caller happens to have, so anyone able to create a schema
+-- earlier on that path could shadow them and decide what an order number says.
+-- Supabase's own database linter flags this as function_search_path_mutable.
 create or replace function next_order_number() returns text
   language sql
   volatile
+  set search_path = ''
 as $$
-  select 'KC-' || to_char(now(), 'YYYY') || '-' ||
-         lpad(nextval('order_number_seq')::text, 5, '0');
+  select 'KC-' || pg_catalog.to_char(pg_catalog.now(), 'YYYY') || '-' ||
+         pg_catalog.lpad(pg_catalog.nextval('public.order_number_seq')::text, 5, '0');
 $$;
 
 alter table orders alter column order_number set default next_order_number();
