@@ -158,18 +158,23 @@ image load, no invented business facts.
 
 ## Known debt from the Lovable prototype
 
-Phase 6 removed the prototype data/state layer entirely: `src/context/ShopContext.jsx`,
+**None left in code.** `src/` is now entirely TypeScript.
+
+Phase 6 removed the prototype data/state layer (`src/context/ShopContext.jsx`,
 `src/components/shop/`, `src/lib/legacy-shop-adapter.ts` and the prototype
-`cart` / `wishlist` / `search` routes are all deleted. What is left:
+`cart` / `wishlist` / `search` routes). Phase 7 rebuilt checkout, account,
+tracking and order confirmation in TypeScript. Phase 9 rebuilt the sitemap from
+the repository, which retired `src/services/catalogService.js` and
+`src/data/legacy/{products,categories}.js`, then deleted the last six orphaned
+Lovable components — `CategoryTiles`, `EditorialSplit`, `Hero`, `Newsletter`,
+`SocialStrip` and `PageContainer` — along with `src/data/legacy/promos.js`,
+their only remaining consumer.
 
-- `src/data/legacy/*.js` (16 products, no variants) still backs
-  `src/services/catalogService.js`, which now only serves `sitemap[.]xml.jsx`.
-  Phase 9 rebuilds the sitemap from the repository and both can go.
-- Phase 7 rebuilt checkout, account, tracking and order confirmation in
-  TypeScript and deleted `src/services/orderService.js`. The only Lovable-era
-  JavaScript left is `src/services/catalogService.js` and `src/data/legacy/`,
-  which now serve `sitemap[.]xml.jsx` alone.
-
+Worth knowing why they lingered: each had a TypeScript replacement under a
+*different* filename (`EditorialSplit` moved into `EditorialBanner.tsx`,
+`Newsletter` into `NewsletterSection.tsx`), so a grep for the component name
+kept finding hits and they read as live. Only checking actual imports showed
+all six had none.
 ⚠ **ORDERS ARE IN-MEMORY WHENEVER `VITE_PRODUCT_REPOSITORY=mock`.**
 `MockOrderRepository` holds orders in a module-level Map, so on Vercel or
 Cloudflare the next request may hit a different isolate and a placed order will
