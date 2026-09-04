@@ -14,8 +14,12 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as BridalRouteImport } from './routes/bridal'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as ReadyToWearRouteImport } from './routes/ready-to-wear'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SaleRouteImport } from './routes/sale'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -24,11 +28,14 @@ import { Route as UnstitchedRouteImport } from './routes/unstitched'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccessoriesIndexRouteImport } from './routes/accessories/index'
 import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories/$subcategory'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
+import { Route as AccountAddressesRouteImport } from './routes/account/addresses'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
 import { Route as ApiOrdersRouteImport } from './routes/api/orders'
 import { Route as ApiProductRouteImport } from './routes/api/product'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
+import { Route as ApiWishlistEntriesRouteImport } from './routes/api/wishlist-entries'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as MenIndexRouteImport } from './routes/men/index'
@@ -38,6 +45,9 @@ import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
 import { Route as WomenIndexRouteImport } from './routes/women/index'
 import { Route as WomenSubcategoryRouteImport } from './routes/women/$subcategory'
+import { Route as AccountOrdersIndexRouteImport } from './routes/account/orders.index'
+import { Route as AccountOrdersOrderNumberRouteImport } from './routes/account/orders.$orderNumber'
+import { Route as ApiAccountOrdersRouteImport } from './routes/api/account/orders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +74,16 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewArrivalsRoute = NewArrivalsRouteImport.update({
   id: '/new-arrivals',
   path: '/new-arrivals',
@@ -72,6 +92,16 @@ const NewArrivalsRoute = NewArrivalsRouteImport.update({
 const ReadyToWearRoute = ReadyToWearRouteImport.update({
   id: '/ready-to-wear',
   path: '/ready-to-wear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SaleRoute = SaleRouteImport.update({
@@ -114,6 +144,16 @@ const AccessoriesSubcategoryRoute = AccessoriesSubcategoryRouteImport.update({
   path: '/accessories/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountAddressesRoute = AccountAddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
+  getParentRoute: () => AccountRoute,
+} as any)
 const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
   id: '/api/newsletter',
   path: '/api/newsletter',
@@ -137,6 +177,11 @@ const ApiSearchRoute = ApiSearchRouteImport.update({
 const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
   id: '/api/track-order',
   path: '/api/track-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistEntriesRoute = ApiWishlistEntriesRouteImport.update({
+  id: '/api/wishlist-entries',
+  path: '/api/wishlist-entries',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -184,15 +229,35 @@ const WomenSubcategoryRoute = WomenSubcategoryRouteImport.update({
   path: '/women/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountOrdersIndexRoute = AccountOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountOrdersOrderNumberRoute =
+  AccountOrdersOrderNumberRouteImport.update({
+    id: '/orders/$orderNumber',
+    path: '/orders/$orderNumber',
+    getParentRoute: () => AccountRoute,
+  } as any)
+const ApiAccountOrdersRoute = ApiAccountOrdersRouteImport.update({
+  id: '/api/account/orders',
+  path: '/api/account/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
   '/ready-to-wear': typeof ReadyToWearRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -200,11 +265,13 @@ export interface FileRoutesByFullPath {
   '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
+  '/account/addresses': typeof AccountAddressesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
+  '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -213,17 +280,24 @@ export interface FileRoutesByFullPath {
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
+  '/account/': typeof AccountIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
+  '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/account/orders/': typeof AccountOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
   '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
   '/ready-to-wear': typeof ReadyToWearRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -231,11 +305,13 @@ export interface FileRoutesByTo {
   '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
+  '/account/addresses': typeof AccountAddressesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
+  '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -244,18 +320,26 @@ export interface FileRoutesByTo {
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories': typeof AccessoriesIndexRoute
+  '/account': typeof AccountIndexRoute
   '/men': typeof MenIndexRoute
   '/women': typeof WomenIndexRoute
+  '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/account/orders': typeof AccountOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
   '/ready-to-wear': typeof ReadyToWearRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -263,11 +347,13 @@ export interface FileRoutesById {
   '/unstitched': typeof UnstitchedRoute
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
+  '/account/addresses': typeof AccountAddressesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
+  '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -276,8 +362,12 @@ export interface FileRoutesById {
   '/products/$slug': typeof ProductsSlugRoute
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
+  '/account/': typeof AccountIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
+  '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/account/orders/': typeof AccountOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -287,8 +377,12 @@ export interface FileRouteTypes {
     | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/forgot-password'
+    | '/login'
     | '/new-arrivals'
     | '/ready-to-wear'
+    | '/register'
+    | '/reset-password'
     | '/sale'
     | '/search'
     | '/sitemap.xml'
@@ -296,11 +390,13 @@ export interface FileRouteTypes {
     | '/unstitched'
     | '/wishlist'
     | '/accessories/$subcategory'
+    | '/account/addresses'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
+    | '/api/wishlist-entries'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -309,17 +405,24 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories/'
+    | '/account/'
     | '/men/'
     | '/women/'
+    | '/account/orders/$orderNumber'
+    | '/api/account/orders'
+    | '/account/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/account'
     | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/forgot-password'
+    | '/login'
     | '/new-arrivals'
     | '/ready-to-wear'
+    | '/register'
+    | '/reset-password'
     | '/sale'
     | '/search'
     | '/sitemap.xml'
@@ -327,11 +430,13 @@ export interface FileRouteTypes {
     | '/unstitched'
     | '/wishlist'
     | '/accessories/$subcategory'
+    | '/account/addresses'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
+    | '/api/wishlist-entries'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -340,8 +445,12 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories'
+    | '/account'
     | '/men'
     | '/women'
+    | '/account/orders/$orderNumber'
+    | '/api/account/orders'
+    | '/account/orders'
   id:
     | '__root__'
     | '/'
@@ -349,8 +458,12 @@ export interface FileRouteTypes {
     | '/bridal'
     | '/cart'
     | '/checkout'
+    | '/forgot-password'
+    | '/login'
     | '/new-arrivals'
     | '/ready-to-wear'
+    | '/register'
+    | '/reset-password'
     | '/sale'
     | '/search'
     | '/sitemap.xml'
@@ -358,11 +471,13 @@ export interface FileRouteTypes {
     | '/unstitched'
     | '/wishlist'
     | '/accessories/$subcategory'
+    | '/account/addresses'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
+    | '/api/wishlist-entries'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -371,18 +486,26 @@ export interface FileRouteTypes {
     | '/products/$slug'
     | '/women/$subcategory'
     | '/accessories/'
+    | '/account/'
     | '/men/'
     | '/women/'
+    | '/account/orders/$orderNumber'
+    | '/api/account/orders'
+    | '/account/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountRoute: typeof AccountRoute
+  AccountRoute: typeof AccountRouteWithChildren
   BridalRoute: typeof BridalRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
   NewArrivalsRoute: typeof NewArrivalsRoute
   ReadyToWearRoute: typeof ReadyToWearRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SaleRoute: typeof SaleRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -395,6 +518,7 @@ export interface RootRouteChildren {
   ApiProductRoute: typeof ApiProductRoute
   ApiSearchRoute: typeof ApiSearchRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
+  ApiWishlistEntriesRoute: typeof ApiWishlistEntriesRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   MenSubcategoryRoute: typeof MenSubcategoryRoute
@@ -405,6 +529,7 @@ export interface RootRouteChildren {
   AccessoriesIndexRoute: typeof AccessoriesIndexRoute
   MenIndexRoute: typeof MenIndexRoute
   WomenIndexRoute: typeof WomenIndexRoute
+  ApiAccountOrdersRoute: typeof ApiAccountOrdersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -444,6 +569,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/new-arrivals': {
       id: '/new-arrivals'
       path: '/new-arrivals'
@@ -456,6 +595,20 @@ declare module '@tanstack/react-router' {
       path: '/ready-to-wear'
       fullPath: '/ready-to-wear'
       preLoaderRoute: typeof ReadyToWearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sale': {
@@ -514,6 +667,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccessoriesSubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/': {
+      id: '/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/addresses': {
+      id: '/account/addresses'
+      path: '/addresses'
+      fullPath: '/account/addresses'
+      preLoaderRoute: typeof AccountAddressesRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/api/newsletter': {
       id: '/api/newsletter'
       path: '/api/newsletter'
@@ -547,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/api/track-order'
       fullPath: '/api/track-order'
       preLoaderRoute: typeof ApiTrackOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist-entries': {
+      id: '/api/wishlist-entries'
+      path: '/api/wishlist-entries'
+      fullPath: '/api/wishlist-entries'
+      preLoaderRoute: typeof ApiWishlistEntriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -612,17 +786,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WomenSubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/orders/': {
+      id: '/account/orders/'
+      path: '/orders'
+      fullPath: '/account/orders/'
+      preLoaderRoute: typeof AccountOrdersIndexRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/orders/$orderNumber': {
+      id: '/account/orders/$orderNumber'
+      path: '/orders/$orderNumber'
+      fullPath: '/account/orders/$orderNumber'
+      preLoaderRoute: typeof AccountOrdersOrderNumberRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/api/account/orders': {
+      id: '/api/account/orders'
+      path: '/api/account/orders'
+      fullPath: '/api/account/orders'
+      preLoaderRoute: typeof ApiAccountOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AccountRouteChildren {
+  AccountAddressesRoute: typeof AccountAddressesRoute
+  AccountIndexRoute: typeof AccountIndexRoute
+  AccountOrdersOrderNumberRoute: typeof AccountOrdersOrderNumberRoute
+  AccountOrdersIndexRoute: typeof AccountOrdersIndexRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountAddressesRoute: AccountAddressesRoute,
+  AccountIndexRoute: AccountIndexRoute,
+  AccountOrdersOrderNumberRoute: AccountOrdersOrderNumberRoute,
+  AccountOrdersIndexRoute: AccountOrdersIndexRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountRoute: AccountRoute,
+  AccountRoute: AccountRouteWithChildren,
   BridalRoute: BridalRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
   NewArrivalsRoute: NewArrivalsRoute,
   ReadyToWearRoute: ReadyToWearRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SaleRoute: SaleRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -635,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductRoute: ApiProductRoute,
   ApiSearchRoute: ApiSearchRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
+  ApiWishlistEntriesRoute: ApiWishlistEntriesRoute,
   CategorySlugRoute: CategorySlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   MenSubcategoryRoute: MenSubcategoryRoute,
@@ -645,6 +862,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccessoriesIndexRoute: AccessoriesIndexRoute,
   MenIndexRoute: MenIndexRoute,
   WomenIndexRoute: WomenIndexRoute,
+  ApiAccountOrdersRoute: ApiAccountOrdersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

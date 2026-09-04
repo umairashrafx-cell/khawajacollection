@@ -84,6 +84,19 @@ export function mergeInto(remote: WishlistEntry[]): WishlistEntry[] {
   return merged;
 }
 
+/**
+ * Non-reactive access, for the Supabase mirror in src/lib/auth/wishlist-sync.ts.
+ * Components must use the hooks below instead — these read outside React and
+ * so will not re-render anything.
+ */
+export function getWishlistSnapshot(): WishlistEntry[] {
+  return store.get();
+}
+
+export function subscribeToWishlist(listener: () => void): () => void {
+  return store.subscribe(listener);
+}
+
 /* --- Reads ---------------------------------------------------------- */
 
 const EMPTY: WishlistEntry[] = [];

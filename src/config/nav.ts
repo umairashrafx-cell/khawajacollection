@@ -207,4 +207,5 @@ export const noindexRoutes = [
   "/login",
   "/register",
   "/forgot-password",
+  "/reset-password",
 ] as const;

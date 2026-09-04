@@ -11,8 +11,8 @@
 
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check } from "lucide-react";
 
+import { OrderStatusSteps } from "@/components/account/OrderStatusSteps";
 import { Container } from "@/components/layout/Container";
 import { formatDate, formatPKR } from "@/lib/format";
 import type { OrderStatus, OrderTotals } from "@/types";
@@ -31,16 +31,6 @@ export const Route = createFileRoute("/track-order")({
   }),
   component: TrackOrderPage,
 });
-
-/** Section 11.6 — the six steps, in order. `cancelled` sits outside them. */
-const STEPS: { status: OrderStatus; label: string; description: string }[] = [
-  { status: "placed", label: "Placed", description: "We have your order." },
-  { status: "confirmed", label: "Confirmed", description: "Stock checked and reserved." },
-  { status: "processing", label: "Processing", description: "Being packed in the studio." },
-  { status: "shipped", label: "Shipped", description: "Handed to the courier." },
-  { status: "out_for_delivery", label: "Out for delivery", description: "With you today." },
-  { status: "delivered", label: "Delivered", description: "Received. Thank you." },
-];
 
 interface TrackedOrder {
   orderNumber: string;
@@ -148,9 +138,6 @@ function TrackOrderPage() {
 }
 
 function Timeline({ order }: { order: TrackedOrder }) {
-  const currentIndex = STEPS.findIndex((step) => step.status === order.status);
-  const cancelled = order.status === "cancelled";
-
   return (
     <section className="mt-10 border border-kc-line bg-kc-white p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-kc-line pb-4">
@@ -160,49 +147,9 @@ function Timeline({ order }: { order: TrackedOrder }) {
         </p>
       </div>
 
-      {cancelled ? (
-        <p className="mt-6 text-sm text-kc-sale">This order was cancelled.</p>
-      ) : (
-        <ol className="mt-6 space-y-0">
-          {STEPS.map((step, index) => {
-            const done = index <= currentIndex;
-            const isCurrent = index === currentIndex;
-            const isLast = index === STEPS.length - 1;
-
-            return (
-              <li key={step.status} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border ${
-                      done ? "border-kc-ink bg-kc-ink" : "border-kc-line bg-kc-white"
-                    }`}
-                  >
-                    {done ? (
-                      <Check className="h-3.5 w-3.5 text-kc-paper" aria-hidden="true" />
-                    ) : null}
-                  </span>
-                  {!isLast ? (
-                    <span
-                      className={`w-px flex-1 ${index < currentIndex ? "bg-kc-ink" : "bg-kc-line"}`}
-                    />
-                  ) : null}
-                </div>
-
-                <div className={`pb-6 ${isLast ? "pb-0" : ""}`}>
-                  <p
-                    className={`text-sm font-medium ${done ? "text-kc-ink" : "text-kc-muted"}`}
-                    aria-current={isCurrent ? "step" : undefined}
-                  >
-                    {step.label}
-                    {isCurrent ? <span className="sr-only"> — current status</span> : null}
-                  </p>
-                  <p className="mt-0.5 text-xs text-kc-muted">{step.description}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+      <div className="mt-6">
+        <OrderStatusSteps status={order.status} />
+      </div>
 
       <div className="mt-6 border-t border-kc-line pt-4">
         <h3 className="kc-eyebrow text-kc-muted">Items</h3>

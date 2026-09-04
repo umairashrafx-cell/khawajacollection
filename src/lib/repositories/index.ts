@@ -14,6 +14,7 @@ import {
 } from "./mock/mock-taxonomy-repositories";
 import { MockOrderRepository } from "./mock/mock-order-repository";
 import { MockProductRepository } from "./mock/mock-product-repository";
+import { SupabaseOrderRepository } from "./supabase/supabase-order-repository";
 import { SupabaseProductRepository } from "./supabase/supabase-product-repository";
 import type {
   CategoryRepository,
@@ -43,11 +44,17 @@ export const productRepository: ProductRepository =
 export const categoryRepository: CategoryRepository = new MockCategoryRepository();
 export const collectionRepository: CollectionRepository = new MockCollectionRepository();
 /**
- * ⚠ In-memory until Phase 8 — see mock-order-repository.ts. Orders do not
- * survive a server restart, and on serverless they very likely do not survive
- * the next request either.
+ * Orders follow the same flag as the catalogue, and for a stronger reason: on
+ * "supabase" they are rows in Postgres and survive a redeploy, while on
+ * "mock" they live in a module-level Map that does not survive the next cold
+ * isolate. A deployment that reads its catalogue from Postgres but writes its
+ * orders to memory would be the worst of both, so one flag decides both.
+ *
+ * ⚠ UNDER "mock", ORDERS ARE STILL IN MEMORY. Do not take real orders on a
+ * mock deployment — see mock-order-repository.ts.
  */
-export const orderRepository: OrderRepository = new MockOrderRepository();
+export const orderRepository: OrderRepository =
+  implementation === "supabase" ? new SupabaseOrderRepository() : new MockOrderRepository();
 
 export type {
   CategoryNode,

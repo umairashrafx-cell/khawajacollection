@@ -124,6 +124,9 @@ function toProduct(row: Row): Product {
   };
 }
 
+/** Canonical UUID shape, as Postgres accepts it. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Slug to display name for facet labels and search. Cached for the process:
  * the taxonomy changes when someone edits the catalogue, not per request.
@@ -183,6 +186,15 @@ export class SupabaseProductRepository implements ProductRepository {
   }
 
   async getById(id: string): Promise<Product | null> {
+    // `products.id` is a uuid column, so Postgres raises 22P02 on anything
+    // that is not one and PostgREST turns that into a 500. Every caller here
+    // takes its id from somewhere a stranger can reach — /api/orders reads it
+    // straight off the request body — so a malformed id has to mean "no such
+    // product", which is the truth, rather than crashing the endpoint. The
+    // mock repository already behaved this way; without this guard the two
+    // implementations disagreed and only the Supabase one 500'd.
+    if (!UUID.test(id)) return null;
+
     const { data, error } = await browserClient()
       .from("products")
       .select(SELECT)

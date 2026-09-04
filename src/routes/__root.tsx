@@ -16,6 +16,7 @@ import AnnouncementBar from "../components/layout/AnnouncementBar";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { Announcer } from "../components/a11y/Announcer";
+import { useAccountSync } from "@/hooks/useAccountSync";
 import { useSearchHotkey } from "../hooks/useSearchHotkey";
 import { useOverlay } from "../store/ui-store";
 
@@ -138,6 +139,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const overlay = useOverlay();
   useSearchHotkey();
+  useAccountSync();
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -34,6 +34,18 @@ export function supabaseUrl(): string {
 }
 
 /**
+ * Whether this deployment has Supabase at all.
+ *
+ * Phase 8 item 6 requires the mock repository to stay a valid way to run the
+ * whole site, and a mock deployment has no Supabase credentials. Anything that
+ * would otherwise throw on a missing key — the account pages, sign-in — asks
+ * this first and says so plainly instead of white-screening.
+ */
+export function isSupabaseConfigured(): boolean {
+  return Boolean(import.meta.env["VITE_SUPABASE_URL"] && import.meta.env["VITE_SUPABASE_ANON_KEY"]);
+}
+
+/**
  * Anonymous, RLS-governed client. Safe in the browser and on the server.
  * Reads the catalogue; can never read an order.
  */

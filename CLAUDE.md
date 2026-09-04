@@ -108,15 +108,18 @@ image load, no invented business facts.
 - [x] **Phase 5** — PDP
 - [x] **Phase 6** — Cart, wishlist, search
 - [x] **Phase 7** — Checkout, orders, tracking
-- [~] **Phase 8** — Supabase migration. Schema, RLS, client, repository and
-      seed are done and verified against the live project. 60 products / 425
-      variants / 174 images are in Postgres; both repositories produce
-      byte-identical listings, facets and PDPs, and `VITE_PRODUCT_REPOSITORY`
-      flips between them with no code change. RLS verified with the
-      publishable key: catalogue readable, `orders` and `order_items` return
-      `[]`, catalogue INSERT returns 401.
-      **Still open:** item 5 (Supabase Auth, account pages, wishlist merge on
-      login) and uploading the placeholder images to Storage — deliberately
+- [~] **Phase 8** — Supabase migration. Schema, RLS, product repository, seed,
+      order repository, Auth, account pages and the wishlist merge are all
+      built. 60 products / 425 variants / 174 images are in Postgres and both
+      repositories produce byte-identical listings, facets and PDPs.
+      **Two things block calling it done:**
+      1. `supabase/migrations/0003_accounts.sql` is NOT APPLIED to the live
+         project. Until it is, `addresses` does not exist and `orders` has no
+         `order_number` default, so placing an order under `supabase` fails.
+      2. `SUPABASE_SERVICE_ROLE_KEY` is empty in `.env.local`, so every
+         server-side order path fails closed. The old key was pasted into a
+         chat transcript and must be rotated before it is used again.
+      Also still open: uploading placeholder images to Storage — deliberately
       deferred, they are throwaway scaffolding due to be replaced by the real
       photography pipeline (Section 19).
 - [ ] **Phase 9** — SEO, performance, a11y, launch
@@ -135,11 +138,13 @@ Phase 6 removed the prototype data/state layer entirely: `src/context/ShopContex
   JavaScript left is `src/services/catalogService.js` and `src/data/legacy/`,
   which now serve `sitemap[.]xml.jsx` alone.
 
-⚠ **ORDERS ARE IN-MEMORY UNTIL PHASE 8.** `MockOrderRepository` holds orders in
-a module-level Map. That is fine locally and useless in production: on Vercel
-or Cloudflare the next request may hit a different isolate, so a placed order
-will usually be invisible to tracking. **Do not take real orders before Phase 8
-replaces it with Supabase.**
+⚠ **ORDERS ARE IN-MEMORY WHENEVER `VITE_PRODUCT_REPOSITORY=mock`.**
+`MockOrderRepository` holds orders in a module-level Map, so on Vercel or
+Cloudflare the next request may hit a different isolate and a placed order will
+usually be invisible to tracking. Under `supabase` orders are rows in Postgres
+and this does not apply. **Do not take real orders on a mock deployment**, and
+do not take them under `supabase` either until 0003 is applied and the service
+role key is set — see the Phase 8 note above.
 - `src/routes/category.$slug.tsx` and `product.$slug.tsx` are redirect-only,
   301ing every legacy URL to its new home. Delete once the old URLs stop
   appearing in Search Console.

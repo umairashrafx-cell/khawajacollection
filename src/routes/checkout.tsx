@@ -13,7 +13,7 @@
  * noindex per Section 7.
  */
 
-import { cloneElement, isValidElement, useState, type ReactElement } from "react";
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,9 @@ import { CartTotals } from "@/components/cart/CartSummary";
 import { Container } from "@/components/layout/Container";
 import { Image } from "@/components/media/Image";
 import { paymentMethods, provinces } from "@/config/site";
+import { Field } from "@/components/forms/Field";
+import { inputClass } from "@/components/forms/input-class";
+import { accessToken } from "@/lib/auth/session-store";
 import { checkoutSchema, type CheckoutInput } from "@/lib/checkout-schema";
 import { formatPKR } from "@/lib/format";
 import { announce } from "@/store/announcer";
@@ -63,9 +66,17 @@ function CheckoutPage() {
   async function onSubmit(values: CheckoutInput) {
     setServerError(null);
     try {
+      // Sent when signed in, so the order lands in the account history. The
+      // server verifies it; a missing or stale token just means a guest
+      // order, which is a supported outcome rather than an error.
+      const token = accessToken();
+
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           ...values,
           // Ids and quantities only. Prices are the server's business.
@@ -325,12 +336,6 @@ function CheckoutPage() {
   );
 }
 
-function inputClass(hasError: boolean): string {
-  return `min-h-11 w-full border bg-kc-white px-3 text-sm text-kc-ink ${
-    hasError ? "border-kc-sale" : "border-kc-line"
-  }`;
-}
-
 function Section({
   title,
   step,
@@ -350,61 +355,5 @@ function Section({
       </h2>
       <div className="mt-5 space-y-4">{children}</div>
     </section>
-  );
-}
-
-/**
- * Section 15 — every error is text tied to its input with aria-describedby,
- * never a red border alone.
- */
-function Field({
-  label,
-  hint,
-  error,
-  required = false,
-  children,
-}: {
-  label: string;
-  // `| undefined` explicitly: with exactOptionalPropertyTypes, react-hook-form's
-  // `errors.x?.message` is `string | undefined` and an optional prop alone
-  // would not accept it.
-  hint?: string | undefined;
-  error?: string | undefined;
-  required?: boolean | undefined;
-  children: React.ReactNode;
-}) {
-  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null]
-    .filter(Boolean)
-    .join(" ");
-
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm text-kc-charcoal">
-        {label}
-        {required ? <span className="text-kc-sale"> *</span> : null}
-      </label>
-      <div className="mt-1.5">
-        {/* Cloned so the label, hint and error all address the real control,
-            without every caller having to repeat the id three times. */}
-        {isValidElement(children)
-          ? cloneElement(children as ReactElement<Record<string, unknown>>, {
-              id,
-              ...(describedBy ? { "aria-describedby": describedBy } : {}),
-              ...(error ? { "aria-invalid": true } : {}),
-            })
-          : children}
-      </div>
-      {hint ? (
-        <p id={`${id}-hint`} className="mt-1 text-xs text-kc-muted">
-          {hint}
-        </p>
-      ) : null}
-      {error ? (
-        <p id={`${id}-error`} className="mt-1 text-xs text-kc-sale">
-          {error}
-        </p>
-      ) : null}
-    </div>
   );
 }

@@ -15,6 +15,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { userFromRequest } from "@/lib/auth/verify";
 import { commerce } from "@/config/site";
 import { orderRequestSchema } from "@/lib/checkout-schema";
 import { getPaymentProvider } from "@/lib/payments";
@@ -158,7 +159,41 @@ export const Route = createFileRoute("/api/orders")({
           return json({ ok: false, error: initiated.message ?? "Payment could not start." }, 400);
         }
 
-        const order = await orderRepository.create({ draft, items, totals });
+        // Guest checkout stays first-class: an unverified or absent token
+        // means the order is simply not attached to an account, never that
+        // the order is refused. Attaching it to whatever id the client
+        // claimed would be worse than not attaching it at all, so the token
+        // is verified server-side or ignored.
+        const buyer = await userFromRequest(request);
+
+        // The repository can fail for reasons the shopper cannot act on: the
+        // database unreachable, a missing service role key, a migration not
+        // applied. Letting that escape renders the framework's crash page over
+        // a filled-in checkout form, which loses the basket and says nothing.
+        // A 503 with a sentence keeps the form and tells them to try again.
+        let order;
+        try {
+          order = await orderRepository.create({
+            draft,
+            items,
+            totals,
+            ...(buyer ? { userId: buyer.id } : {}),
+          });
+        } catch (cause) {
+          // Logged in full for us, summarised for them: the message can name
+          // a table or an environment variable, and neither belongs on a
+          // customer's screen.
+          console.error("Order creation failed", cause);
+          return json(
+            {
+              ok: false,
+              error:
+                "We could not save your order just now. Nothing has been charged — " +
+                "please try again in a moment.",
+            },
+            503,
+          );
+        }
 
         return json({
           ok: true,
