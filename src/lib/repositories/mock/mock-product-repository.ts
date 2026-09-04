@@ -68,4 +68,21 @@ export class MockProductRepository implements ProductRepository {
       .sort((a, b) => score(a) - score(b) || b.reviewCount - a.reviewCount)
       .slice(0, limit);
   }
+
+  /**
+   * Mutates the in-memory catalogue. Same caveat as MockOrderRepository: it
+   * holds for the life of one process and is invisible to the next isolate,
+   * which is fine for local development and useless in production. Under
+   * `supabase` this is a real UPDATE.
+   */
+  async updateVariantStock(variantId: string, stock: number): Promise<Product | null> {
+    for (const product of products) {
+      const variant = product.variants.find((candidate) => candidate.id === variantId);
+      if (variant) {
+        variant.stock = Math.max(0, Math.trunc(stock));
+        return product;
+      }
+    }
+    return null;
+  }
 }

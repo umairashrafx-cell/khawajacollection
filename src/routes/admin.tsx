@@ -17,7 +17,7 @@
  */
 
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { ClipboardList, LayoutDashboard, LogOut, Store } from "lucide-react";
+import { Boxes, ClipboardList, LayoutDashboard, LogOut, Store } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { signOut } from "@/lib/auth/actions";
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/admin")({
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList, exact: false },
+  { href: "/admin/products", label: "Stock", icon: Boxes, exact: false },
 ] as const;
 
 function Shell({ children }: { children: React.ReactNode }) {

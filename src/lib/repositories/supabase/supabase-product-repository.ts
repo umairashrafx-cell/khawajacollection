@@ -18,7 +18,7 @@
  */
 
 import { PER_PAGE } from "@/config/filters";
-import { browserClient } from "@/lib/supabase/client";
+import { browserClient, serviceClient } from "@/lib/supabase/client";
 import type { Product, ProductImage, ProductVariant } from "@/types";
 import { buildFacets, filterAndSort } from "../shared/catalogue-query";
 import type { ProductListResult, ProductQuery, ProductRepository } from "../product-repository";
@@ -227,5 +227,33 @@ export class SupabaseProductRepository implements ProductRepository {
       .filter((candidate) => candidate.id !== product.id)
       .sort((a, b) => score(a) - score(b) || b.reviewCount - a.reviewCount)
       .slice(0, limit);
+  }
+
+  /**
+   * The one write in this file, and the one call that does NOT use the
+   * anonymous client. 0002_rls.sql gives the catalogue no update policy at
+   * all — deliberately, because nothing should be able to change stock from a
+   * browser. So this goes through the service role, which is server-only, and
+   * the admin check that authorises it happens in /api/admin/products before
+   * this is ever reached.
+   */
+  async updateVariantStock(variantId: string, stock: number): Promise<Product | null> {
+    if (!UUID.test(variantId)) return null;
+
+    const { data, error } = await (
+      await serviceClient()
+    )
+      .from("product_variants")
+      .update({ stock: Math.max(0, Math.trunc(stock)) })
+      .eq("id", variantId)
+      .select("product_id")
+      .maybeSingle();
+
+    if (error) throw new Error(`Stock update failed: ${error.message}`);
+    if (!data) return null;
+
+    // Read the product back so the caller sees the whole thing consistently,
+    // rather than a variant floating free of its product.
+    return this.getById((data as { product_id: string }).product_id);
   }
 }

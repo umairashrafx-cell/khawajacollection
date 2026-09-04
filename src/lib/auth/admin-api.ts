@@ -96,3 +96,50 @@ export async function updateOrderStatus(
   });
   return body.order;
 }
+
+/* --- Stock ----------------------------------------------------------- */
+
+export interface AdminVariant {
+  id: string;
+  sku: string;
+  size: string;
+  colorName: string;
+  stock: number;
+}
+
+export interface AdminProduct {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  categorySlug: string;
+  totalStock: number;
+  variants: AdminVariant[];
+}
+
+export interface AdminProductPage {
+  products: AdminProduct[];
+  total: number;
+  page: number;
+  perPage: number;
+}
+
+export function fetchAdminProducts(params: {
+  q?: string | undefined;
+  page?: number | undefined;
+}): Promise<AdminProductPage> {
+  const search = new URLSearchParams();
+  if (params.q) search.set("q", params.q);
+  if (params.page && params.page > 1) search.set("page", String(params.page));
+
+  const qs = search.toString();
+  return request<AdminProductPage>(`/api/admin/products${qs ? `?${qs}` : ""}`);
+}
+
+export async function updateVariantStock(variantId: string, stock: number): Promise<AdminProduct> {
+  const body = await request<{ product: AdminProduct }>("/api/admin/products", {
+    method: "POST",
+    body: JSON.stringify({ variantId, stock }),
+  });
+  return body.product;
+}

@@ -61,6 +61,20 @@ export interface ProductRepository {
   getById(id: string): Promise<Product | null>;
   getAllSlugs(): Promise<string[]>;
   related(product: Product, limit: number): Promise<Product[]>;
+
+  /**
+   * ADMIN. Set one variant's stock and return the product it belongs to.
+   *
+   * The only write on this interface, and scoped as narrowly as it can be:
+   * one variant, one integer. Prices are deliberately not editable here —
+   * `/api/orders` recomputes every price from the repository at order time
+   * (Guardrail 5), so a price is the one field where a careless edit changes
+   * what customers are charged, and it is better done deliberately in the
+   * database than with an inline input on a busy screen.
+   *
+   * Returns null when no such variant exists.
+   */
+  updateVariantStock(variantId: string, stock: number): Promise<Product | null>;
 }
 
 /**

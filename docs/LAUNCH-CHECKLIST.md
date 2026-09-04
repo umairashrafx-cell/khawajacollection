@@ -194,6 +194,11 @@ cannot write to it.
       403 from `/api/admin/orders`. Worth doing once with a real second
       account rather than trusting it.
 
+Once you are in, `/admin` has three screens: a dashboard, the order book, and
+stock. **42 of the 425 seeded variants are currently at zero** — that is mock
+data, not real counts, so walk the stock screen before launch and set what you
+actually hold.
+
 **Why `raw_app_meta_data` and not `raw_user_meta_data`:** a signed-in user can
 write their own `user_metadata` — the account page does exactly that to store a
 display name. If the admin flag lived there, any customer could promote
