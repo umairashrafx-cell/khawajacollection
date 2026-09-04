@@ -133,14 +133,28 @@ image load, no invented business facts.
       nitro cache rules + asset compression, and docs/LAUNCH-CHECKLIST.md.
       Accessibility: zero axe violations across 12 page types, all five
       overlays trap focus and close on Escape, 44px tap targets throughout.
-      Lighthouse mobile: SEO 100, Best Practices 100, Accessibility 100 on
-      home and product.
-      **Open:** mobile Performance is measured locally at 60-64 against a
-      >= 90 target. The gzipped homepage JS is 158 KB against a 180 KB budget,
-      so the bundle is within spec; the score is dominated by LCP on a
-      throttled connection serving placeholder SVG imagery from a local
-      node-server build. Re-measure on Vercel with the real photography
-      before treating the number as final — see the launch checklist.
+
+      Lighthouse (mobile, node-server production build):
+
+      | page    | Perf | A11y | BP  | SEO | LCP  |
+      |---------|------|------|-----|-----|------|
+      | home    | 70   | 100  | 100 | 100 | 5.2s |
+      | /women  | 74   | 100  | 100 | 100 | 4.6s |
+      | product | 86   | 100  | 100 | 100 | 3.4s |
+
+      Homepage JS is 158 KB gzipped against a 180 KB budget, and CLS is
+      0.001/0/0 against 0.05 — both within Section 14.
+
+      **Performance is knowingly short of the >= 90 target, by decision.**
+      LCP is the binding constraint on all three pages and on every one the
+      LCP element is placeholder imagery. Section 14 wants AVIF/WebP with a
+      responsive srcset; `<Image>` already accepts `sources` and `srcSet` and
+      is passed neither, because generated SVGs and a stock JPEG have no
+      variants to offer. Generating them needs an image library (`sharp`),
+      and on 2026-09-04 Umair chose to defer that until the real photography
+      arrives (Section 19) rather than tune images due to be deleted. Do not
+      re-raise it as an open question — build the derivative pipeline once,
+      against the real assets, and re-measure on Vercel then.
 
 ## Known debt from the Lovable prototype
 

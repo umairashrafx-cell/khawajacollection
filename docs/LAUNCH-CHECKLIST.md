@@ -138,7 +138,11 @@ Producing those variants needs an image-processing dependency (`sharp` or
 equivalent), which Hard Rule 7 forbids adding without asking. **This is a
 decision for Umair**, and it is bundled with the real photography anyway:
 
-- [ ] Decide whether to add `sharp` and generate AVIF/WebP + srcset at build time
+- [x] ~~Decide whether to add `sharp`~~ — **decided 2026-09-04: deferred.** The
+      current LCP images are throwaway placeholders, so the derivative
+      pipeline gets built once against the real photography rather than twice.
+- [ ] When the real photography lands: add the image pipeline, pass `sources`
+      and `srcSet` into `<Image>` (it already accepts both), and re-measure
 - [ ] Re-run Lighthouse after the real photography lands and after deploying to
       Vercel — a CDN with HTTP/2, edge caching and real latency is not the same
       measurement as a local Node server, and the numbers above should not be
