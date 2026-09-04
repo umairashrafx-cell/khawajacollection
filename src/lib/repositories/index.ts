@@ -60,6 +60,7 @@ export type {
   CategoryNode,
   CategoryRepository,
   CollectionRepository,
+  ProductInput,
   ProductListResult,
   ProductQuery,
   ProductRepository,

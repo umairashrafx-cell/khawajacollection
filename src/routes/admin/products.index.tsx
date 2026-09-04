@@ -22,7 +22,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Check, Search } from "lucide-react";
+import { Check, Pencil, Plus, Search } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import {
@@ -34,7 +34,7 @@ import {
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatPKR } from "@/lib/format";
 
-export const Route = createFileRoute("/admin/products")({
+export const Route = createFileRoute("/admin/products/")({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search["q"] === "string" ? search["q"] : undefined,
     filter: typeof search["filter"] === "string" ? search["filter"] : undefined,
@@ -67,10 +67,21 @@ function AdminProducts() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl text-kc-ink">Stock</h1>
-      <p className="mt-1 text-sm text-kc-muted">
-        Changes save as you leave each box. Prices are not editable here.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl text-kc-ink">Stock</h1>
+          <p className="mt-1 text-sm text-kc-muted">
+            Changes save as you leave each box. Everything else is behind Edit.
+          </p>
+        </div>
+        <AppLink
+          href="/admin/products/new"
+          className="flex min-h-11 items-center gap-2 bg-kc-ink px-5 text-sm tracking-wide text-kc-paper"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Add product
+        </AppLink>
+      </div>
 
       <form
         onSubmit={(event) => {
@@ -216,6 +227,13 @@ function ProductStock({ product }: { product: AdminProduct }) {
         >
           {soldOut ? "Sold out" : `${product.totalStock} in stock`}
         </span>
+        <AppLink
+          href={`/admin/products/${product.id}`}
+          className="flex min-h-11 items-center gap-1.5 text-xs text-kc-charcoal underline-offset-4 hover:underline"
+        >
+          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+          Edit<span className="sr-only"> {product.name}</span>
+        </AppLink>
       </div>
 
       <ul className="divide-y divide-kc-line">

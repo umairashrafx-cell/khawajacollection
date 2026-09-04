@@ -216,3 +216,99 @@ export async function fetchAdminAccess(): Promise<AdminWhoami> {
   const body = (await response.json()) as AdminWhoami;
   return { isAdmin: body.isAdmin === true, email: body.email ?? null };
 }
+
+/* --- Product editing -------------------------------------------------- */
+
+export interface AdminCategory {
+  slug: string;
+  name: string;
+  parentSlug?: string;
+  children?: { slug: string; name: string }[];
+}
+
+/**
+ * The form's own shape. Deliberately all-strings for the number fields: an
+ * <input type="number"> gives you "" while someone is retyping a price, and
+ * storing that as 0 would show a free kurta for as long as the field is empty.
+ * The strings are converted once, on the server, where a bad one can be
+ * refused with a sentence.
+ */
+export interface ProductFormValues {
+  id?: string;
+  slug: string;
+  name: string;
+  description: string;
+  shortDescription: string;
+  price: string;
+  salePrice: string;
+  categorySlug: string;
+  subcategorySlug: string;
+  fabric: string;
+  pieces: string;
+  care: string;
+  tags: string;
+  isFeatured: boolean;
+  isNewArrival: boolean;
+  isMadeToOrder: boolean;
+  isActive: boolean;
+  images: { url: string; alt: string }[];
+  variants: {
+    id?: string;
+    sku: string;
+    size: string;
+    colorName: string;
+    colorHex: string;
+    stock: string;
+  }[];
+}
+
+export interface ProductFormData {
+  categories: AdminCategory[];
+  product?: {
+    id: string;
+    slug: string;
+    name: string;
+    description: string;
+    shortDescription: string;
+    price: number;
+    salePrice?: number;
+    categorySlug: string;
+    subcategorySlug?: string;
+    fabric?: string;
+    pieces?: number;
+    care?: string;
+    tags: string[];
+    isFeatured: boolean;
+    isNewArrival: boolean;
+    isMadeToOrder?: boolean;
+    images: { url: string; alt: string }[];
+    variants: {
+      id: string;
+      sku: string;
+      size: string;
+      colorName: string;
+      colorHex: string;
+      stock: number;
+    }[];
+  };
+}
+
+export function fetchProductForm(id?: string): Promise<ProductFormData> {
+  return request<ProductFormData>(`/api/admin/product${id ? `?id=${encodeURIComponent(id)}` : ""}`);
+}
+
+export async function saveProduct(
+  values: ProductFormValues,
+): Promise<{ slug: string; id: string }> {
+  const body = await request<{ product: { slug: string; id: string } }>("/api/admin/product", {
+    method: "POST",
+    body: JSON.stringify({
+      ...values,
+      tags: values.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+    }),
+  });
+  return body.product;
+}

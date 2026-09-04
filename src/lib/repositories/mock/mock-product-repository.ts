@@ -16,7 +16,12 @@ import { collections } from "@/data/collections";
 import { products } from "@/data/products";
 import type { Product } from "@/types";
 import { buildFacets, filterAndSort } from "../shared/catalogue-query";
-import type { ProductListResult, ProductQuery, ProductRepository } from "../product-repository";
+import type {
+  ProductInput,
+  ProductListResult,
+  ProductQuery,
+  ProductRepository,
+} from "../product-repository";
 
 /** Slug to display name, for search matching and facet labels. */
 const NAMES = new Map<string, string>([
@@ -25,6 +30,11 @@ const NAMES = new Map<string, string>([
 ]);
 
 const BY_ID = new Map(products.map((product) => [product.id, product]));
+
+/** A fresh id for a variant the admin just added. */
+function newVariantId(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `var-${Date.now()}-${Math.random()}`;
+}
 
 export class MockProductRepository implements ProductRepository {
   async list(query: ProductQuery): Promise<ProductListResult> {
@@ -84,5 +94,73 @@ export class MockProductRepository implements ProductRepository {
       }
     }
     return null;
+  }
+
+  /**
+   * Create or replace in the in-memory catalogue. Same caveat as every other
+   * write here: it holds for one process and is invisible to the next isolate.
+   * It exists because Phase 8 item 6 requires the mock to stay a valid way to
+   * run the whole site, and an admin that cannot save is not that.
+   */
+  async saveProduct(input: ProductInput, id?: string): Promise<Product> {
+    const existing = id ? BY_ID.get(id) : undefined;
+
+    // Postgres enforces this with a unique index on products.slug, and the two
+    // implementations have to refuse the same things for the same reasons —
+    // otherwise a product that saves under `mock` fails under `supabase` with
+    // a message nobody has seen before. Same wording as the Supabase one.
+    const clash = products.find(
+      (candidate) => candidate.slug === input.slug && candidate.id !== existing?.id,
+    );
+    if (clash) {
+      throw new Error(`The web address "${input.slug}" is already used by another product.`);
+    }
+
+    const product: Product = {
+      id: existing?.id ?? `kc-${Date.now().toString(36)}`,
+      slug: input.slug,
+      name: input.name,
+      description: input.description,
+      shortDescription: input.shortDescription,
+      price: input.price,
+      ...(input.salePrice !== null ? { salePrice: input.salePrice } : {}),
+      categorySlug: input.categorySlug,
+      ...(input.subcategorySlug ? { subcategorySlug: input.subcategorySlug } : {}),
+      collectionSlugs: existing?.collectionSlugs ?? [],
+      images: input.images.map((image, index) => ({
+        url: image.url,
+        alt: image.alt,
+        width: 900,
+        height: 1200,
+        ...(index === 0 ? { isPrimary: true } : {}),
+      })),
+      variants: input.variants.map((variant) => ({
+        id: variant.id ?? newVariantId(),
+        sku: variant.sku,
+        size: variant.size,
+        colorName: variant.colorName,
+        colorHex: variant.colorHex,
+        stock: Math.max(0, Math.trunc(variant.stock)),
+      })),
+      ...(input.fabric ? { fabric: input.fabric } : {}),
+      ...(input.pieces !== null ? { pieces: input.pieces } : {}),
+      ...(input.care ? { care: input.care } : {}),
+      tags: input.tags,
+      rating: existing?.rating ?? 0,
+      reviewCount: existing?.reviewCount ?? 0,
+      isFeatured: input.isFeatured,
+      isNewArrival: input.isNewArrival,
+      isBestSeller: existing?.isBestSeller ?? false,
+      isOnSale: input.salePrice !== null,
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
+      ...(input.isMadeToOrder ? { isMadeToOrder: true } : {}),
+    };
+
+    const at = products.findIndex((candidate) => candidate.id === product.id);
+    if (at >= 0) products[at] = product;
+    else products.push(product);
+    BY_ID.set(product.id, product);
+
+    return product;
   }
 }

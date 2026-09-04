@@ -186,6 +186,32 @@ role key is set — see the Phase 8 note above.
   301ing every legacy URL to its new home. Delete once the old URLs stop
   appearing in Search Console.
 
+## Admin panel
+
+Not a spec phase — built on request, at `/admin`, behind the `admins` table
+(0004) and `adminFromRequest`. Dashboard, orders, order detail, CSV export,
+stock, and product create/edit with image upload (`product-images` bucket,
+0005). The storefront chrome is stripped from `/admin` in `__root.tsx`, and
+`vite.config.ts` keeps `/admin` and `/account` out of the prerender.
+
+Staff membership is a ROW IN `admins`, never `app_metadata` — GoTrue rewrites
+`raw_app_meta_data` on sign-in and silently destroyed the grant twice. See the
+long note in `src/lib/auth/verify.ts` before changing how admin is decided.
+
+⚠ **ADDING OR EDITING A PRODUCT NEEDS `SUPABASE_SERVICE_ROLE_KEY`.**
+0002_rls.sql gives the catalogue no write policy, so `saveProduct` goes through
+`serviceClient()`. With the key unset the form returns a 503 saying so and
+nothing is written — same blocker as order placement. Stock edits, order status
+and CSV export need it too.
+
+Known gaps, deliberate:
+- No unpublish. `products.is_active` is written but every read filters on it,
+  so unpublishing would hide a product from its own editor. See the header of
+  `src/components/admin/ProductForm.tsx`.
+- Removing an image from a product leaves the file in Storage. Orphaned bytes
+  are cheaper than deleting a photo that a failed save then needed back.
+- No collections field, and no delete.
+
 ## Prerender coverage is best-effort, not guaranteed
 
 `vite.config.ts` sets `crawlLinks: true` with `failOnError: false`, so the

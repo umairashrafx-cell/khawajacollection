@@ -75,6 +75,49 @@ export interface ProductRepository {
    * Returns null when no such variant exists.
    */
   updateVariantStock(variantId: string, stock: number): Promise<Product | null>;
+
+  /**
+   * ADMIN. Creates a product when `id` is absent, replaces one when present.
+   *
+   * One method for both because the two differ by a single WHERE clause and
+   * the form that calls them is identical. Splitting them would mean two code
+   * paths that must stay in agreement about what a product is.
+   *
+   * Images and variants are replaced wholesale, not merged — the form always
+   * submits the complete set, and a merge would leave no way to delete the
+   * last image or retire a size.
+   */
+  saveProduct(input: ProductInput, id?: string): Promise<Product>;
+}
+
+/** What the admin form submits. Prices are integer PKR (Section 16). */
+export interface ProductInput {
+  slug: string;
+  name: string;
+  description: string;
+  shortDescription: string;
+  price: number;
+  salePrice: number | null;
+  categorySlug: string;
+  subcategorySlug: string | null;
+  fabric: string | null;
+  pieces: number | null;
+  care: string | null;
+  tags: string[];
+  isFeatured: boolean;
+  isNewArrival: boolean;
+  isMadeToOrder: boolean;
+  isActive: boolean;
+  images: { url: string; alt: string }[];
+  variants: {
+    /** Present when editing an existing variant, so its stock survives. */
+    id?: string | undefined;
+    sku: string;
+    size: string;
+    colorName: string;
+    colorHex: string;
+    stock: number;
+  }[];
 }
 
 /**

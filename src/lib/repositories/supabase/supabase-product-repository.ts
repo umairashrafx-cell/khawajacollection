@@ -21,7 +21,12 @@ import { PER_PAGE } from "@/config/filters";
 import { browserClient, serviceClient } from "@/lib/supabase/client";
 import type { Product, ProductImage, ProductVariant } from "@/types";
 import { buildFacets, filterAndSort } from "../shared/catalogue-query";
-import type { ProductListResult, ProductQuery, ProductRepository } from "../product-repository";
+import type {
+  ProductInput,
+  ProductListResult,
+  ProductQuery,
+  ProductRepository,
+} from "../product-repository";
 
 /** The shape a joined product row comes back as. */
 interface Row {
@@ -255,5 +260,117 @@ export class SupabaseProductRepository implements ProductRepository {
     // Read the product back so the caller sees the whole thing consistently,
     // rather than a variant floating free of its product.
     return this.getById((data as { product_id: string }).product_id);
+  }
+
+  /**
+   * Create or replace a product. Service role, for the same reason as the
+   * stock write: 0002_rls.sql gives the catalogue no write policy at all.
+   *
+   * NOT A TRANSACTION, AND THAT MATTERS. PostgREST has no multi-statement
+   * transaction, so this is four calls. The order is chosen so a failure
+   * part-way leaves the least bad state: the product row is written first and
+   * variants next, because a product with stale images is a cosmetic problem
+   * while a product with no variants cannot be added to a bag at all. A
+   * failure after the first step leaves the previous images in place rather
+   * than none.
+   */
+  async saveProduct(input: ProductInput, id?: string): Promise<Product> {
+    // Same reasoning as getById: `products.id` is a uuid column, so a
+    // malformed id raises 22P02 and PostgREST turns that into a 500. An id
+    // that cannot name a product means there is no such product.
+    if (id !== undefined && !UUID.test(id)) {
+      throw new Error("That product no longer exists.");
+    }
+
+    const supabase = await serviceClient();
+
+    const row = {
+      slug: input.slug,
+      name: input.name,
+      description: input.description,
+      short_description: input.shortDescription,
+      price: input.price,
+      sale_price: input.salePrice,
+      category_slug: input.categorySlug,
+      subcategory_slug: input.subcategorySlug,
+      fabric: input.fabric,
+      pieces: input.pieces,
+      care: input.care,
+      tags: input.tags,
+      is_featured: input.isFeatured,
+      is_new_arrival: input.isNewArrival,
+      is_made_to_order: input.isMadeToOrder,
+      is_active: input.isActive,
+    };
+
+    const saved = id
+      ? await supabase.from("products").update(row).eq("id", id).select("id").maybeSingle()
+      : await supabase.from("products").insert(row).select("id").maybeSingle();
+
+    if (saved.error || !saved.data) {
+      // The one failure a shopkeeper can actually act on.
+      if (saved.error?.message.includes("products_slug_key")) {
+        throw new Error(`The web address "${input.slug}" is already used by another product.`);
+      }
+      throw new Error(`Could not save the product: ${saved.error?.message ?? "no row returned"}`);
+    }
+
+    const productId = (saved.data as { id: string }).id;
+
+    // Variants are upserted on SKU so an existing size keeps its id — and
+    // therefore its stock — rather than being deleted and recreated at zero.
+    if (input.variants.length > 0) {
+      const { error } = await supabase.from("product_variants").upsert(
+        input.variants.map((variant) => ({
+          product_id: productId,
+          sku: variant.sku,
+          size: variant.size,
+          color_name: variant.colorName,
+          color_hex: variant.colorHex,
+          stock: Math.max(0, Math.trunc(variant.stock)),
+        })),
+        { onConflict: "sku" },
+      );
+      if (error) throw new Error(`Could not save the sizes: ${error.message}`);
+    }
+
+    /*
+     * Sizes the form no longer lists are retired.
+     *
+     * Safe to delete outright: `order_items` snapshots the name, size, colour
+     * and unit price and holds `variant_id` as a bare uuid with no foreign
+     * key, precisely so a past order still reads correctly after the size it
+     * refers to has gone.
+     */
+    const keptSkus = input.variants.map((variant) => variant.sku);
+    const retire = supabase.from("product_variants").delete().eq("product_id", productId);
+    const { error: retireError } = await (keptSkus.length > 0
+      ? retire.not("sku", "in", `(${keptSkus.join(",")})`)
+      : retire);
+    if (retireError) throw new Error(`Could not remove the old sizes: ${retireError.message}`);
+
+    // Images have no natural key worth upserting on and the list is short, so
+    // they are replaced wholesale.
+    const { error: clearError } = await supabase
+      .from("product_images")
+      .delete()
+      .eq("product_id", productId);
+    if (clearError) throw new Error(`Could not replace the images: ${clearError.message}`);
+    if (input.images.length > 0) {
+      const { error } = await supabase.from("product_images").insert(
+        input.images.map((image, index) => ({
+          product_id: productId,
+          url: image.url,
+          alt: image.alt,
+          sort_order: index,
+          is_primary: index === 0,
+        })),
+      );
+      if (error) throw new Error(`Could not save the images: ${error.message}`);
+    }
+
+    const product = await this.getById(productId);
+    if (!product) throw new Error("The product saved but could not be read back.");
+    return product;
   }
 }
