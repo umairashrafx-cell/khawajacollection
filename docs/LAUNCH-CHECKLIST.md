@@ -20,7 +20,7 @@ Two rules held throughout the build shape this list:
 | # | Item | Why it blocks |
 |---|------|---------------|
 | 0.1 | **Rotate the Supabase `service_role` key** and set `SUPABASE_SERVICE_ROLE_KEY` on the host | The previous key was pasted into a chat transcript and must be considered compromised. Until a key is set, every server-side order path fails closed with a 503 — no order can be placed. |
-| 0.2 | **Set `commerce.flatShippingRate`** in `src/config/site.ts` | It is `null`. `/api/orders` deliberately refuses any order below the free-delivery threshold rather than charge a made-up amount, so today only orders over PKR 5,000 can be placed at all. |
+| ~~0.2~~ | ~~Set `commerce.flatShippingRate`~~ | **CLEARED 2026-09-04 — PKR 250.** Verified end to end: a PKR 2,600 order now totals 2,850, and orders above PKR 5,000 still ship free. |
 | 0.3 | **Set `VITE_PRODUCT_REPOSITORY=supabase`** on the host | The default is `mock`, and under `mock` orders live in a module-level Map that does not survive a serverless cold start. A placed order would usually be invisible to tracking. |
 | 0.4 | **Legal review of `/terms`, `/privacy`, `/refund-policy`** | They are written from what the software actually does, but the legal identity, jurisdiction and retention periods are placeholders, and none of it has been reviewed by a lawyer. |
 
@@ -83,9 +83,11 @@ is omitted entirely. Grep for `PLACEHOLDER` in `src/config/site.ts` and for
 `/contact` and `/about` now carry no placeholders at all.
 
 ### Commerce — `src/config/site.ts`, `commerce`
-- [ ] `flatShippingRate` — **blocks orders under PKR 5,000** (blocker 0.2)
-- [ ] `deliveryEstimate` — e.g. `"3–5 working days"`. Shown on `/shipping`, `/faqs` and the PDP trust row
-- [ ] `exchangeWindow` — e.g. `"7 days from delivery"`. Shown on `/returns` and `/faqs`
+- [x] `flatShippingRate` — **PKR 250**, supplied 2026-09-04. This was the
+      blocker on selling anything under PKR 5,000.
+- [x] `deliveryEstimate` — **3 to 5 working days**, supplied 2026-09-04.
+- [ ] `exchangeWindow` — e.g. `"7 days from delivery"`. The last commerce
+      number, and the only placeholder left on `/returns` and `/faqs`.
 
 ### Social — `src/config/site.ts`, `social`
 - [x] **All four profiles live** as of 2026-09-04 — Facebook, Instagram, TikTok

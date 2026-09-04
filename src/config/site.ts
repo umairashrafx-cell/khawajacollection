@@ -93,19 +93,19 @@ export const commerce = {
   /** Section 16 — free delivery above PKR 5,000. Integer PKR. */
   freeDeliveryThreshold: 5000,
   /**
-   * TODO(Umair): set the real flat shipping rate before launch. Section 16
-   * forbids inventing a number, so checkout must surface this as unset rather
-   * than quietly charging a made-up amount.
+   * Delivery below the free threshold. Supplied 2026-09-04. Integer PKR,
+   * Section 16 — no floats, no paisa.
+   *
+   * Setting this is what unblocks selling. While it was null, /api/orders
+   * refused every order under PKR 5,000 outright rather than charge a number
+   * nobody had agreed to, so the shop could only take orders above the free
+   * -delivery threshold.
    */
-  flatShippingRate: null as number | null,
+  flatShippingRate: 250 as number | null,
   /** Section 16 — human-readable, phone-friendly: KC-2026-00042. */
   orderNumberPrefix: "KC",
-  /**
-   * TODO(Umair): the real delivery window, e.g. "3-5 working days".
-   * Section 11.3 puts a delivery estimate in the PDP trust row, but Guardrail 2
-   * forbids inventing a timeline, so the row omits that line until this is set.
-   */
-  deliveryEstimate: null as string | null,
+  /** Supplied 2026-09-04. Shown in the PDP trust row, /shipping and /faqs. */
+  deliveryEstimate: "3 to 5 working days" as string | null,
   /**
    * TODO(Umair): the real exchange window, e.g. "7 days from delivery".
    * Same rule — the copy says "easy exchange" and no number until this is set.
