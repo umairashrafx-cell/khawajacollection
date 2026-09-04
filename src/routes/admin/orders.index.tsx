@@ -13,7 +13,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Download, Search } from "lucide-react";
+import { ChevronRight, Download, Search } from "lucide-react";
 import { useState } from "react";
 
 import { AppLink } from "@/components/layout/AppLink";
@@ -191,15 +191,30 @@ function AdminOrders() {
                   <th scope="col" className="px-4 py-3 text-right font-medium">
                     Total
                   </th>
+                  <th scope="col" className="px-4 py-3">
+                    <span className="sr-only">Open</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-kc-line">
                 {data.orders.map((order) => (
                   <tr key={order.orderNumber} className="hover:bg-kc-sand">
                     <td className="px-4 py-3">
+                      {/*
+                        UNDERLINED ALWAYS, NOT ON HOVER. The row already
+                        highlights on hover, so a link that only reveals itself
+                        on hover is invisible inside it: the whole row looks
+                        interactive and only eight characters of it are. Umair
+                        clicked the status badge twice before saying it did not
+                        work, which is the correct conclusion from what was on
+                        screen.
+
+                        min-h-11 because this is the way into every order and
+                        it was a 16px-tall target on a phone.
+                      */}
                       <AppLink
                         href={`/admin/orders/${order.orderNumber}`}
-                        className="kc-price text-kc-ink underline-offset-4 hover:underline"
+                        className="kc-price inline-flex min-h-11 items-center font-medium text-kc-ink underline underline-offset-4 decoration-kc-muted hover:decoration-kc-ink"
                       >
                         {order.orderNumber}
                       </AppLink>
@@ -222,6 +237,23 @@ function AdminOrders() {
                     </td>
                     <td className="kc-price whitespace-nowrap px-4 py-3 text-right text-kc-ink">
                       {formatPKR(order.totals.total)}
+                    </td>
+                    {/*
+                      A second way in, at the end of the row where the eye
+                      finishes. Redundant with the order number on purpose:
+                      the status badge sits between them and reads as a
+                      button, so one obvious action on each side of it removes
+                      the ambiguity rather than explaining it away.
+                    */}
+                    <td className="px-4 py-3 text-right">
+                      <AppLink
+                        href={`/admin/orders/${order.orderNumber}`}
+                        className="inline-flex min-h-11 items-center gap-1 text-sm text-kc-charcoal underline-offset-4 hover:text-kc-ink hover:underline"
+                      >
+                        Open
+                        <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                        <span className="sr-only">order {order.orderNumber}</span>
+                      </AppLink>
                     </td>
                   </tr>
                 ))}
