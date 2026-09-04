@@ -112,7 +112,10 @@ function AdminProducts() {
             },
             {
               key: "soldout",
-              label: `Sold out (${data.summary.soldOutProducts})`,
+              // Counts SIZES, matching what the filter now selects. Counting
+              // whole products showed “Sold out (0)” directly above a product
+              // with an empty size, which is the opposite of useful.
+              label: `Sold out (${data.summary.soldOutVariants})`,
             },
           ].map((chip) => {
             const active = filter === chip.key;

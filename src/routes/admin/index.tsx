@@ -110,10 +110,10 @@ function AdminDashboard() {
 
       {/* Sold-out pieces are invisible on the storefront, so nothing prompts
           anyone to notice. This is the only place that does. */}
-      {stock && (stock.summary.soldOutProducts > 0 || stock.summary.lowStockVariants > 0) ? (
+      {stock && (stock.summary.soldOutVariants > 0 || stock.summary.lowStockVariants > 0) ? (
         <AppLink
           href={
-            stock.summary.soldOutProducts > 0
+            stock.summary.soldOutVariants > 0
               ? "/admin/products?filter=soldout"
               : "/admin/products?filter=low"
           }
@@ -121,15 +121,15 @@ function AdminDashboard() {
         >
           <PackageX className="h-6 w-6 shrink-0 text-kc-sale" aria-hidden="true" />
           <span className="flex-1 text-sm text-kc-charcoal">
-            <strong className="font-medium text-kc-ink">{stock.summary.soldOutProducts}</strong>{" "}
-            {stock.summary.soldOutProducts === 1 ? "product is" : "products are"} sold out
+            <strong className="font-medium text-kc-ink">{stock.summary.soldOutVariants}</strong>{" "}
+            {stock.summary.soldOutVariants === 1 ? "size cannot" : "sizes cannot"} be bought
             {stock.summary.lowStockVariants > 0 ? (
               <>
                 {", and "}
                 <strong className="font-medium text-kc-ink">
                   {stock.summary.lowStockVariants}
                 </strong>{" "}
-                {stock.summary.lowStockVariants === 1 ? "size is" : "sizes are"} down to{" "}
+                {stock.summary.lowStockVariants === 1 ? "is" : "are"} down to{" "}
                 {stock.summary.lowStockThreshold} or fewer
               </>
             ) : null}

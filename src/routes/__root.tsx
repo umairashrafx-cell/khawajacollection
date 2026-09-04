@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
@@ -171,18 +172,33 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const overlay = useOverlay();
+  const { pathname } = useLocation();
   useSearchHotkey();
   useAccountSync();
 
+  /*
+   * THE ADMIN IS NOT THE SHOP, so it does not wear the shop's chrome.
+   *
+   * /admin brings its own dark bar and is meant to be recognisable from the
+   * corner of the eye — staff move between the two all day and every
+   * destructive action in there happens to a real customer's order. Rendering
+   * it inside the storefront header put an announcement bar, a wordmark, a
+   * category nav and a cart icon above the admin bar: two competing
+   * navigations, the top third of the screen spent on links that make no
+   * sense to someone packing a parcel, and no visual signal about which side
+   * of the shop you are on.
+   */
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AnnouncementBar />
-      <Header />
+      {!isAdmin ? <AnnouncementBar /> : null}
+      {!isAdmin ? <Header /> : null}
       <main>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </main>
-      <Footer />
+      {!isAdmin ? <Footer /> : null}
 
       {/* Mounted only while open, so the chunk is never fetched for a visitor
           who does not touch the bag or the search field. */}

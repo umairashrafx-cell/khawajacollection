@@ -98,7 +98,13 @@ export const Route = createFileRoute("/api/admin/products")({
 
         const filtered =
           filter === "soldout"
-            ? matching.filter((p) => p.variants.every((v) => v.stock === 0))
+            ? // BOTH FILTERS ARE ABOUT VARIANTS, NOT PRODUCTS. “Sold out” first
+              // meant “every size of this product is gone”, which rendered as
+              // “Sold out (0)” on a catalogue with 42 unbuyable sizes — the
+              // screen said nothing was wrong while a customer choosing
+              // Emerald got nothing. The size someone cannot buy is the thing
+              // worth restocking, so one empty size puts a product in the list.
+              matching.filter((p) => p.variants.some((v) => v.stock === 0))
             : filter === "low"
               ? matching.filter((p) =>
                   p.variants.some((v) => v.stock > 0 && v.stock <= operations.lowStockThreshold),
