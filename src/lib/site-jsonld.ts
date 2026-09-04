@@ -37,7 +37,13 @@ function realSocialProfiles(): string[] {
 
 export function organizationAndWebsiteJsonLd(): unknown {
   const profiles = realSocialProfiles();
-  const email = contact.supportEmail === PLACEHOLDER ? null : contact.supportEmail;
+  // Widened before comparing, for the same reason as realSocialProfiles():
+  // `contact` is `as const`, so once a value is filled in its literal type no
+  // longer overlaps "PLACEHOLDER" and TypeScript rejects the check. The check
+  // still has to be here — it is what keeps a placeholder out of the markup if
+  // the value is ever cleared.
+  const supportEmail: string = contact.supportEmail;
+  const email = supportEmail === PLACEHOLDER || !supportEmail ? null : supportEmail;
 
   // Real as of 2026-09-04, so they belong in the markup. They were omitted
   // while they were placeholders — an invented address in structured data is

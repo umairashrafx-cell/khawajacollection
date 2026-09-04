@@ -55,8 +55,8 @@ export const contact = {
   whatsapp: "+923338757747",
   phone: "+923338757747",
 
-  /** Still PLACEHOLDER — Section 19. Omitted from the footer and JSON-LD. */
-  supportEmail: PLACEHOLDER,
+  /** Supplied 2026-09-04. */
+  supportEmail: "hello@khawajacollection.com",
 
   /**
    * The shop. Structured rather than one string because the Organization
@@ -72,8 +72,14 @@ export const contact = {
     country: "PK",
   },
 
-  /** Still PLACEHOLDER — opening hours. Shown on /contact when set. */
-  hours: PLACEHOLDER,
+  /**
+   * Supplied 2026-09-04 as the daily trading window. WHICH DAYS was not
+   * given, so this is the only place hours appear: the Organization JSON-LD
+   * deliberately carries no `openingHoursSpecification`, because schema.org
+   * requires a dayOfWeek and guessing "every day" would tell Google the shop
+   * is open on a day it might be shut. Add the days and the markup can follow.
+   */
+  hours: "10:00 am to 8:00 pm",
 } as const;
 
 /** The shop address as display lines, in the order they should be read. */

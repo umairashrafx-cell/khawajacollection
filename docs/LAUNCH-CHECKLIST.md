@@ -70,9 +70,17 @@ is omitted entirely. Grep for `PLACEHOLDER` in `src/config/site.ts` and for
       Bahauddin**, supplied 2026-09-04. Now a schema.org PostalAddress in the
       Organization markup, which is what lets Google treat the shop as a place
       rather than just a name.
-- [ ] `supportEmail` — still unset. Omitted from the footer, contact page and
-      PDP accordions rather than shown broken.
-- [ ] `hours` — opening hours. The last placeholder on `/contact`.
+- [x] `supportEmail` — **hello@khawajacollection.com**, supplied 2026-09-04.
+      Now live in the footer, the PDP accordions, the order confirmation and
+      the Organization `contactPoint`.
+- [x] `hours` — **10:00 am to 8:00 pm**, supplied 2026-09-04.
+- [ ] **Which days?** The hours are shown on `/contact` as a plain daily
+      window. They are deliberately NOT in the Organization JSON-LD, because
+      schema.org `openingHoursSpecification` requires a `dayOfWeek` and
+      guessing "every day" would tell Google the shop is open on a day it may
+      be shut. Supply the days and the markup can follow.
+
+`/contact` and `/about` now carry no placeholders at all.
 
 ### Commerce — `src/config/site.ts`, `commerce`
 - [ ] `flatShippingRate` — **blocks orders under PKR 5,000** (blocker 0.2)

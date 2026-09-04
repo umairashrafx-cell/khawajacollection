@@ -186,6 +186,23 @@ role key is set — see the Phase 8 note above.
   301ing every legacy URL to its new home. Delete once the old URLs stop
   appearing in Search Console.
 
+## Prerender coverage is best-effort, not guaranteed
+
+`vite.config.ts` sets `crawlLinks: true` with `failOnError: false`, so the
+static pages are whatever a crawl from `/` happens to reach, and a transient
+failure silently drops one. Observed: a build produced 104 pages instead of
+the usual 105, with no error in the log —
+`/products/wali-charcoal-cotton-kurta` had fallen out.
+
+**This is not a correctness bug.** A page that is not prerendered is served by
+the SSR function instead, verified in production: that URL returns 200 with
+the right title and h1. The cost is a slower first byte for that one page,
+not a broken one.
+
+Do not “fix” it by setting `failOnError: true` — that turns a slow page into
+a failed deploy. If coverage needs to be guaranteed, enumerate the product
+slugs from the repository into `pages` rather than relying on the crawl.
+
 ## State management
 
 `zustand` is **not installed**. Section 12 specifies it; Hard Rule 7 forbids
