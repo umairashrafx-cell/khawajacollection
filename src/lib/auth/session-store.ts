@@ -142,24 +142,13 @@ export function useUser(): User | null {
   );
 }
 
-/**
- * Whether the signed-in user carries the admin role.
- *
- * FOR HIDING UI ONLY. This reads a claim out of the session the browser is
- * holding, and a determined visitor can put whatever they like in there. It
- * decides whether the admin link renders and whether /admin shows a screen or
- * a refusal — nothing more. Every admin endpoint independently asks Supabase
- * (src/lib/auth/verify.ts, adminFromRequest), so faking this flag buys a view
- * of empty tables and a row of 403s.
+/*
+ * There was a `useIsAdmin()` here that read `app_metadata.role` out of the
+ * session. It is gone, and deliberately not replaced: staff membership now
+ * lives in the `admins` table (0004_admins.sql), because GoTrue rewrites
+ * app_metadata on sign-in and silently dropped the role. Ask the server
+ * instead — src/hooks/useAdminAccess.ts.
  */
-export function useIsAdmin(): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => state.user?.app_metadata?.["role"] === "admin",
-    () => false,
-  );
-}
-
 export function useAuthReady(): boolean {
   return useSyncExternalStore(
     subscribe,

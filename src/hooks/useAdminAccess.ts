@@ -5,10 +5,11 @@
  * account page's staff link and anything else asking share one cached answer
  * rather than each firing their own request.
  *
- * `useIsAdmin()` in the session store still exists and is still useful for
- * hiding something instantly with no network call — but it reads a claim from
- * a token issued at sign-in, so it goes stale the moment a role changes. Where
- * being WRONG matters, ask this instead.
+ * There is no client-side shortcut for this and there should not be. Staff
+ * membership lives in the `admins` table, which a token knows nothing about:
+ * the earlier version read a role claim out of the session and was wrong
+ * twice over — stale after a grant, and reading a field GoTrue wipes on
+ * sign-in. Asking the server is the only answer that is actually true.
  */
 
 import { useQuery } from "@tanstack/react-query";

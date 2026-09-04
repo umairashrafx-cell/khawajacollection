@@ -175,20 +175,31 @@ decision for Umair**, and it is bundled with the real photography anyway:
 
 ## 6c. Admin access
 
-The admin panel lives at `/admin` and is invisible without the role. Nothing
-grants it automatically — by design, since the flag lives where a customer
-cannot write to it.
+The admin panel lives at `/admin`. Staff membership is a row in the `admins`
+table (0004_admins.sql). Nothing grants it automatically.
 
-- [ ] **Grant yourself admin.** In the Supabase SQL editor:
+- [x] **Owner accounts granted 2026-09-04** — `hello@khawajacollection.com`
+      and `umairskk@gmail.com`.
 
-      ```sql
-      update auth.users
-         set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}'
-       where email = 'you@example.com';
-      ```
+To grant somebody else, in the Supabase SQL editor:
 
-      Then sign out and back in on the site so the browser picks up a fresh
-      session. A link to the admin appears on `/account` once it has.
+```sql
+insert into admins (user_id, note)
+select id, 'Why this person has access'
+  from auth.users
+ where email = 'them@example.com'
+    on conflict (user_id) do nothing;
+```
+
+To revoke:
+
+```sql
+delete from admins
+ where user_id = (select id from auth.users where email = 'them@example.com');
+```
+
+Both take effect on the **next request**. No sign-out is needed — the server
+reads the table, not the token.
 
 - [ ] Confirm a NON-admin account gets “Not an admin account” at `/admin` and
       403 from `/api/admin/orders`. Worth doing once with a real second
@@ -199,15 +210,30 @@ stock. **42 of the 425 seeded variants are currently at zero** — that is mock
 data, not real counts, so walk the stock screen before launch and set what you
 actually hold.
 
-**Why `raw_app_meta_data` and not `raw_user_meta_data`:** a signed-in user can
-write their own `user_metadata` — the account page does exactly that to store a
-display name. If the admin flag lived there, any customer could promote
-themselves with one API call. `app_metadata` is writable only with the service
-role or from the dashboard.
+### Why a table and not `app_metadata`
 
-To revoke, set the role to something else or remove the key; it takes effect on
-the next request, because the server reads the user record rather than trusting
-the token's claims.
+The first version put `{"role":"admin"}` into `auth.users.raw_app_meta_data`,
+reasoning that a customer can write their own `user_metadata` — the account
+page does exactly that for a display name — but not their `app_metadata`.
+
+The reasoning was right and the storage was wrong. **GoTrue rewrites
+`raw_app_meta_data` on sign-in**, resetting it to `{provider, providers}`. The
+grant survived until the new admin signed in and then vanished. That happened
+twice here, because the advice for picking the role up was “sign out and back
+in” — the very thing destroying it.
+
+The `admins` table is ours and the auth server never touches it. The security
+property is unchanged: RLS lets a signed-in user read only their own row, and
+there is no write policy at all, so creating an administrator still requires
+the SQL editor or the service role.
+## 6d. Supabase security advisors
+
+Run them after any schema change: Supabase dashboard → Advisors → Security.
+As of 2026-09-04 the only finding is a setting, not a schema problem:
+
+- [ ] **Enable leaked-password protection.** Auth → Providers → Email. It
+      checks new passwords against HaveIBeenPwned, which matters here because
+      an admin account is one password away from every customer's address.
 
 ## 7. Pre-flight verification
 
