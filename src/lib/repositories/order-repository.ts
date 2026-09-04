@@ -16,7 +16,7 @@
  * first. A user id reaching here is a claim that has already been checked.
  */
 
-import type { Order, OrderDraft, OrderItem, OrderTotals } from "@/types";
+import type { Order, OrderDraft, OrderItem, OrderStatus, OrderTotals } from "@/types";
 
 export interface CreateOrderInput {
   draft: OrderDraft;
@@ -38,4 +38,39 @@ export interface OrderRepository {
   listForUser(userId: string): Promise<Order[]>;
   /** One order, scoped to its owner so an order number alone reveals nothing. */
   findForUser(userId: string, orderNumber: string): Promise<Order | null>;
+
+  /* --- Admin ---------------------------------------------------------
+   *
+   * THESE TWO ARE THE ONLY UNSCOPED ORDER OPERATIONS IN THE APP, and the
+   * reason the rest of this interface is so narrow. `listAll` can read every
+   * customer's address and `updateStatus` can change any order, so a caller
+   * that reaches them without checking `adminFromRequest` first is a data
+   * breach rather than a bug.
+   *
+   * They take no user id because an admin is not scoped to one. That is
+   * precisely why the authorisation has to happen above them — there is
+   * nothing here that can fail safe on its own.
+   */
+  listAll(query: AdminOrderQuery): Promise<AdminOrderPage>;
+  updateStatus(orderNumber: string, status: OrderStatus): Promise<Order | null>;
+}
+
+export interface AdminOrderQuery {
+  /** Filter to one status, or all of them. */
+  status?: OrderStatus | undefined;
+  /** Matches an order number or a phone number, loosely. */
+  q?: string | undefined;
+  page?: number | undefined;
+  perPage?: number | undefined;
+}
+
+export interface AdminOrderPage {
+  items: Order[];
+  total: number;
+  page: number;
+  perPage: number;
+  /** Count per status across the whole table, for the dashboard and filter chips. */
+  counts: Record<string, number>;
+  /** Sum of `total` across every order that is not cancelled. */
+  revenue: number;
 }

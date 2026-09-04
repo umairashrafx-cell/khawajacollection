@@ -204,6 +204,7 @@ export const noindexRoutes = [
   "/checkout",
   "/wishlist",
   "/account",
+  "/admin",
   "/login",
   "/register",
   "/forgot-password",

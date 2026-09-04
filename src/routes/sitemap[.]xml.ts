@@ -28,7 +28,7 @@ interface Entry {
 }
 
 /**
- * Editorial and evergreen routes. The commerce ones (cart, checkout, account,
+ * Editorial and evergreen routes. The commerce ones (cart, checkout, account, admin,
  * the auth pages) are absent on purpose — they are `noindex` and disallowed.
  */
 const STATIC: Entry[] = [

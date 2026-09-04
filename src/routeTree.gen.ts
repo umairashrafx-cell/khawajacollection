@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BridalRouteImport } from './routes/bridal'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -39,6 +40,7 @@ import { Route as AccessoriesIndexRouteImport } from './routes/accessories/index
 import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories/$subcategory'
 import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as AccountAddressesRouteImport } from './routes/account/addresses'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
 import { Route as ApiOrdersRouteImport } from './routes/api/orders'
 import { Route as ApiProductRouteImport } from './routes/api/product'
@@ -56,7 +58,10 @@ import { Route as WomenIndexRouteImport } from './routes/women/index'
 import { Route as WomenSubcategoryRouteImport } from './routes/women/$subcategory'
 import { Route as AccountOrdersIndexRouteImport } from './routes/account/orders.index'
 import { Route as AccountOrdersOrderNumberRouteImport } from './routes/account/orders.$orderNumber'
+import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders.index'
+import { Route as AdminOrdersOrderNumberRouteImport } from './routes/admin/orders.$orderNumber'
 import { Route as ApiAccountOrdersRouteImport } from './routes/api/account/orders'
+import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,6 +76,11 @@ const AboutRoute = AboutRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BridalRoute = BridalRouteImport.update({
@@ -208,6 +218,11 @@ const AccountAddressesRoute = AccountAddressesRouteImport.update({
   path: '/addresses',
   getParentRoute: () => AccountRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
   id: '/api/newsletter',
   path: '/api/newsletter',
@@ -294,9 +309,24 @@ const AccountOrdersOrderNumberRoute =
     path: '/orders/$orderNumber',
     getParentRoute: () => AccountRoute,
   } as any)
+const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersOrderNumberRoute = AdminOrdersOrderNumberRouteImport.update({
+  id: '/orders/$orderNumber',
+  path: '/orders/$orderNumber',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiAccountOrdersRoute = ApiAccountOrdersRouteImport.update({
   id: '/api/account/orders',
   path: '/api/account/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
+  id: '/api/admin/orders',
+  path: '/api/admin/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -304,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -344,11 +375,15 @@ export interface FileRoutesByFullPath {
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
   '/account/': typeof AccountIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/admin/orders/$orderNumber': typeof AdminOrdersOrderNumberRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -393,17 +428,22 @@ export interface FileRoutesByTo {
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories': typeof AccessoriesIndexRoute
   '/account': typeof AccountIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/men': typeof MenIndexRoute
   '/women': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/admin/orders/$orderNumber': typeof AdminOrdersOrderNumberRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/account/orders': typeof AccountOrdersIndexRoute
+  '/admin/orders': typeof AdminOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/bridal': typeof BridalRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -444,11 +484,15 @@ export interface FileRoutesById {
   '/women/$subcategory': typeof WomenSubcategoryRoute
   '/accessories/': typeof AccessoriesIndexRoute
   '/account/': typeof AccountIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
+  '/admin/orders/$orderNumber': typeof AdminOrdersOrderNumberRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
+  '/admin/orders/': typeof AdminOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -456,6 +500,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/bridal'
     | '/cart'
     | '/checkout'
@@ -496,11 +541,15 @@ export interface FileRouteTypes {
     | '/women/$subcategory'
     | '/accessories/'
     | '/account/'
+    | '/admin/'
     | '/men/'
     | '/women/'
     | '/account/orders/$orderNumber'
+    | '/admin/orders/$orderNumber'
     | '/api/account/orders'
+    | '/api/admin/orders'
     | '/account/orders/'
+    | '/admin/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -545,16 +594,21 @@ export interface FileRouteTypes {
     | '/women/$subcategory'
     | '/accessories'
     | '/account'
+    | '/admin'
     | '/men'
     | '/women'
     | '/account/orders/$orderNumber'
+    | '/admin/orders/$orderNumber'
     | '/api/account/orders'
+    | '/api/admin/orders'
     | '/account/orders'
+    | '/admin/orders'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/bridal'
     | '/cart'
     | '/checkout'
@@ -595,17 +649,22 @@ export interface FileRouteTypes {
     | '/women/$subcategory'
     | '/accessories/'
     | '/account/'
+    | '/admin/'
     | '/men/'
     | '/women/'
     | '/account/orders/$orderNumber'
+    | '/admin/orders/$orderNumber'
     | '/api/account/orders'
+    | '/api/admin/orders'
     | '/account/orders/'
+    | '/admin/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   BridalRoute: typeof BridalRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -647,6 +706,7 @@ export interface RootRouteChildren {
   MenIndexRoute: typeof MenIndexRoute
   WomenIndexRoute: typeof WomenIndexRoute
   ApiAccountOrdersRoute: typeof ApiAccountOrdersRoute
+  ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -670,6 +730,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bridal': {
@@ -861,6 +928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAddressesRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/newsletter': {
       id: '/api/newsletter'
       path: '/api/newsletter'
@@ -980,11 +1054,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountOrdersOrderNumberRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/admin/orders/': {
+      id: '/admin/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminOrdersIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders/$orderNumber': {
+      id: '/admin/orders/$orderNumber'
+      path: '/orders/$orderNumber'
+      fullPath: '/admin/orders/$orderNumber'
+      preLoaderRoute: typeof AdminOrdersOrderNumberRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/account/orders': {
       id: '/api/account/orders'
       path: '/api/account/orders'
       fullPath: '/api/account/orders'
       preLoaderRoute: typeof ApiAccountOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/orders': {
+      id: '/api/admin/orders'
+      path: '/api/admin/orders'
+      fullPath: '/api/admin/orders'
+      preLoaderRoute: typeof ApiAdminOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -1007,10 +1102,25 @@ const AccountRouteChildren: AccountRouteChildren = {
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminOrdersOrderNumberRoute: typeof AdminOrdersOrderNumberRoute
+  AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminOrdersOrderNumberRoute: AdminOrdersOrderNumberRoute,
+  AdminOrdersIndexRoute: AdminOrdersIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   BridalRoute: BridalRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
@@ -1052,6 +1162,7 @@ const rootRouteChildren: RootRouteChildren = {
   MenIndexRoute: MenIndexRoute,
   WomenIndexRoute: WomenIndexRoute,
   ApiAccountOrdersRoute: ApiAccountOrdersRoute,
+  ApiAdminOrdersRoute: ApiAdminOrdersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

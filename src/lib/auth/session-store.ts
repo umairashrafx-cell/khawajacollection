@@ -142,6 +142,24 @@ export function useUser(): User | null {
   );
 }
 
+/**
+ * Whether the signed-in user carries the admin role.
+ *
+ * FOR HIDING UI ONLY. This reads a claim out of the session the browser is
+ * holding, and a determined visitor can put whatever they like in there. It
+ * decides whether the admin link renders and whether /admin shows a screen or
+ * a refusal — nothing more. Every admin endpoint independently asks Supabase
+ * (src/lib/auth/verify.ts, adminFromRequest), so faking this flag buys a view
+ * of empty tables and a row of 403s.
+ */
+export function useIsAdmin(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => state.user?.app_metadata?.["role"] === "admin",
+    () => false,
+  );
+}
+
 export function useAuthReady(): boolean {
   return useSyncExternalStore(
     subscribe,

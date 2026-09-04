@@ -14,7 +14,8 @@
     "placeholders": "node scripts/generate-placeholders.mjs",
     "catalogue": "node scripts/catalogue-report.mjs",
     "og-image": "node scripts/generate-og-image.mjs",
-    "fonts": "node scripts/fetch-fonts.mjs"
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

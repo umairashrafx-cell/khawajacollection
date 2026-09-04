@@ -26,6 +26,7 @@ const DISALLOW = [
   "/cart",
   "/checkout",
   "/account",
+  "/admin",
   "/wishlist",
   "/login",
   "/register",

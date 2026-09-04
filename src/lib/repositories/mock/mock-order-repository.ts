@@ -17,8 +17,13 @@
  */
 
 import { formatOrderNumber, normalizePakistaniPhone } from "@/lib/format";
-import type { Order } from "@/types";
-import type { CreateOrderInput, OrderRepository } from "../order-repository";
+import type { Order, OrderStatus } from "@/types";
+import type {
+  AdminOrderPage,
+  AdminOrderQuery,
+  CreateOrderInput,
+  OrderRepository,
+} from "../order-repository";
 
 const orders = new Map<string, Order>();
 /** Order number -> owning user id, for the account history seam. */
@@ -95,5 +100,56 @@ export class MockOrderRepository implements OrderRepository {
     // Scoped by owner, so an order number alone reveals nothing.
     if (owners.get(key) !== userId) return null;
     return orders.get(key) ?? null;
+  }
+
+  /* --- Admin --------------------------------------------------------- */
+
+  async listAll(query: AdminOrderQuery): Promise<AdminOrderPage> {
+    const all = [...orders.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    const term = query.q?.trim().toLowerCase();
+    const asPhone = term ? normalizePakistaniPhone(term) : null;
+
+    const matched = all.filter((order) => {
+      if (query.status && order.status !== query.status) return false;
+      if (!term) return true;
+      return (
+        normalise(order.orderNumber).includes(normalise(term)) ||
+        order.phone.includes(term) ||
+        (asPhone !== null && order.phone === asPhone)
+      );
+    });
+
+    // Over every order, not just the page — same contract as the Supabase
+    // implementation, so a dashboard reads the same under either.
+    const counts: Record<string, number> = {};
+    let revenue = 0;
+    for (const order of all) {
+      counts[order.status] = (counts[order.status] ?? 0) + 1;
+      if (order.status !== "cancelled") revenue += order.totals.total;
+    }
+
+    const perPage = Math.min(query.perPage ?? 25, 100);
+    const page = Math.max(1, query.page ?? 1);
+    const start = (page - 1) * perPage;
+
+    return {
+      items: matched.slice(start, start + perPage),
+      total: matched.length,
+      page,
+      perPage,
+      counts,
+      revenue,
+    };
+  }
+
+  async updateStatus(orderNumber: string, status: OrderStatus): Promise<Order | null> {
+    const key = normalise(orderNumber);
+    const order = orders.get(key);
+    if (!order) return null;
+
+    const updated: Order = { ...order, status };
+    orders.set(key, updated);
+    return updated;
   }
 }

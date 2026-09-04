@@ -173,6 +173,37 @@ decision for Umair**, and it is bundled with the real photography anyway:
       measurement as a local Node server, and the numbers above should not be
       treated as final until it is repeated there
 
+## 6c. Admin access
+
+The admin panel lives at `/admin` and is invisible without the role. Nothing
+grants it automatically — by design, since the flag lives where a customer
+cannot write to it.
+
+- [ ] **Grant yourself admin.** In the Supabase SQL editor:
+
+      ```sql
+      update auth.users
+         set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}'
+       where email = 'you@example.com';
+      ```
+
+      Then sign out and back in on the site so the browser picks up a fresh
+      session. A link to the admin appears on `/account` once it has.
+
+- [ ] Confirm a NON-admin account gets “Not an admin account” at `/admin` and
+      403 from `/api/admin/orders`. Worth doing once with a real second
+      account rather than trusting it.
+
+**Why `raw_app_meta_data` and not `raw_user_meta_data`:** a signed-in user can
+write their own `user_metadata` — the account page does exactly that to store a
+display name. If the admin flag lived there, any customer could promote
+themselves with one API call. `app_metadata` is writable only with the service
+role or from the dashboard.
+
+To revoke, set the role to something else or remove the key; it takes effect on
+the next request, because the server reads the user record rather than trusting
+the token's claims.
+
 ## 7. Pre-flight verification
 
 Run against the production build (`NITRO_PRESET=node-server npm run build && node .output/server/index.mjs`), not the dev server.

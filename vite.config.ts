@@ -23,6 +23,18 @@ export default defineConfig({
       // A slug that 404s should not take the whole build down.
       failOnError: false,
       concurrency: 4,
+
+      /*
+       * Private areas are never prerendered. The crawler reached /admin and
+       * wrote three static shells — harmless in themselves, since the guard is
+       * client-side and every /api/admin route re-checks the role server-side,
+       * so the HTML contains no data. But a static file of a staff-only screen
+       * sitting on a CDN is the kind of thing that becomes a real leak the
+       * first time someone renders data into it during SSR. Cheaper to never
+       * start.
+       */
+      filter: ({ path }: { path: string }) =>
+        !path.startsWith("/admin") && !path.startsWith("/account"),
     },
     pages: [{ path: "/" }],
   },

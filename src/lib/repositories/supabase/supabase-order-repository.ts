@@ -24,7 +24,12 @@
 import { normalizePakistaniPhone } from "@/lib/format";
 import { serviceClient } from "@/lib/supabase/client";
 import type { Order, OrderItem, OrderStatus, PaymentMethodId, ShippingAddress } from "@/types";
-import type { CreateOrderInput, OrderRepository } from "../order-repository";
+import type {
+  AdminOrderPage,
+  AdminOrderQuery,
+  CreateOrderInput,
+  OrderRepository,
+} from "../order-repository";
 
 interface OrderRow {
   id: string;
@@ -261,6 +266,77 @@ export class SupabaseOrderRepository implements OrderRepository {
       .maybeSingle();
 
     if (error || !data) return null;
+    const [order] = await hydrate([data as unknown as OrderRow]);
+    return order ?? null;
+  }
+
+  /* --- Admin --------------------------------------------------------- */
+
+  async listAll(query: AdminOrderQuery): Promise<AdminOrderPage> {
+    const supabase = await serviceClient();
+    const perPage = Math.min(query.perPage ?? 25, 100);
+    const page = Math.max(1, query.page ?? 1);
+
+    let rows = supabase.from("orders").select(SELECT, { count: "exact" });
+
+    if (query.status) rows = rows.eq("status", query.status);
+
+    if (query.q?.trim()) {
+      const term = query.q.trim();
+      // Order number or phone. The phone is stored normalised to +92, so a
+      // search for the 03xx form people actually type is normalised the same
+      // way before it is compared — the same trap that broke guest tracking.
+      const asPhone = normalizePakistaniPhone(term);
+      const like = `%${term.replace(/[%_]/g, "")}%`;
+      rows = rows.or(
+        asPhone
+          ? `order_number.ilike.${like},phone.eq.${asPhone}`
+          : `order_number.ilike.${like},phone.ilike.${like}`,
+      );
+    }
+
+    const from = (page - 1) * perPage;
+    const { data, error, count } = await rows
+      .order("created_at", { ascending: false })
+      .range(from, from + perPage - 1);
+
+    if (error) throw new Error(`Admin order query failed: ${error.message}`);
+
+    // Counts and revenue are over the WHOLE table, not the current page — a
+    // dashboard that only counted what fits on screen would be worse than no
+    // dashboard. Selecting just the two columns keeps it cheap.
+    const { data: totals } = await supabase.from("orders").select("status, total");
+    const counts: Record<string, number> = {};
+    let revenue = 0;
+    for (const row of (totals ?? []) as { status: string | null; total: number | null }[]) {
+      const status = row.status ?? "placed";
+      counts[status] = (counts[status] ?? 0) + 1;
+      if (status !== "cancelled") revenue += row.total ?? 0;
+    }
+
+    return {
+      items: await hydrate((data ?? []) as unknown as OrderRow[]),
+      total: count ?? 0,
+      page,
+      perPage,
+      counts,
+      revenue,
+    };
+  }
+
+  async updateStatus(orderNumber: string, status: OrderStatus): Promise<Order | null> {
+    const { data, error } = await (
+      await serviceClient()
+    )
+      .from("orders")
+      .update({ status })
+      .ilike("order_number", tidy(orderNumber))
+      .select(SELECT)
+      .maybeSingle();
+
+    if (error) throw new Error(`Order status update failed: ${error.message}`);
+    if (!data) return null;
+
     const [order] = await hydrate([data as unknown as OrderRow]);
     return order ?? null;
   }

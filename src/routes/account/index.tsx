@@ -11,13 +11,13 @@
 
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Heart, PackageSearch } from "lucide-react";
+import { Heart, PackageSearch, ShieldCheck } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { FormError } from "@/components/account/AuthShell";
 import { Field } from "@/components/forms/Field";
 import { inputClass } from "@/components/forms/input-class";
-import { useAuth } from "@/lib/auth/session-store";
+import { useAuth, useIsAdmin } from "@/lib/auth/session-store";
 import { browserClient } from "@/lib/supabase/client";
 import { useWishlistCount, useWishlistHydrated } from "@/store/wishlist-store";
 
@@ -35,6 +35,7 @@ export const Route = createFileRoute("/account/")({
 
 function ProfilePage() {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const savedCount = useWishlistCount();
   const hydrated = useWishlistHydrated();
 
@@ -112,6 +113,24 @@ function ProfilePage() {
           </div>
         </form>
       </section>
+
+      {/* Only staff see this. It is a convenience, not a boundary — the admin
+          area guards itself and every /api/admin route re-checks the role. */}
+      {isAdmin ? (
+        <section>
+          <h2 className="font-display text-xl">Staff</h2>
+          <AppLink
+            href="/admin"
+            className="mt-5 flex items-center gap-4 border border-kc-ink bg-kc-white p-5 transition-colors hover:bg-kc-sand"
+          >
+            <ShieldCheck className="h-5 w-5 shrink-0 text-kc-ink" aria-hidden="true" />
+            <span className="flex-1">
+              <span className="block text-sm font-medium text-kc-ink">Admin</span>
+              <span className="block text-xs text-kc-muted">Orders and fulfilment</span>
+            </span>
+          </AppLink>
+        </section>
+      ) : null}
 
       <section>
         <h2 className="font-display text-xl">Shortcuts</h2>
