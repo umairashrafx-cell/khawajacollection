@@ -88,6 +88,14 @@ export default defineConfig({
       // `max-age=60` that /api/product sets for the wishlist size-picker,
       // which is public catalogue data and worth caching. Public endpoints
       // set their own headers; these override anything they might get wrong.
+      // Public catalogue endpoints, stated explicitly. The catch-all "/**"
+      // below overrides whatever a handler sets for itself, so /api/product's
+      // own `max-age=60` was being replaced by `max-age=0` — verified in
+      // production. A route rule is the only thing that wins here.
+      "/api/product": { headers: { "cache-control": "public, max-age=60" } },
+      "/api/search": { headers: { "cache-control": "public, max-age=60" } },
+
+      // Everything carrying personal data.
       "/api/orders": { headers: { "cache-control": "no-store" } },
       "/api/track-order": { headers: { "cache-control": "no-store" } },
       "/api/newsletter": { headers: { "cache-control": "no-store" } },
