@@ -108,11 +108,17 @@ image load, no invented business facts.
 - [x] **Phase 5** — PDP
 - [x] **Phase 6** — Cart, wishlist, search
 - [x] **Phase 7** — Checkout, orders, tracking
-- [~] **Phase 8** — Supabase migration. Schema + RLS done
-      (`supabase/migrations/`). Client, repository, seed and auth BLOCKED:
-      no KC Supabase project exists yet (the only one on the account is
-      Al-Madina-Jewellers, a different business), and `@supabase/supabase-js`
-      is not installed — ask before adding it.
+- [~] **Phase 8** — Supabase migration. Schema, RLS, client, repository and
+      seed are done and verified against the live project. 60 products / 425
+      variants / 174 images are in Postgres; both repositories produce
+      byte-identical listings, facets and PDPs, and `VITE_PRODUCT_REPOSITORY`
+      flips between them with no code change. RLS verified with the
+      publishable key: catalogue readable, `orders` and `order_items` return
+      `[]`, catalogue INSERT returns 401.
+      **Still open:** item 5 (Supabase Auth, account pages, wishlist merge on
+      login) and uploading the placeholder images to Storage — deliberately
+      deferred, they are throwaway scaffolding due to be replaced by the real
+      photography pipeline (Section 19).
 - [ ] **Phase 9** — SEO, performance, a11y, launch
 
 ## Known debt from the Lovable prototype
