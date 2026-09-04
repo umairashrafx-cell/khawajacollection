@@ -143,6 +143,29 @@ export interface CategoryRepository {
    * only carries the segment.
    */
   getSubcategory(parentSlug: string, segment: string): Promise<Category | null>;
+
+  /**
+   * Create a category, or rename an existing one.
+   *
+   * WHY THE SLUG IS PART OF THE INPUT AND NEVER CHANGES. `slug` is the primary
+   * key (Section 8.3), it is the URL of the listing page, and every product
+   * carries it in `category_slug`. Renaming it would 404 the page and orphan
+   * every product on it in the same statement, so an edit reaches only the
+   * name, description, image and order; a new slug always means a new
+   * category.
+   */
+  saveCategory(input: CategoryInput): Promise<Category>;
+}
+
+export interface CategoryInput {
+  slug: string;
+  name: string;
+  /** null for a top-level department. */
+  parentSlug: string | null;
+  description: string | null;
+  /** A 4:5 card. null is fine — the listing page does not require one. */
+  imageUrl: string | null;
+  sortOrder: number;
 }
 
 export interface CollectionRepository {

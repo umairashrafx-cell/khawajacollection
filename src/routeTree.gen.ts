@@ -41,12 +41,15 @@ import { Route as AccessoriesSubcategoryRouteImport } from './routes/accessories
 import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as AccountAddressesRouteImport } from './routes/account/addresses'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as ApiNewsletterRouteImport } from './routes/api/newsletter'
 import { Route as ApiOrdersRouteImport } from './routes/api/orders'
 import { Route as ApiProductRouteImport } from './routes/api/product'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as ApiWishlistEntriesRouteImport } from './routes/api/wishlist-entries'
+import { Route as BedsheetsIndexRouteImport } from './routes/bedsheets/index'
+import { Route as BedsheetsSubcategoryRouteImport } from './routes/bedsheets/$subcategory'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as MenIndexRouteImport } from './routes/men/index'
@@ -64,6 +67,7 @@ import { Route as AdminProductsIndexRouteImport } from './routes/admin/products.
 import { Route as AdminProductsIdRouteImport } from './routes/admin/products.$id'
 import { Route as AdminProductsNewRouteImport } from './routes/admin/products.new'
 import { Route as ApiAccountOrdersRouteImport } from './routes/api/account/orders'
+import { Route as ApiAdminCategoriesRouteImport } from './routes/api/admin/categories'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminProductRouteImport } from './routes/api/admin/product'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
@@ -229,6 +233,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiNewsletterRoute = ApiNewsletterRouteImport.update({
   id: '/api/newsletter',
   path: '/api/newsletter',
@@ -257,6 +266,16 @@ const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
 const ApiWishlistEntriesRoute = ApiWishlistEntriesRouteImport.update({
   id: '/api/wishlist-entries',
   path: '/api/wishlist-entries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BedsheetsIndexRoute = BedsheetsIndexRouteImport.update({
+  id: '/bedsheets/',
+  path: '/bedsheets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BedsheetsSubcategoryRoute = BedsheetsSubcategoryRouteImport.update({
+  id: '/bedsheets/$subcategory',
+  path: '/bedsheets/$subcategory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -345,6 +364,11 @@ const ApiAccountOrdersRoute = ApiAccountOrdersRouteImport.update({
   path: '/api/account/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminCategoriesRoute = ApiAdminCategoriesRouteImport.update({
+  id: '/api/admin/categories',
+  path: '/api/admin/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
   id: '/api/admin/orders',
   path: '/api/admin/orders',
@@ -396,12 +420,14 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
+  '/bedsheets/$subcategory': typeof BedsheetsSubcategoryRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -412,6 +438,7 @@ export interface FileRoutesByFullPath {
   '/accessories/': typeof AccessoriesIndexRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/bedsheets/': typeof BedsheetsIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
@@ -419,6 +446,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/categories': typeof ApiAdminCategoriesRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/product': typeof ApiAdminProductRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
@@ -455,12 +483,14 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
+  '/bedsheets/$subcategory': typeof BedsheetsSubcategoryRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -471,6 +501,7 @@ export interface FileRoutesByTo {
   '/accessories': typeof AccessoriesIndexRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/bedsheets': typeof BedsheetsIndexRoute
   '/men': typeof MenIndexRoute
   '/women': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
@@ -478,6 +509,7 @@ export interface FileRoutesByTo {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/categories': typeof ApiAdminCategoriesRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/product': typeof ApiAdminProductRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
@@ -517,12 +549,14 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/accessories/$subcategory': typeof AccessoriesSubcategoryRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/api/newsletter': typeof ApiNewsletterRoute
   '/api/orders': typeof ApiOrdersRoute
   '/api/product': typeof ApiProductRoute
   '/api/search': typeof ApiSearchRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/api/wishlist-entries': typeof ApiWishlistEntriesRoute
+  '/bedsheets/$subcategory': typeof BedsheetsSubcategoryRoute
   '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/men/$subcategory': typeof MenSubcategoryRoute
@@ -533,6 +567,7 @@ export interface FileRoutesById {
   '/accessories/': typeof AccessoriesIndexRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/bedsheets/': typeof BedsheetsIndexRoute
   '/men/': typeof MenIndexRoute
   '/women/': typeof WomenIndexRoute
   '/account/orders/$orderNumber': typeof AccountOrdersOrderNumberRoute
@@ -540,6 +575,7 @@ export interface FileRoutesById {
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/api/account/orders': typeof ApiAccountOrdersRoute
+  '/api/admin/categories': typeof ApiAdminCategoriesRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/product': typeof ApiAdminProductRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
@@ -580,12 +616,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/account/addresses'
+    | '/admin/categories'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
     | '/api/wishlist-entries'
+    | '/bedsheets/$subcategory'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -596,6 +634,7 @@ export interface FileRouteTypes {
     | '/accessories/'
     | '/account/'
     | '/admin/'
+    | '/bedsheets/'
     | '/men/'
     | '/women/'
     | '/account/orders/$orderNumber'
@@ -603,6 +642,7 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/api/account/orders'
+    | '/api/admin/categories'
     | '/api/admin/orders'
     | '/api/admin/product'
     | '/api/admin/products'
@@ -639,12 +679,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/account/addresses'
+    | '/admin/categories'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
     | '/api/wishlist-entries'
+    | '/bedsheets/$subcategory'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -655,6 +697,7 @@ export interface FileRouteTypes {
     | '/accessories'
     | '/account'
     | '/admin'
+    | '/bedsheets'
     | '/men'
     | '/women'
     | '/account/orders/$orderNumber'
@@ -662,6 +705,7 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/api/account/orders'
+    | '/api/admin/categories'
     | '/api/admin/orders'
     | '/api/admin/product'
     | '/api/admin/products'
@@ -700,12 +744,14 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/accessories/$subcategory'
     | '/account/addresses'
+    | '/admin/categories'
     | '/api/newsletter'
     | '/api/orders'
     | '/api/product'
     | '/api/search'
     | '/api/track-order'
     | '/api/wishlist-entries'
+    | '/bedsheets/$subcategory'
     | '/category/$slug'
     | '/collections/$slug'
     | '/men/$subcategory'
@@ -716,6 +762,7 @@ export interface FileRouteTypes {
     | '/accessories/'
     | '/account/'
     | '/admin/'
+    | '/bedsheets/'
     | '/men/'
     | '/women/'
     | '/account/orders/$orderNumber'
@@ -723,6 +770,7 @@ export interface FileRouteTypes {
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/api/account/orders'
+    | '/api/admin/categories'
     | '/api/admin/orders'
     | '/api/admin/product'
     | '/api/admin/products'
@@ -767,6 +815,7 @@ export interface RootRouteChildren {
   ApiSearchRoute: typeof ApiSearchRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ApiWishlistEntriesRoute: typeof ApiWishlistEntriesRoute
+  BedsheetsSubcategoryRoute: typeof BedsheetsSubcategoryRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   MenSubcategoryRoute: typeof MenSubcategoryRoute
@@ -775,9 +824,11 @@ export interface RootRouteChildren {
   ProductsSlugRoute: typeof ProductsSlugRoute
   WomenSubcategoryRoute: typeof WomenSubcategoryRoute
   AccessoriesIndexRoute: typeof AccessoriesIndexRoute
+  BedsheetsIndexRoute: typeof BedsheetsIndexRoute
   MenIndexRoute: typeof MenIndexRoute
   WomenIndexRoute: typeof WomenIndexRoute
   ApiAccountOrdersRoute: typeof ApiAccountOrdersRoute
+  ApiAdminCategoriesRoute: typeof ApiAdminCategoriesRoute
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
   ApiAdminProductRoute: typeof ApiAdminProductRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
@@ -1010,6 +1061,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/newsletter': {
       id: '/api/newsletter'
       path: '/api/newsletter'
@@ -1050,6 +1108,20 @@ declare module '@tanstack/react-router' {
       path: '/api/wishlist-entries'
       fullPath: '/api/wishlist-entries'
       preLoaderRoute: typeof ApiWishlistEntriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bedsheets/': {
+      id: '/bedsheets/'
+      path: '/bedsheets'
+      fullPath: '/bedsheets/'
+      preLoaderRoute: typeof BedsheetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bedsheets/$subcategory': {
+      id: '/bedsheets/$subcategory'
+      path: '/bedsheets/$subcategory'
+      fullPath: '/bedsheets/$subcategory'
+      preLoaderRoute: typeof BedsheetsSubcategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -1171,6 +1243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAccountOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/categories': {
+      id: '/api/admin/categories'
+      path: '/api/admin/categories'
+      fullPath: '/api/admin/categories'
+      preLoaderRoute: typeof ApiAdminCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/orders': {
       id: '/api/admin/orders'
       path: '/api/admin/orders'
@@ -1220,6 +1299,7 @@ const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrdersOrderNumberRoute: typeof AdminOrdersOrderNumberRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
@@ -1229,6 +1309,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrdersOrderNumberRoute: AdminOrdersOrderNumberRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
@@ -1274,6 +1355,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSearchRoute: ApiSearchRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
   ApiWishlistEntriesRoute: ApiWishlistEntriesRoute,
+  BedsheetsSubcategoryRoute: BedsheetsSubcategoryRoute,
   CategorySlugRoute: CategorySlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   MenSubcategoryRoute: MenSubcategoryRoute,
@@ -1282,9 +1364,11 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsSlugRoute: ProductsSlugRoute,
   WomenSubcategoryRoute: WomenSubcategoryRoute,
   AccessoriesIndexRoute: AccessoriesIndexRoute,
+  BedsheetsIndexRoute: BedsheetsIndexRoute,
   MenIndexRoute: MenIndexRoute,
   WomenIndexRoute: WomenIndexRoute,
   ApiAccountOrdersRoute: ApiAccountOrdersRoute,
+  ApiAdminCategoriesRoute: ApiAdminCategoriesRoute,
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
   ApiAdminProductRoute: ApiAdminProductRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,

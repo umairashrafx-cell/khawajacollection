@@ -17,11 +17,11 @@
 
 import { ChevronDown } from "lucide-react";
 
-import { mensSizes, sizeGuideNote, womensSizes } from "@/config/size-guide";
+import { bedSizeGuideNote, mensSizes, sizeGuideNote, womensSizes } from "@/config/size-guide";
 import { commerce, contact, PLACEHOLDER } from "@/config/site";
 import { formatPKR, labelFromSlug } from "@/lib/format";
 import type { Product } from "@/types";
-import { SizeTable } from "./SizeGuideDialog";
+import { BedSizeTable, SizeTable } from "./SizeGuideDialog";
 
 export function ProductAccordions({ product }: { product: Product }) {
   const details = [
@@ -56,8 +56,19 @@ export function ProductAccordions({ product }: { product: Product }) {
       </Panel>
 
       <Panel title="Size Guide">
-        <SizeTable rows={product.categorySlug === "men" ? mensSizes : womensSizes} />
-        <p className="mt-4 text-xs text-kc-muted">{sizeGuideNote}</p>
+        {/* Bedding gets the bed chart. A chest measurement on a bedsheet is
+            not an imprecise answer, it is an answer to another question. */}
+        {product.categorySlug === "bedsheets" ? (
+          <>
+            <BedSizeTable />
+            <p className="mt-4 text-xs text-kc-muted">{bedSizeGuideNote}</p>
+          </>
+        ) : (
+          <>
+            <SizeTable rows={product.categorySlug === "men" ? mensSizes : womensSizes} />
+            <p className="mt-4 text-xs text-kc-muted">{sizeGuideNote}</p>
+          </>
+        )}
       </Panel>
 
       <Panel title="Shipping Information">

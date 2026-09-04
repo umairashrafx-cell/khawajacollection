@@ -7,7 +7,12 @@
 import { categories } from "@/data/categories";
 import { collections } from "@/data/collections";
 import type { Category, Collection } from "@/types";
-import type { CategoryNode, CategoryRepository, CollectionRepository } from "../product-repository";
+import type {
+  CategoryInput,
+  CategoryNode,
+  CategoryRepository,
+  CollectionRepository,
+} from "../product-repository";
 
 export class MockCategoryRepository implements CategoryRepository {
   async list(): Promise<Category[]> {
@@ -34,6 +39,36 @@ export class MockCategoryRepository implements CategoryRepository {
     const slug = `${parentSlug}-${segment}`;
     const found = categories.find((c) => c.slug === slug && c.parentSlug === parentSlug);
     return found ?? null;
+  }
+
+  /**
+   * Writes into the imported array. Same caveat as every other mock write:
+   * it holds for one process and is invisible to the next isolate, so a
+   * category created on a mock deployment is gone on the next cold start.
+   * It exists because Phase 8 item 6 requires the mock to remain a valid way
+   * to run the whole site, and an admin whose Save does nothing is not that.
+   */
+  async saveCategory(input: CategoryInput): Promise<Category> {
+    const category: Category = {
+      slug: input.slug,
+      name: input.name,
+      ...(input.description ? { description: input.description } : {}),
+      ...(input.parentSlug ? { parentSlug: input.parentSlug } : {}),
+      ...(input.imageUrl
+        ? { image: { url: input.imageUrl, alt: input.name, width: 960, height: 1200 } }
+        : {}),
+      sortOrder: input.sortOrder,
+    };
+
+    if (input.parentSlug && !categories.some((c) => c.slug === input.parentSlug)) {
+      throw new Error("That parent category does not exist.");
+    }
+
+    const at = categories.findIndex((c) => c.slug === input.slug);
+    if (at >= 0) categories[at] = category;
+    else categories.push(category);
+
+    return category;
   }
 }
 

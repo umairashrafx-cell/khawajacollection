@@ -16,6 +16,7 @@ import { MockOrderRepository } from "./mock/mock-order-repository";
 import { MockProductRepository } from "./mock/mock-product-repository";
 import { SupabaseOrderRepository } from "./supabase/supabase-order-repository";
 import { SupabaseProductRepository } from "./supabase/supabase-product-repository";
+import { SupabaseCategoryRepository } from "./supabase/supabase-taxonomy-repositories";
 import type {
   CategoryRepository,
   CollectionRepository,
@@ -41,7 +42,15 @@ if (implementation !== "mock" && implementation !== "supabase") {
 
 export const productRepository: ProductRepository =
   implementation === "supabase" ? new SupabaseProductRepository() : new MockProductRepository();
-export const categoryRepository: CategoryRepository = new MockCategoryRepository();
+/*
+ * Follows the same flag as the catalogue, and has to. Until the admin could
+ * create one, the taxonomy was served from src/data/categories.ts under both
+ * settings, which was harmless while it only changed at deploy time. A
+ * category written to Postgres that the site never reads is a different thing
+ * entirely.
+ */
+export const categoryRepository: CategoryRepository =
+  implementation === "supabase" ? new SupabaseCategoryRepository() : new MockCategoryRepository();
 export const collectionRepository: CollectionRepository = new MockCollectionRepository();
 /**
  * Orders follow the same flag as the catalogue, and for a stronger reason: on
@@ -57,6 +66,7 @@ export const orderRepository: OrderRepository =
   implementation === "supabase" ? new SupabaseOrderRepository() : new MockOrderRepository();
 
 export type {
+  CategoryInput,
   CategoryNode,
   CategoryRepository,
   CollectionRepository,

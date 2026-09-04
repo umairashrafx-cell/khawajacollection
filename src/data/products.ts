@@ -31,6 +31,8 @@ const MENS = ["S", "M", "L", "XL", "XXL"];
 const UNSTITCHED = ["Unstitched"];
 const ONE_SIZE = ["One Size"];
 const KHUSSA = ["36", "37", "38", "39", "40"];
+/** Bedding. One product, four bed sizes, priced by size on the PDP. */
+const BED = ["Single", "Double", "Queen", "King"];
 
 /* ------------------------------------------------------------------ */
 /* Seed rows — the editable catalogue                                  */
@@ -1000,6 +1002,193 @@ const seeds: Seed[] = [
     blurb:
       "Black velvet khussa worked with tonal thread across the vamp. Made by hand, so no two pairs match exactly.",
   },
+  /* --- Bedsheets ------------------------------------------------------ *
+   * ALL TWELVE ARE INVENTED, LIKE EVERY OTHER ROW IN THIS FILE. Names,
+   * copy, prices, thread counts and stock are placeholders for the real
+   * bedding range (spec Section 19), and the photographs are drawn SVGs.
+   * Prices sit in a 3,200-18,500 band, set against nothing but the clothing
+   * bands above it — REPLACE THEM WITH REAL ONES BEFORE SELLING.
+   */
+  {
+    id: "kc-b-001",
+    name: "Sukoon Ivory Cotton Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-double",
+    price: 5200,
+    fabric: "Cotton",
+    pieces: 3,
+    colors: ["ivory", "sand"],
+    sizes: BED,
+    tags: ["bedding", "everyday", "cotton"],
+    isNew: true,
+    featured: true,
+    blurb:
+      "Plain-woven cotton in a warm ivory, with a flat sheet and two pillowcases. The one you put on when nothing else is clean.",
+  },
+  {
+    id: "kc-b-002",
+    name: "Chandni Navy Percale Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-king",
+    price: 8900,
+    sale: 6900,
+    fabric: "Percale",
+    pieces: 3,
+    colors: ["navy", "ivory"],
+    sizes: BED,
+    tags: ["bedding", "percale", "cool"],
+    isNew: true,
+    best: true,
+    blurb:
+      "Crisp percale in deep navy, cut oversized so it still tucks after a wash. Sleeps cool through a Punjab summer.",
+  },
+  {
+    id: "kc-b-003",
+    name: "Gulnar Rose Sateen Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-double",
+    price: 11500,
+    fabric: "Sateen",
+    pieces: 3,
+    colors: ["rose", "beige"],
+    sizes: BED,
+    tags: ["bedding", "sateen", "luxury"],
+    featured: true,
+    blurb:
+      "Sateen with a low sheen that catches lamplight rather than throwing it. Heavier than percale, and it drapes like it.",
+  },
+  {
+    id: "kc-b-004",
+    name: "Sahil Teal Striped Cotton Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-double",
+    price: 6400,
+    fabric: "Cotton",
+    pieces: 3,
+    colors: ["teal", "ivory"],
+    sizes: BED,
+    tags: ["bedding", "striped", "cotton"],
+    isNew: true,
+    blurb:
+      "Woven stripes in teal on an ivory ground, not printed, so the pattern is on both faces and does not fade off.",
+  },
+  {
+    id: "kc-b-005",
+    name: "Mehr Beige Checked Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-single",
+    price: 3200,
+    fabric: "Cotton",
+    pieces: 2,
+    colors: ["beige", "charcoal"],
+    sizes: BED,
+    tags: ["bedding", "checked", "single"],
+    blurb:
+      "A single-bed check in beige and charcoal, with one pillowcase. Sized for a child's room or a guest bed.",
+  },
+  {
+    id: "kc-b-006",
+    name: "Anaya Emerald Sateen Quilt Cover",
+    category: "bedsheets",
+    subcategory: "bedsheets-quilt-covers",
+    price: 14800,
+    fabric: "Sateen",
+    pieces: 3,
+    colors: ["emerald", "gold"],
+    sizes: BED,
+    tags: ["bedding", "quilt-cover", "sateen"],
+    featured: true,
+    blurb:
+      "A buttoned quilt cover in emerald sateen with two matching pillowcases. Internal ties, so the quilt stays where you put it.",
+  },
+  {
+    id: "kc-b-007",
+    name: "Barfi Ivory Flannel Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-double",
+    price: 7600,
+    fabric: "Flannel",
+    pieces: 3,
+    colors: ["ivory", "grey"],
+    sizes: BED,
+    tags: ["bedding", "winter", "flannel"],
+    blurb:
+      "Brushed flannel for December through February. Warm without weight, and it stops being scratchy after one wash.",
+  },
+  {
+    id: "kc-b-008",
+    name: "Noorani Maroon Trellis Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-king",
+    price: 12400,
+    sale: 9900,
+    fabric: "Percale",
+    pieces: 3,
+    colors: ["maroon", "ivory"],
+    sizes: BED,
+    tags: ["bedding", "percale", "printed"],
+    best: true,
+    blurb:
+      "A fine trellis in maroon over ivory percale, king sized. The pattern is small enough not to fight a patterned room.",
+  },
+  {
+    id: "kc-b-009",
+    name: "Sadaf Grey Dotted Cotton Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-single",
+    price: 3800,
+    fabric: "Cotton",
+    pieces: 2,
+    colors: ["grey", "ivory"],
+    sizes: BED,
+    tags: ["bedding", "cotton", "single"],
+    isNew: true,
+    blurb:
+      "Small grey dots on ivory cotton, single sized with one pillowcase. Plain enough to live with for years.",
+  },
+  {
+    id: "kc-b-010",
+    name: "Zamurd Emerald Cotton Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-double",
+    price: 6900,
+    fabric: "Cotton",
+    pieces: 3,
+    colors: ["emerald", "sand"],
+    sizes: BED,
+    tags: ["bedding", "cotton", "everyday"],
+    blurb:
+      "Solid emerald cotton with a sand-coloured hem, double sized. Bought most often as a second set.",
+  },
+  {
+    id: "kc-b-011",
+    name: "Firdaus Gold Jacquard Quilt Cover",
+    category: "bedsheets",
+    subcategory: "bedsheets-quilt-covers",
+    price: 18500,
+    fabric: "Jacquard",
+    pieces: 3,
+    colors: ["gold", "ivory"],
+    sizes: BED,
+    tags: ["bedding", "quilt-cover", "wedding"],
+    featured: true,
+    blurb:
+      "A woven jacquard quilt cover in gold on ivory. Made for a wedding room, and heavy enough to feel like one.",
+  },
+  {
+    id: "kc-b-012",
+    name: "Aab Charcoal Percale Bedsheet",
+    category: "bedsheets",
+    subcategory: "bedsheets-king",
+    price: 9400,
+    fabric: "Percale",
+    pieces: 3,
+    colors: ["charcoal", "grey"],
+    sizes: BED,
+    tags: ["bedding", "percale", "plain"],
+    blurb:
+      "Undyed-looking charcoal percale, king sized, no pattern at all. The one that goes with whatever is already in the room.",
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -1034,10 +1223,18 @@ const VIEWS = ["front view", "detail", "back view", "styled view"];
 function buildImages(seed: Seed, heroColorName: string): ProductImage[] {
   const count = 2 + (hash(`${seed.id}:images`) % 3); // 2–4 images
   const first = hash(seed.id) % 12;
+  /*
+   * Bedding draws from its own pool. The clothing placeholders are flat sand
+   * panels with a monogram, which say nothing about a product whose entire
+   * appeal is the pattern — twelve identical beige squares would make the
+   * bedsheet grid impossible to judge. scripts/generate-placeholders.mjs
+   * draws a made bed for these instead.
+   */
+  const pool = seed.category === "bedsheets" ? "bedsheet" : "product";
   return Array.from({ length: count }, (_, i) => {
     const index = ((first + i * 5) % 12) + 1;
     return {
-      url: `/placeholders/product-${String(index).padStart(2, "0")}-3x4.svg`,
+      url: `/placeholders/${pool}-${String(index).padStart(2, "0")}-3x4.svg`,
       alt: `${seed.name} — ${heroColorName} — ${VIEWS[i % VIEWS.length]}`,
       width: 900,
       height: 1200,
@@ -1080,6 +1277,9 @@ const CARE_BY_FABRIC: Record<string, string> = {
   Linen: "Machine wash cold. Creasing is characteristic of the cloth.",
   Jacquard: "Dry clean recommended. Cool iron on reverse only.",
   "Wash & Wear": "Machine wash warm. Drip dry. Little or no ironing needed.",
+  Percale: "Machine wash warm. Tumble dry low. Presses crisp, creases honestly.",
+  Sateen: "Machine wash cold. Tumble dry low. Warm iron on reverse to hold the sheen.",
+  Flannel: "Machine wash warm. Tumble dry low. Expect some lint on the first two washes.",
 };
 
 /** Fixed base date so `newest` sorting is stable across server and client. */
@@ -1091,11 +1291,18 @@ function buildProduct(seed: Seed, index: number): Product {
   if (!heroToken) throw new Error(`${seed.id}: missing hero colour`);
 
   const h = hash(seed.id);
+  const bedding = seed.category === "bedsheets";
   const setPiece = seed.pieces ? ` as a ${seed.pieces}-piece set` : "";
   const description = [
     seed.blurb,
-    `Cut from ${seed.fabric.toLowerCase()}${setPiece} and finished by hand in our Lahore studio.`,
-    "Model is 5'7\" and wears a size M. Colour may read slightly differently between screens.",
+    bedding
+      ? `Woven in ${seed.fabric.toLowerCase()}${setPiece}, with a deep hem cut to stay tucked.`
+      : `Cut from ${seed.fabric.toLowerCase()}${setPiece} and finished by hand in our Lahore studio.`,
+    // A bedsheet has no model in the photograph, and saying it does is the
+    // kind of copy that survives into production and reads as carelessness.
+    bedding
+      ? "Measurements are for the flat sheet. Colour may read slightly differently between screens."
+      : "Model is 5'7\" and wears a size M. Colour may read slightly differently between screens.",
   ].join("\n\n");
 
   return {

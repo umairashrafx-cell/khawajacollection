@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="Khawaja Collection bedsheet placeholder">
+  <defs>
+    <pattern id="p-trellis-900" width="52" height="52" patternUnits="userSpaceOnUse">
+      <path d="M0 26 L26 0 L52 26 L26 52 Z" stroke="#3A3633" stroke-opacity="0.28" fill="none" stroke-width="3"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1200" fill="#E4E0D9"/>
+
+  <rect x="90" y="156" width="720" height="888" rx="11" fill="#D8C9B2"/>
+  <rect x="90" y="156" width="720" height="888" rx="11" fill="url(#p-trellis-900)"/>
+  <rect x="90" y="156" width="720" height="888" rx="11" fill="none" stroke="#14110F" stroke-opacity="0.16" stroke-width="1"/>
+
+  <rect x="117" y="192" width="306" height="133" rx="37" fill="#E4E0D9" fill-opacity="0.85" stroke="#14110F" stroke-opacity="0.14" stroke-width="1"/>
+  <rect x="450" y="192" width="306" height="133" rx="37" fill="#E4E0D9" fill-opacity="0.85" stroke="#14110F" stroke-opacity="0.14" stroke-width="1"/>
+
+  <rect x="90" y="707" width="720" height="169" fill="#14110F" fill-opacity="0.07"/>
+  <line x1="90" y1="707" x2="810" y2="707" stroke="#14110F" stroke-opacity="0.18" stroke-width="1"/>
+  <line x1="90" y1="876" x2="810" y2="876" stroke="#14110F" stroke-opacity="0.18" stroke-width="1"/>
+
+  <text x="450" y="1146" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="23" letter-spacing="4.14" fill="#14110F" fill-opacity="0.4">BEIGE</text>
+</svg>

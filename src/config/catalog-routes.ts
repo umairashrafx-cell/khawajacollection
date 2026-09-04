@@ -37,6 +37,15 @@ export const accessoriesCatalog: CatalogDescriptor = {
   base: { category: "accessories" },
 };
 
+export const bedsheetsCatalog: CatalogDescriptor = {
+  path: "/bedsheets",
+  h1: "Bedsheets",
+  metaTitle: "Bedsheets & Bedding | Khawaja Collection",
+  description:
+    "Cotton, percale and sateen bedsheets and quilt covers in single through king. Woven patterns, deep hems, cash on delivery across Pakistan.",
+  base: { category: "bedsheets" },
+};
+
 export const unstitchedCatalog: CatalogDescriptor = {
   path: "/unstitched",
   h1: "Unstitched",

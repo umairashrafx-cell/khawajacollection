@@ -312,3 +312,46 @@ export async function saveProduct(
   });
   return body.product;
 }
+
+/* --- Categories -------------------------------------------------------- */
+
+export interface AdminCategoryChild {
+  slug: string;
+  name: string;
+  description: string | null;
+  sortOrder: number;
+  productCount: number;
+  /** The part that appears in the URL: `women-unstitched` -> `unstitched`. */
+  segment: string;
+}
+
+export interface AdminCategoryNode {
+  slug: string;
+  name: string;
+  description: string | null;
+  sortOrder: number;
+  productCount: number;
+  children: AdminCategoryChild[];
+}
+
+export interface CategorySaveInput {
+  name: string;
+  parentSlug: string | null;
+  description: string;
+  /** Only sent when editing; a new one derives its segment from the name. */
+  segment?: string;
+  /** Required to write over an existing slug, so a rename has to be meant. */
+  allowRename?: boolean;
+}
+
+export function fetchAdminCategories(): Promise<{ categories: AdminCategoryNode[] }> {
+  return request<{ categories: AdminCategoryNode[] }>("/api/admin/categories");
+}
+
+export async function saveCategory(input: CategorySaveInput): Promise<{ slug: string }> {
+  const body = await request<{ category: { slug: string } }>("/api/admin/categories", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return body.category;
+}

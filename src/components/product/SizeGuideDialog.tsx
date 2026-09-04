@@ -9,7 +9,10 @@
 import { X } from "lucide-react";
 
 import {
+  bedSizeGuideNote,
+  bedSizeRows,
   howToMeasure,
+  howToMeasureBed,
   mensSizes,
   sizeGuideNote,
   womensSizes,
@@ -32,6 +35,9 @@ export function SizeGuideDialog({
 
   if (!open) return null;
 
+  // Bedding first, because it is the case the garment chart gets wrong
+  // rather than merely imprecise. See the note in src/config/size-guide.ts.
+  const bedding = categorySlug === "bedsheets";
   const mens = categorySlug === "men";
   const rows = mens ? mensSizes : womensSizes;
 
@@ -53,7 +59,7 @@ export function SizeGuideDialog({
       >
         <div className="flex items-start justify-between gap-4">
           <h2 id="size-guide-title" className="font-display text-xl">
-            {mens ? "Men's size guide" : "Women's size guide"}
+            {bedding ? "Bed size guide" : mens ? "Men's size guide" : "Women's size guide"}
           </h2>
           <button
             type="button"
@@ -65,16 +71,18 @@ export function SizeGuideDialog({
           </button>
         </div>
 
-        <SizeTable rows={rows} />
+        {bedding ? <BedSizeTable /> : <SizeTable rows={rows} />}
 
         <h3 className="mt-6 kc-eyebrow text-kc-muted">How to measure</h3>
         <ul className="mt-3 space-y-1.5 text-sm text-kc-charcoal">
-          {howToMeasure.map((line) => (
+          {(bedding ? howToMeasureBed : howToMeasure).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
 
-        <p className="mt-6 border-t border-kc-line pt-4 text-xs text-kc-muted">{sizeGuideNote}</p>
+        <p className="mt-6 border-t border-kc-line pt-4 text-xs text-kc-muted">
+          {bedding ? bedSizeGuideNote : sizeGuideNote}
+        </p>
       </div>
     </div>
   );
@@ -110,6 +118,45 @@ export function SizeTable({ rows }: { rows: SizeRow[] }) {
               <td className="py-2 pr-4">{row.chest}</td>
               <td className="py-2 pr-4">{row.waist}</td>
               <td className="py-2">{row.hip}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Mattress, flat sheet and pillowcase count. Same markup rules as SizeTable. */
+export function BedSizeTable() {
+  return (
+    <div className="mt-5 overflow-x-auto">
+      <table className="w-full border-collapse text-sm">
+        <caption className="sr-only">Bed measurements in inches</caption>
+        <thead>
+          <tr className="border-b border-kc-line text-left">
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Size
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Mattress
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Flat sheet
+            </th>
+            <th scope="col" className="py-2 font-medium">
+              Pillowcases
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {bedSizeRows.map((row) => (
+            <tr key={row.size} className="border-b border-kc-line/60">
+              <th scope="row" className="py-2 pr-4 text-left font-normal">
+                {row.size}
+              </th>
+              <td className="py-2 pr-4 text-kc-charcoal">{row.mattress}</td>
+              <td className="py-2 pr-4 text-kc-charcoal">{row.flatSheet}</td>
+              <td className="py-2 text-kc-charcoal">{row.pillowcases}</td>
             </tr>
           ))}
         </tbody>

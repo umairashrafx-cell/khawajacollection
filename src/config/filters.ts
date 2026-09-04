@@ -11,6 +11,13 @@ import type { ProductSort } from "@/types";
 
 /** Section 16 — ready-to-wear runs XS–XXL; unstitched is a single variant. */
 export const sizes = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+/**
+ * Bed sizes are a size run like any other, and they arrive on the same
+ * `variants[].size` field, so the PLP's size filter picks them up without
+ * knowing anything about bedding. Listed separately only because a shopper
+ * looking for a kurta should never be offered "King".
+ */
+export const bedSizes = ["Single", "Double", "Queen", "King"] as const;
 export const UNSTITCHED_SIZE = "Unstitched" as const;
 
 /**
@@ -28,6 +35,12 @@ export const fabrics = [
   { value: "linen", label: "Linen" },
   { value: "jacquard", label: "Jacquard" },
   { value: "wash-and-wear", label: "Wash & Wear" },
+  // Bedding weaves. A sheet is bought by its weave the way a suit is
+  // bought by its cloth, so they belong in the same vocabulary rather
+  // than a parallel one that only /bedsheets knows about.
+  { value: "percale", label: "Percale" },
+  { value: "sateen", label: "Sateen" },
+  { value: "flannel", label: "Flannel" },
 ] as const;
 
 /** Section 16 — 1/2/3-piece suits are a first-class filter. */

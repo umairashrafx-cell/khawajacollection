@@ -117,4 +117,40 @@ export const categories: Category[] = [
     parentSlug: "accessories",
     sortOrder: 2,
   },
+  {
+    slug: "bedsheets",
+    name: "Bedsheets",
+    description:
+      "Cotton, percale and sateen bedding in single through king, cut and finished in Pakistan.",
+    image: card("bedsheets", "Khawaja Collection bedsheets"),
+    sortOrder: 4,
+  },
+  {
+    slug: "bedsheets-single",
+    name: "Single",
+    description: "One flat sheet and one pillowcase, sized for a single bed.",
+    parentSlug: "bedsheets",
+    sortOrder: 1,
+  },
+  {
+    slug: "bedsheets-double",
+    name: "Double",
+    description: "Flat sheet and two pillowcases for a standard double.",
+    parentSlug: "bedsheets",
+    sortOrder: 2,
+  },
+  {
+    slug: "bedsheets-king",
+    name: "King",
+    description: "Oversized flat sheet and two king pillowcases, cut with room to tuck.",
+    parentSlug: "bedsheets",
+    sortOrder: 3,
+  },
+  {
+    slug: "bedsheets-quilt-covers",
+    name: "Quilt Covers",
+    description: "Buttoned quilt covers with matching pillowcases, in the same weaves.",
+    parentSlug: "bedsheets",
+    sortOrder: 4,
+  },
 ];

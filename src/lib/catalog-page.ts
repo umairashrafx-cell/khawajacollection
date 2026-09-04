@@ -197,18 +197,41 @@ export function catalogHead(
  * (Section 8.3 makes slug the primary key), so the stored slug is
  * `${parentSlug}-${segment}` and the URL carries only the segment.
  */
+/**
+ * How a department's name joins its subcategory's in a heading.
+ *
+ * "possessive" is the default and reads correctly for the departments that
+ * name PEOPLE: Women + Unstitched gives "Unstitched for Women" and "Women's
+ * Unstitched". Applied to a department that names a THING it produces
+ * nonsense — Bedsheets + King gave "King for Bedsheets" and, worse,
+ * "Bedsheets's King" in the title tag, which is not even correct English for
+ * a plural. "plain" drops the possessive entirely and lets the breadcrumb
+ * carry the parent, which is the one form that works for every child:
+ * "Quilt Covers Bedsheets" would be no better than what it replaced.
+ */
+export type SubcategoryNaming = "possessive" | "plain";
+
+export interface SubcategoryParent extends Crumb {
+  slug: string;
+  naming?: SubcategoryNaming;
+}
+
 export async function loadSubcategory(
-  parent: Crumb & { slug: string },
+  parent: SubcategoryParent,
   segment: string,
   search: PlpSearch,
 ): Promise<{ descriptor: CatalogDescriptor; data: CatalogData }> {
   const category = await categoryRepository.getSubcategory(parent.slug, segment);
   if (!category) throw notFound();
 
+  const plain = parent.naming === "plain";
+
   const descriptor: CatalogDescriptor = {
     path: `${parent.href}/${segment}`,
-    h1: `${category.name} for ${parent.label}`,
-    metaTitle: `${parent.label}'s ${category.name} | Khawaja Collection`,
+    h1: plain ? category.name : `${category.name} for ${parent.label}`,
+    metaTitle: plain
+      ? `${category.name} — ${parent.label} | Khawaja Collection`
+      : `${parent.label}'s ${category.name} | Khawaja Collection`,
     description:
       category.description ??
       `${category.name} from Khawaja Collection, made in limited runs in Lahore.`,

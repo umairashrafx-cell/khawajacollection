@@ -136,6 +136,51 @@ export const primaryNav: NavSection[] = [
       },
     },
   },
+  {
+    label: "Bedsheets",
+    href: "/bedsheets",
+    columns: [
+      {
+        heading: "Shop by size",
+        links: [
+          { label: "Single", href: "/bedsheets/single" },
+          { label: "Double", href: "/bedsheets/double" },
+          { label: "King", href: "/bedsheets/king" },
+          { label: "Quilt Covers", href: "/bedsheets/quilt-covers" },
+        ],
+      },
+      {
+        heading: "Shop by weave",
+        links: [
+          { label: "Cotton", href: "/bedsheets?fabric=cotton" },
+          { label: "Percale", href: "/bedsheets?fabric=percale" },
+          { label: "Sateen", href: "/bedsheets?fabric=sateen" },
+          { label: "Flannel", href: "/bedsheets?fabric=flannel" },
+          { label: "Jacquard", href: "/bedsheets?fabric=jacquard" },
+        ],
+      },
+      {
+        heading: "Shop by colour",
+        links: [
+          { label: "Ivory", href: "/bedsheets?color=ivory" },
+          { label: "Navy", href: "/bedsheets?color=navy" },
+          { label: "Emerald", href: "/bedsheets?color=emerald" },
+          { label: "On Sale", href: "/bedsheets?onSale=true" },
+        ],
+      },
+    ],
+    promo: {
+      eyebrow: "Home Textiles",
+      headline: "Woven, not printed",
+      href: "/bedsheets",
+      image: {
+        src: "/placeholders/nav-bedsheets-4x5.svg",
+        alt: "Khawaja Collection bedsheets",
+        width: 480,
+        height: 600,
+      },
+    },
+  },
   { label: "Unstitched", href: "/unstitched" },
   { label: "Ready to Wear", href: "/ready-to-wear" },
   { label: "Bridal", href: "/bridal" },
@@ -178,6 +223,7 @@ export const footerNav: NavColumn[] = [
       { label: "Women", href: "/women" },
       { label: "Men", href: "/men" },
       { label: "Unstitched", href: "/unstitched" },
+      { label: "Bedsheets", href: "/bedsheets" },
       { label: "Sale", href: "/sale" },
     ],
   },

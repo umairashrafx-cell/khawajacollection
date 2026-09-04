@@ -103,7 +103,7 @@ image load, no invented business facts.
 ## Phase status
 
 - [x] **Phase 0** — Foundation: tokens, fonts, types, config, format helpers, folder structure
-- [x] **Phase 1** — Data layer: `ProductRepository`, 60 mock products, placeholder image script
+- [x] **Phase 1** — Data layer: `ProductRepository`, 72 mock products, placeholder image script
 - [x] **Phase 2** — Layout shell: AnnouncementBar, Header, MegaMenu, MobileNav, Footer
 - [x] **Phase 3** — ProductCard + homepage (12 sections)
 - [x] **Phase 4** — PLP, filters, sorting, pagination
@@ -155,6 +155,42 @@ image load, no invented business facts.
       arrives (Section 19) rather than tune images due to be deleted. Do not
       re-raise it as an open question — build the derivative pipeline once,
       against the real assets, and re-measure on Vercel then.
+
+## Bedsheets
+
+A fourth department, added on request. `/bedsheets` plus
+`/bedsheets/$subcategory` (Single, Double, King, Quilt Covers), 12 products,
+and its own drawn placeholder imagery — a top-down made bed rather than the KC
+monogram block, because a category whose whole appeal is the pattern cannot be
+judged against twelve identical beige squares.
+
+**Everything about them is invented**, like the other 60: names, copy, prices
+(3,200–18,500), thread counts and stock are placeholders for the real bedding
+range. Replace them before selling.
+
+Three general things fell out of adding it, and they apply to any future
+department:
+
+- `SubcategoryNaming` in `src/lib/catalog-page.ts`. The subcategory heading
+  template is possessive — "Women's Unstitched" — which produced
+  "Bedsheets's King". Departments that name a THING pass `naming: "plain"`.
+- `bedSizeRows` in `src/config/size-guide.ts`. A bedsheet has no chest, waist
+  or hip; the PDP and the accordion both switch on `categorySlug`.
+- `buildImages` in `src/data/products.ts` picks its placeholder pool by
+  category.
+
+`supabase/migrations/0006_bedsheets.sql` seeds them into Postgres and is
+generated, not written: `node scripts/emit-category-sql.mjs bedsheets`.
+Regenerate it rather than hand-editing, so the mock catalogue and Postgres
+cannot drift. **Until it is applied AND the site is redeployed, /bedsheets is
+an empty listing under `supabase`** — the page is prerendered at build time, so
+applying the migration alone is not enough.
+
+Not done, and a merchandising call rather than a technical one: the homepage
+"Shop by category" strip is six 4:5 cards in a 3x2 grid (Section 11.1 item 3).
+A seventh leaves two holes on desktop, so Bedsheets is in the main nav, the
+mega menu and the footer but not that strip. Swapping one out, or widening it
+to eight, is Umair's decision.
 
 ## Known debt from the Lovable prototype
 
@@ -211,6 +247,27 @@ Known gaps, deliberate:
 - Removing an image from a product leaves the file in Storage. Orphaned bytes
   are cheaper than deleting a photo that a failed save then needed back.
 - No collections field, and no delete.
+
+Categories can be created and renamed at `/admin/categories`. Two things to
+know before touching it:
+
+- **A new SUBCATEGORY is live immediately.** `/women/$subcategory` resolves the
+  URL segment against the `categories` table, so a row is a working page the
+  moment it is saved, and it appears in the product form's dropdown.
+- **A new DEPARTMENT is not.** Top-level listings are route files
+  (`src/routes/bedsheets/`), so a new department needs a route, a descriptor in
+  `src/config/catalog-routes.ts` and an entry in `src/config/nav.ts`. The admin
+  screen says so on screen rather than leaving it to be discovered by a
+  customer.
+- **Renaming never moves a slug.** `slug` is the primary key, the URL, and what
+  `products.category_slug` points at. The API refuses a reparent outright and
+  treats a matching slug as a rename of name/description/order only.
+
+`categoryRepository` now follows `VITE_PRODUCT_REPOSITORY` like the other two.
+It read `src/data/categories.ts` under both settings until the admin could
+write categories, at which point a row Postgres held and the site never read
+would have been a lie on a form. Reads are anon-key and cached for 60s;
+`saveCategory` uses the service role and drops the cache.
 
 ## Prerender coverage is best-effort, not guaranteed
 
