@@ -201,6 +201,7 @@ const CATEGORY_CARDS = [
   "bridal",
   "accessories",
   "bedsheets",
+  "sale",
 ];
 
 const COLLECTIONS = ["the-new-season", "wedding-season", "everyday-essentials", "summer-lawn"];

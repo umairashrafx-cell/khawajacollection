@@ -186,11 +186,17 @@ cannot drift. **Until it is applied AND the site is redeployed, /bedsheets is
 an empty listing under `supabase`** — the page is prerendered at build time, so
 applying the migration alone is not enough.
 
-Not done, and a merchandising call rather than a technical one: the homepage
-"Shop by category" strip is six 4:5 cards in a 3x2 grid (Section 11.1 item 3).
-A seventh leaves two holes on desktop, so Bedsheets is in the main nav, the
-mega menu and the footer but not that strip. Swapping one out, or widening it
-to eight, is Umair's decision.
+The homepage "Shop by category" strip is now EIGHT cards in a 4x2 grid, not
+the spec's six in 3x2. A seventh tile leaves two holes, and dropping one of the
+six clothing entry points to make room for Bedsheets would have cost more than
+it bought — so the grid widened and took an eighth. Sale is that eighth: the
+only other top-level listing with a card of its own, already in the main nav,
+and the highest-intent link on the page.
+
+The count and the column count have to stay divisible. A ninth card means going
+back to three columns, not 4+4+1. And a tile's href must be a single segment:
+`cardImage()` builds the art path from it, so `/women/formals` would ask for
+`category-women/formals-4x5.svg`.
 
 ## Known debt from the Lovable prototype
 

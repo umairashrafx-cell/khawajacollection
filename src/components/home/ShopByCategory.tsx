@@ -1,8 +1,13 @@
 /**
  * Shop by Category. See docs/BUILD-SPEC.pdf Section 11.1 item 3.
  *
- * Six 4:5 cards. Horizontal scroll on mobile, 3x2 grid on desktop — a
+ * Eight 4:5 cards. Horizontal scroll on mobile, 4x2 grid from md up — a
  * separate mobile layout, not the desktop grid squeezed (Rule 8).
+ *
+ * FOUR COLUMNS RATHER THAN THREE because the strip now carries eight tiles;
+ * at three it would be 3+3+2 and end on two holes. The count and the column
+ * count have to stay divisible — if a ninth is ever added, this goes back to
+ * three columns, not to 4+4+1.
  */
 
 import { Image } from "@/components/media/Image";
@@ -22,7 +27,7 @@ function cardImage(href: string) {
 export function ShopByCategory() {
   return (
     <ul
-      className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0"
+      className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:gap-x-4 md:gap-y-6 lg:gap-6 md:overflow-visible md:px-0 md:pb-0"
       aria-label="Shop by category"
     >
       {shopByCategory.map((category) => {
@@ -39,7 +44,7 @@ export function ShopByCategory() {
                   alt={`${category.label} at Khawaja Collection`}
                   width={image.width}
                   height={image.height}
-                  sizes="(min-width: 768px) 33vw, 62vw"
+                  sizes="(min-width: 768px) 25vw, 62vw"
                   className="aspect-[4/5] w-full object-cover"
                 />
               </div>

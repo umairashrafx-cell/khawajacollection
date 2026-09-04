@@ -187,14 +187,32 @@ export const primaryNav: NavSection[] = [
   { label: "Sale", href: "/sale", isSale: true },
 ];
 
-/** Section 11.1 item 3 — six 4:5 cards on the homepage. */
+/**
+ * Section 11.1 item 3 — 4:5 cards on the homepage.
+ *
+ * EIGHT, NOT THE SPEC'S SIX. Bedsheets is a fourth department and belongs on
+ * the strip, but a seventh card leaves two holes in a 3x2 grid. Rather than
+ * drop one of the six clothing entry points to make room, the grid went to
+ * 4x2 and took an eighth tile.
+ *
+ * Sale is that eighth. It is the only other top-level listing with a card of
+ * its own, it is the highest-intent link on the page, and it is already in the
+ * main nav — so it is a real destination rather than a tile invented to fill a
+ * hole. Swapping it for something else is one line here plus a card from
+ * scripts/generate-placeholders.mjs.
+ *
+ * The href must be a single segment: cardImage() derives the art from it, so
+ * `/women/formals` would ask for `category-women/formals-4x5.svg`.
+ */
 export const shopByCategory: NavLink[] = [
   { label: "Women", href: "/women" },
   { label: "Men", href: "/men" },
+  { label: "Bedsheets", href: "/bedsheets" },
   { label: "Unstitched", href: "/unstitched" },
   { label: "Ready to Wear", href: "/ready-to-wear" },
   { label: "Bridal", href: "/bridal" },
   { label: "Accessories", href: "/accessories" },
+  { label: "Sale", href: "/sale" },
 ];
 
 /** Section 11.1 item 12 — four footer columns. */

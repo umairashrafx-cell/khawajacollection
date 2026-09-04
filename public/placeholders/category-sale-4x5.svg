@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200" role="img" aria-label="Khawaja Collection placeholder">
+  <rect width="960" height="1200" fill="#E4E0D9"/>
+  <rect x="43" y="43" width="874" height="1114" fill="none" stroke="#14110F" stroke-opacity="0.12" stroke-width="1"/>
+  <line x1="422" y1="469.1" x2="538" y2="469.1" stroke="#B08D3F" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="480" y="600" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="154" letter-spacing="12.32" fill="#14110F" fill-opacity="0.22">KC</text>
+  <text x="480" y="777.1" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-size="27" letter-spacing="4.859999999999999" fill="#14110F" fill-opacity="0.35">SALE</text>
+</svg>
