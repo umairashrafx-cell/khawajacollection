@@ -88,6 +88,28 @@ export interface ProductRepository {
    * last image or retire a size.
    */
   saveProduct(input: ProductInput, id?: string): Promise<Product>;
+
+  /**
+   * Take `quantity` off a variant, atomically, and return what is left.
+   * Returns null when the variant is gone or does not have enough.
+   *
+   * WHY THIS IS NOT "read the stock, then call updateVariantStock". Those are
+   * two statements, and between them a second request reads the same number.
+   * Both see the last piece, both pass the check, both orders are accepted,
+   * and one customer is told later that theirs is cancelled. Reserving has to
+   * be one operation that either succeeds or reports that it could not.
+   *
+   * A null is a refusal, never a zero. Callers must not treat it as "sold
+   * out, but carry on".
+   */
+  reserveStock(variantId: string, quantity: number): Promise<number | null>;
+
+  /**
+   * Put stock back. Called when a later line in the same basket cannot be
+   * reserved, or when writing the order fails after the reservation — without
+   * it a failed checkout silently eats stock nobody bought.
+   */
+  releaseStock(variantId: string, quantity: number): Promise<void>;
 }
 
 /** What the admin form submits. Prices are integer PKR (Section 16). */

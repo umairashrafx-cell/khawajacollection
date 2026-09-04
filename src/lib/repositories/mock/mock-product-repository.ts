@@ -163,4 +163,34 @@ export class MockProductRepository implements ProductRepository {
 
     return product;
   }
+
+  /**
+   * Single-threaded JavaScript, so the read and the write below cannot
+   * interleave the way two Postgres sessions can. The in-memory caveat that
+   * applies to every other write here applies to this one too.
+   */
+  async reserveStock(variantId: string, quantity: number): Promise<number | null> {
+    if (!Number.isInteger(quantity) || quantity <= 0) return null;
+
+    for (const product of products) {
+      const variant = product.variants.find((candidate) => candidate.id === variantId);
+      if (!variant) continue;
+      if (variant.stock < quantity) return null;
+      variant.stock -= quantity;
+      return variant.stock;
+    }
+    return null;
+  }
+
+  async releaseStock(variantId: string, quantity: number): Promise<void> {
+    if (!Number.isInteger(quantity) || quantity <= 0) return;
+
+    for (const product of products) {
+      const variant = product.variants.find((candidate) => candidate.id === variantId);
+      if (variant) {
+        variant.stock += quantity;
+        return;
+      }
+    }
+  }
 }

@@ -9,8 +9,18 @@
  * from the repository here. A client that sends prices has them ignored; a
  * client that tampers with them changes nothing.
  *
- * Stock is checked at the same moment, because a basket can sit in
+ * Stock is RESERVED at the same moment, because a basket can sit in
  * localStorage for weeks and the last piece may be gone.
+ *
+ * "Reserved", not "checked". The first version read the stock, refused the
+ * order if it was too low, and never wrote the number back — so the same last
+ * piece could be sold to an unlimited number of customers and the stock screen
+ * went on calling it available. It was found by placing the first real order
+ * end to end: every field was right and the count did not move.
+ *
+ * The fix is one atomic operation per line (see `reserveStock`), and a
+ * rollback if any part of the order fails afterwards. Checking and then
+ * subtracting would still be two statements with a gap in the middle.
  */
 
 import { createFileRoute } from "@tanstack/react-router";
@@ -67,34 +77,60 @@ export const Route = createFileRoute("/api/orders")({
 
         /* --- Price everything from the repository ---------------------- */
 
+        /*
+         * Anything reserved so far, so a failure part-way can put it back.
+         * A basket of three where the third is sold out must not silently
+         * consume the first two.
+         */
+        const reserved: { variantId: string; quantity: number }[] = [];
+        const releaseAll = async () => {
+          for (const held of reserved) {
+            await productRepository.releaseStock(held.variantId, held.quantity);
+          }
+        };
+
         const items: OrderItem[] = [];
         for (const line of input.items) {
           // Resolved from the catalogue, so a stale or invented id cannot
           // enter an order.
           const product = await productRepository.getById(line.productId);
           if (!product) {
+            await releaseAll();
             return json({ ok: false, error: "One of these pieces is no longer available." }, 409);
           }
 
           const variant = product.variants.find((candidate) => candidate.id === line.variantId);
           if (!variant) {
+            await releaseAll();
             return json(
               { ok: false, error: `That size of ${product.name} is no longer available.` },
               409,
             );
           }
-          if (variant.stock < line.quantity) {
+
+          // The stock check and the stock write are the SAME operation. Null
+          // means it could not be taken — either sold out, or someone else got
+          // there between this request reading the catalogue and reaching here.
+          const remaining = await productRepository.reserveStock(variant.id, line.quantity);
+          if (remaining === null) {
+            await releaseAll();
+            // Re-read rather than quoting the stale number the catalogue gave
+            // us; by now it may have changed again, and "only 2 left" when
+            // there are none is worse than saying nothing useful.
+            const fresh = await productRepository.getById(line.productId);
+            const now = fresh?.variants.find((c) => c.id === line.variantId)?.stock ?? 0;
             return json(
               {
                 ok: false,
                 error:
-                  variant.stock === 0
+                  now === 0
                     ? `${product.name} in size ${variant.size} has sold out.`
-                    : `Only ${variant.stock} left of ${product.name} in size ${variant.size}.`,
+                    : `Only ${now} left of ${product.name} in size ${variant.size}.`,
               },
               409,
             );
           }
+          reserved.push({ variantId: variant.id, quantity: line.quantity });
 
           items.push({
             productId: product.id,
@@ -115,6 +151,7 @@ export const Route = createFileRoute("/api/orders")({
         // Guardrail 2: the flat rate is a TODO in config. Rather than invent a
         // number, an order that would need one is refused.
         if (!qualifiesForFreeDelivery && commerce.flatShippingRate === null) {
+          await releaseAll();
           return json(
             {
               ok: false,
@@ -156,6 +193,7 @@ export const Route = createFileRoute("/api/orders")({
 
         const initiated = await provider.initiate(draft);
         if (!initiated.ok) {
+          await releaseAll();
           return json({ ok: false, error: initiated.message ?? "Payment could not start." }, 400);
         }
 
@@ -184,6 +222,10 @@ export const Route = createFileRoute("/api/orders")({
           // a table or an environment variable, and neither belongs on a
           // customer's screen.
           console.error("Order creation failed", cause);
+          // The stock was taken off the shelf a moment ago for an order that
+          // does not exist. Without this the shop quietly loses inventory
+          // every time the database hiccups.
+          await releaseAll();
           return json(
             {
               ok: false,

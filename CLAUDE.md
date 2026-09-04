@@ -228,6 +228,34 @@ role key is set — see the Phase 8 note above.
   301ing every legacy URL to its new home. Delete once the old URLs stop
   appearing in Search Console.
 
+## Stock is reserved, not just checked
+
+`/api/orders` used to read a variant's stock, refuse the order if it was too
+low, and never write the number back. Nothing else did either — no trigger, no
+repository code — so the same last piece could be sold to an unlimited number
+of customers while the stock screen went on calling it available.
+
+Found by placing the first real order end to end (KC-2026-00001, 2026-09-04):
+every field in the row was correct and the count did not move. It had been
+there since Phase 7 and no amount of reading the code had caught it.
+
+0007_stock_reservation.sql adds `reserve_variant_stock` and
+`release_variant_stock`. The reserve is a single
+`update ... where stock >= quantity returning stock`, so it cannot interleave:
+a second caller sees the decremented value, its WHERE fails, and it gets NULL,
+which callers must treat as a refusal and never as a zero. Checking and then
+subtracting would still be two statements with a gap in the middle.
+
+Both functions are granted to `service_role` ALONE and are not security
+definer. A stock-subtracting RPC a browser can reach is a vandalism tool — a
+loop over it would empty the shop in seconds. Verified from outside with the
+publishable key: `permission denied for function`.
+
+The order route holds every reservation it makes and releases them all if any
+later step fails — a sold-out third line, unconfigured shipping, payment
+refusing, or the order write throwing. Without that a failed checkout silently
+eats stock nobody bought.
+
 ## Admin panel
 
 Not a spec phase — built on request, at `/admin`, behind the `admins` table

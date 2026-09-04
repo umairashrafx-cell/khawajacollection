@@ -373,4 +373,37 @@ export class SupabaseProductRepository implements ProductRepository {
     if (!product) throw new Error("The product saved but could not be read back.");
     return product;
   }
+
+  /**
+   * Atomic reserve, via the function 0007_stock_reservation.sql defines.
+   * Service role, because that function is granted to service_role alone —
+   * a stock-subtracting RPC a browser could call is a vandalism tool.
+   */
+  async reserveStock(variantId: string, quantity: number): Promise<number | null> {
+    if (!UUID.test(variantId) || !Number.isInteger(quantity) || quantity <= 0) return null;
+
+    const { data, error } = await (
+      await serviceClient()
+    ).rpc("reserve_variant_stock", { p_variant_id: variantId, p_quantity: quantity });
+
+    if (error) throw new Error(`Could not reserve stock: ${error.message}`);
+
+    // The function returns NULL when the WHERE matched nothing — no such
+    // variant, or not enough left. Both mean "not reserved".
+    return typeof data === "number" ? data : null;
+  }
+
+  async releaseStock(variantId: string, quantity: number): Promise<void> {
+    if (!UUID.test(variantId) || !Number.isInteger(quantity) || quantity <= 0) return;
+
+    const { error } = await (
+      await serviceClient()
+    ).rpc("release_variant_stock", { p_variant_id: variantId, p_quantity: quantity });
+
+    // Deliberately not thrown. A release runs on a path that is already
+    // failing, and turning "your order could not be placed" into a 500 helps
+    // nobody. The stock is wrong by one until someone corrects it, which is
+    // the lesser of the two problems and visible on the stock screen.
+    if (error) console.error(`Could not release stock for ${variantId}: ${error.message}`);
+  }
 }
