@@ -59,6 +59,78 @@ function toAdminOrder(order: Order) {
   };
 }
 
+/**
+ * ONE CSV CELL. The quoting is not decorative: an address containing a comma
+ * would otherwise split into two columns and silently shift every field after
+ * it, which is the classic way a spreadsheet export corrupts a whole row
+ * without erroring. Anything with a comma, quote or newline is quoted, and
+ * embedded quotes are doubled per RFC 4180.
+ *
+ * A leading =, +, - or @ is prefixed with an apostrophe. Excel treats those as
+ * formulas, so a delivery note beginning "=" becomes executable content when
+ * the file is opened — CSV injection, and a real risk for a file assembled
+ * from text customers typed.
+ */
+function csvCell(value: unknown): string {
+  const raw = value === null || value === undefined ? "" : String(value);
+  const guarded = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  const needsQuotes = guarded.includes('"') || /[,\r\n]/.test(guarded);
+  return needsQuotes ? `"${guarded.replace(/"/g, '""')}"` : guarded;
+}
+
+const CSV_COLUMNS = [
+  "order_number",
+  "placed_at",
+  "status",
+  "payment_method",
+  "payment_status",
+  "customer",
+  "phone",
+  "email",
+  "address",
+  "city",
+  "province",
+  "postal_code",
+  "items",
+  "subtotal_pkr",
+  "delivery_pkr",
+  "total_pkr",
+] as const;
+
+function toCsv(orders: Order[]): string {
+  const rows = orders.map((order) =>
+    [
+      order.orderNumber,
+      order.createdAt,
+      order.status,
+      order.paymentMethod,
+      order.paymentStatus,
+      order.shipping.name,
+      order.phone,
+      order.email ?? "",
+      [order.shipping.line1, order.shipping.line2].filter(Boolean).join(", "),
+      order.shipping.city,
+      order.shipping.province,
+      order.shipping.postalCode ?? "",
+      order.items
+        .map((i) => `${i.quantity}x ${i.nameSnapshot} (${i.size}/${i.colorName})`)
+        .join("; "),
+      order.totals.subtotal,
+      order.totals.shipping,
+      order.totals.total,
+    ]
+      .map(csvCell)
+      .join(","),
+  );
+
+  // CRLF line endings and a UTF-8 BOM. Excel on Windows reads a plain UTF-8
+  // CSV as the local codepage and mangles every non-ASCII character, which
+  // here means customer names. The BOM is what tells it otherwise.
+  const BOM = "\ufeff";
+  const CRLF = "\r\n";
+  return BOM + [CSV_COLUMNS.join(","), ...rows].join(CRLF) + CRLF;
+}
+
 export const Route = createFileRoute("/api/admin/orders")({
   server: {
     handlers: {
@@ -83,6 +155,26 @@ export const Route = createFileRoute("/api/admin/orders")({
         }
 
         const statusParam = url.searchParams.get("status");
+
+        if (url.searchParams.get("format") === "csv") {
+          // Everything matching the filter, not one page — an export that
+          // silently stopped at 25 rows would be worse than no export.
+          const all = await orderRepository.listAll({
+            ...(isStatus(statusParam) ? { status: statusParam } : {}),
+            ...(url.searchParams.get("q") ? { q: url.searchParams.get("q") as string } : {}),
+            perPage: 100,
+            page: 1,
+          });
+
+          const stamp = new Date().toISOString().slice(0, 10);
+          return new Response(toCsv(all.items), {
+            headers: {
+              "Content-Type": "text/csv; charset=utf-8",
+              "Content-Disposition": `attachment; filename="kc-orders-${stamp}.csv"`,
+              "Cache-Control": "no-store, private",
+            },
+          });
+        }
         const page = await orderRepository.listAll({
           ...(isStatus(statusParam) ? { status: statusParam } : {}),
           ...(url.searchParams.get("q") ? { q: url.searchParams.get("q") as string } : {}),

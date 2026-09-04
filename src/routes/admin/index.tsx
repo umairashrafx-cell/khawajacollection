@@ -13,11 +13,11 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, PackageCheck, Wallet } from "lucide-react";
+import { ArrowRight, PackageCheck, PackageX, Wallet } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { ORDER_STEPS } from "@/lib/order-steps";
-import { fetchAdminOrders } from "@/lib/auth/admin-api";
+import { fetchAdminOrders, fetchAdminProducts } from "@/lib/auth/admin-api";
 import { useIsAdmin } from "@/lib/auth/session-store";
 import { formatDate, formatPKR } from "@/lib/format";
 
@@ -41,6 +41,16 @@ function AdminDashboard() {
     // Someone leaves this open on a shop counter all day.
     refetchInterval: 60_000,
     staleTime: 30_000,
+  });
+
+  // Stock is the other thing that quietly costs money. It is a separate query
+  // so a slow catalogue read never delays the order counts, which are the
+  // reason anyone opens this page.
+  const { data: stock } = useQuery({
+    queryKey: ["admin-stock-summary"],
+    queryFn: () => fetchAdminProducts({}),
+    enabled: isAdmin,
+    staleTime: 60_000,
   });
 
   if (isPending) return <p className="text-sm text-kc-muted">Loading…</p>;
@@ -95,6 +105,37 @@ function AdminDashboard() {
           <ArrowRight className="h-5 w-5 shrink-0 text-kc-muted" aria-hidden="true" />
         ) : null}
       </AppLink>
+
+      {/* Sold-out pieces are invisible on the storefront, so nothing prompts
+          anyone to notice. This is the only place that does. */}
+      {stock && (stock.summary.soldOutProducts > 0 || stock.summary.lowStockVariants > 0) ? (
+        <AppLink
+          href={
+            stock.summary.soldOutProducts > 0
+              ? "/admin/products?filter=soldout"
+              : "/admin/products?filter=low"
+          }
+          className="flex items-center gap-4 border border-kc-line bg-kc-white p-5 transition-colors hover:border-kc-ink"
+        >
+          <PackageX className="h-6 w-6 shrink-0 text-kc-sale" aria-hidden="true" />
+          <span className="flex-1 text-sm text-kc-charcoal">
+            <strong className="font-medium text-kc-ink">{stock.summary.soldOutProducts}</strong>{" "}
+            {stock.summary.soldOutProducts === 1 ? "product is" : "products are"} sold out
+            {stock.summary.lowStockVariants > 0 ? (
+              <>
+                {", and "}
+                <strong className="font-medium text-kc-ink">
+                  {stock.summary.lowStockVariants}
+                </strong>{" "}
+                {stock.summary.lowStockVariants === 1 ? "size is" : "sizes are"} down to{" "}
+                {stock.summary.lowStockThreshold} or fewer
+              </>
+            ) : null}
+            .
+          </span>
+          <ArrowRight className="h-5 w-5 shrink-0 text-kc-muted" aria-hidden="true" />
+        </AppLink>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="border border-kc-line bg-kc-white p-5">

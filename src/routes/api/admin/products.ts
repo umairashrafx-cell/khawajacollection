@@ -16,6 +16,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { adminFromRequest } from "@/lib/auth/verify";
+import { operations } from "@/config/site";
 import { productRepository } from "@/lib/repositories";
 import type { Product } from "@/types";
 
@@ -55,21 +56,70 @@ export const Route = createFileRoute("/api/admin/products")({
 
         const url = new URL(request.url);
         const q = url.searchParams.get("q")?.trim();
+        const filter = url.searchParams.get("filter");
         const page = Number(url.searchParams.get("page") ?? 1) || 1;
+        const perPage = 24;
 
-        const result = await productRepository.list({
-          ...(q ? { q } : {}),
-          page,
-          perPage: 24,
-          sort: "featured",
+        /*
+         * The stock summary is over the WHOLE catalogue, not the current page.
+         * A “low stock” count that only saw 24 products would be worse than no
+         * count — it would read as reassuring while a sold-out piece sat on
+         * page three. Same reasoning as the order counts.
+         *
+         * At sixty products one full read is trivially cheap. Past a few
+         * thousand this belongs in a Postgres aggregate, and that is a change
+         * to this file alone.
+         */
+        const everything = await productRepository.list({ perPage: 1000, sort: "featured" });
+
+        let soldOutVariants = 0;
+        let lowStockVariants = 0;
+        let soldOutProducts = 0;
+        let totalVariants = 0;
+
+        for (const product of everything.items) {
+          let productStock = 0;
+          for (const variant of product.variants) {
+            totalVariants += 1;
+            productStock += variant.stock;
+            if (variant.stock === 0) soldOutVariants += 1;
+            else if (variant.stock <= operations.lowStockThreshold) lowStockVariants += 1;
+          }
+          if (productStock === 0) soldOutProducts += 1;
+        }
+
+        // Filtering happens here rather than in the query because “low stock” is
+        // a fact about variants, and ProductQuery filters products.
+        const matching = everything.items.filter((product) => {
+          if (!q) return true;
+          const haystack = `${product.name} ${product.slug}`.toLowerCase();
+          return haystack.includes(q.toLowerCase());
         });
+
+        const filtered =
+          filter === "soldout"
+            ? matching.filter((p) => p.variants.every((v) => v.stock === 0))
+            : filter === "low"
+              ? matching.filter((p) =>
+                  p.variants.some((v) => v.stock > 0 && v.stock <= operations.lowStockThreshold),
+                )
+              : matching;
+
+        const start = (page - 1) * perPage;
 
         return json({
           ok: true,
-          products: result.items.map(toStockRow),
-          total: result.total,
+          products: filtered.slice(start, start + perPage).map(toStockRow),
+          total: filtered.length,
           page,
-          perPage: 24,
+          perPage,
+          summary: {
+            soldOutVariants,
+            lowStockVariants,
+            soldOutProducts,
+            totalVariants,
+            lowStockThreshold: operations.lowStockThreshold,
+          },
         });
       },
 

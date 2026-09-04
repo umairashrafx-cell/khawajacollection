@@ -117,19 +117,30 @@ export interface AdminProduct {
   variants: AdminVariant[];
 }
 
+export interface StockSummary {
+  soldOutVariants: number;
+  lowStockVariants: number;
+  soldOutProducts: number;
+  totalVariants: number;
+  lowStockThreshold: number;
+}
+
 export interface AdminProductPage {
   products: AdminProduct[];
   total: number;
   page: number;
   perPage: number;
+  summary: StockSummary;
 }
 
 export function fetchAdminProducts(params: {
   q?: string | undefined;
+  filter?: string | undefined;
   page?: number | undefined;
 }): Promise<AdminProductPage> {
   const search = new URLSearchParams();
   if (params.q) search.set("q", params.q);
+  if (params.filter) search.set("filter", params.filter);
   if (params.page && params.page > 1) search.set("page", String(params.page));
 
   const qs = search.toString();
@@ -142,4 +153,39 @@ export async function updateVariantStock(variantId: string, stock: number): Prom
     body: JSON.stringify({ variantId, stock }),
   });
   return body.product;
+}
+
+/**
+ * Downloads the order book as CSV.
+ *
+ * Fetched rather than linked, because the endpoint needs an Authorization
+ * header and a plain <a href> cannot carry one. The blob URL is revoked
+ * afterwards — without that, every export leaks a copy of the whole order
+ * book into the tab's memory for as long as it stays open.
+ */
+export async function downloadOrdersCsv(params: {
+  status?: string | undefined;
+  q?: string | undefined;
+}): Promise<void> {
+  const token = accessToken();
+  if (!token) throw new NotSignedIn();
+
+  const search = new URLSearchParams({ format: "csv" });
+  if (params.status) search.set("status", params.status);
+  if (params.q) search.set("q", params.q);
+
+  const response = await fetch(`/api/admin/orders?${search}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Export failed.");
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `kc-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

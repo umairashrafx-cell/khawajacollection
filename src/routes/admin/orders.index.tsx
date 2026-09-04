@@ -13,13 +13,13 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import { useState } from "react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { OrderStatusBadge } from "@/components/account/OrderStatusSteps";
 import { ORDER_STEPS } from "@/lib/order-steps";
-import { fetchAdminOrders } from "@/lib/auth/admin-api";
+import { downloadOrdersCsv, fetchAdminOrders } from "@/lib/auth/admin-api";
 import { useIsAdmin } from "@/lib/auth/session-store";
 import { formatDate, formatPKR } from "@/lib/format";
 
@@ -46,6 +46,8 @@ function AdminOrders() {
   const navigate = Route.useNavigate();
   const isAdmin = useIsAdmin();
   const [term, setTerm] = useState(q ?? "");
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const { data, isPending, error, isPlaceholderData } = useQuery({
     queryKey: ["admin-orders", status, q, page],
@@ -92,7 +94,30 @@ function AdminOrders() {
           <Search className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only sm:not-sr-only">Search</span>
         </button>
+
+        {/* Exports whatever the current filter shows, not just this page. */}
+        <button
+          type="button"
+          disabled={exporting}
+          onClick={() => {
+            setExporting(true);
+            setExportError(null);
+            downloadOrdersCsv({ status, q })
+              .catch((e: Error) => setExportError(e.message))
+              .finally(() => setExporting(false));
+          }}
+          className="ml-auto flex min-h-11 items-center gap-2 border border-kc-line bg-kc-white px-4 text-sm text-kc-charcoal transition-colors hover:border-kc-ink disabled:opacity-60"
+        >
+          <Download className="h-4 w-4" aria-hidden="true" />
+          {exporting ? "Preparing…" : "Export CSV"}
+        </button>
       </form>
+
+      {exportError ? (
+        <p role="alert" className="mt-2 text-sm text-kc-sale">
+          {exportError}
+        </p>
+      ) : null}
 
       <nav aria-label="Filter by status" className="mt-4 -mx-4 overflow-x-auto px-4">
         <ul className="flex gap-2">

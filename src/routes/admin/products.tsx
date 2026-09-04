@@ -37,6 +37,7 @@ import { formatPKR } from "@/lib/format";
 export const Route = createFileRoute("/admin/products")({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search["q"] === "string" ? search["q"] : undefined,
+    filter: typeof search["filter"] === "string" ? search["filter"] : undefined,
     page: Number(search["page"]) > 1 ? Number(search["page"]) : undefined,
   }),
   head: () => ({
@@ -46,14 +47,14 @@ export const Route = createFileRoute("/admin/products")({
 });
 
 function AdminProducts() {
-  const { q, page } = Route.useSearch();
+  const { q, filter, page } = Route.useSearch();
   const navigate = Route.useNavigate();
   const isAdmin = useIsAdmin();
   const [term, setTerm] = useState(q ?? "");
 
   const { data, isPending, error, isPlaceholderData } = useQuery({
-    queryKey: ["admin-products", q, page],
-    queryFn: () => fetchAdminProducts({ q, page }),
+    queryKey: ["admin-products", q, filter, page],
+    queryFn: () => fetchAdminProducts({ q, filter, page }),
     enabled: isAdmin,
     placeholderData: keepPreviousData,
     staleTime: 15_000,
@@ -98,6 +99,38 @@ function AdminProducts() {
           <span className="sr-only sm:not-sr-only">Search</span>
         </button>
       </form>
+
+      {data ? (
+        <nav aria-label="Filter stock" className="mt-4 flex flex-wrap gap-2">
+          {[
+            { key: undefined, label: "All" },
+            {
+              key: "low",
+              label: `Low stock (${data.summary.lowStockVariants})`,
+            },
+            {
+              key: "soldout",
+              label: `Sold out (${data.summary.soldOutProducts})`,
+            },
+          ].map((chip) => {
+            const active = filter === chip.key;
+            return (
+              <AppLink
+                key={chip.label}
+                href={chip.key ? `/admin/products?filter=${chip.key}` : "/admin/products"}
+                {...(active ? { "aria-current": "page" as const } : {})}
+                className={`flex min-h-11 items-center whitespace-nowrap border px-3 text-sm transition-colors ${
+                  active
+                    ? "border-kc-ink bg-kc-ink text-kc-paper"
+                    : "border-kc-line bg-kc-white text-kc-charcoal hover:border-kc-ink"
+                }`}
+              >
+                {chip.label}
+              </AppLink>
+            );
+          })}
+        </nav>
+      ) : null}
 
       {error ? (
         <p role="alert" className="mt-6 text-sm text-kc-sale">

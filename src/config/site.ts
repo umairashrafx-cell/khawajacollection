@@ -127,6 +127,19 @@ export const commerce = {
  */
 export const hasRealReviews = false;
 
+/**
+ * Internal operational defaults. NOTHING HERE IS SHOWN TO A CUSTOMER, which
+ * is why these are not PLACEHOLDER despite nobody having specified them:
+ * Hard Rule 9 is about not inventing facts a customer will act on — a delivery
+ * window, a refund period, an address. A threshold that decides when staff see
+ * an amber warning on their own dashboard is a default, not a claim, and a
+ * sensible one beats leaving the feature switched off.
+ */
+export const operations = {
+  /** A variant at or below this count shows as low stock in the admin. */
+  lowStockThreshold: 2,
+} as const;
+
 /** Section 16 — the seven shipping regions, in the order the select renders. */
 export const provinces: readonly Province[] = [
   "Punjab",
