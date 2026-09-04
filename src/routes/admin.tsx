@@ -7,11 +7,16 @@
  * to a real customer's order — "which one am I looking at" should be answerable
  * from the corner of your eye, not by reading the URL.
  *
- * THE GUARD HIDES; IT DOES NOT PROTECT. `useIsAdmin` reads a claim from the
- * session the browser holds, and a determined visitor can forge that. It is
- * what decides whether a screen renders. The data behind it is protected by
- * every /api/admin/* handler independently calling `adminFromRequest`, which
- * asks Supabase. Defeat this guard and you get empty tables and 403s.
+ * THE GUARD HIDES; IT DOES NOT PROTECT. It decides whether a screen renders.
+ * The data behind it is protected by every /api/admin/* handler independently
+ * calling `adminFromRequest`, which asks Supabase. Defeat this guard and you
+ * get empty tables and 403s.
+ *
+ * It asks the server (`useAdminAccess`) rather than reading the role out of
+ * the session this browser is holding. That session is a snapshot taken at
+ * sign-in, so an account granted admin afterwards was shown “Not an admin
+ * account” while every API call would have succeeded — the UI contradicting
+ * the server, with nothing on screen to explain it.
  *
  * noindex, and disallowed in robots.txt.
  */
@@ -21,7 +26,8 @@ import { Boxes, ClipboardList, LayoutDashboard, LogOut, Store } from "lucide-rea
 
 import { AppLink } from "@/components/layout/AppLink";
 import { signOut } from "@/lib/auth/actions";
-import { useAuth, useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { useAuth } from "@/lib/auth/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -44,7 +50,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 function AdminLayout() {
   const { user, ready } = useAuth();
-  const isAdmin = useIsAdmin();
+  // The SERVER decides, not the token this browser is holding. See
+  // src/hooks/useAdminAccess.ts.
+  const { isAdmin, isPending: checking } = useAdminAccess();
   const { pathname } = useLocation();
 
   if (!isSupabaseConfigured()) {
@@ -59,8 +67,10 @@ function AdminLayout() {
   }
 
   // First render is always "not ready" on server and client alike, which is
-  // what keeps hydration honest. See session-store.ts.
-  if (!ready) {
+  // what keeps hydration honest. See session-store.ts. `checking` also
+  // covers the whoami round trip, so a real admin never sees a refusal
+  // flash before the answer arrives.
+  if (!ready || checking) {
     return (
       <Shell>
         <p className="text-sm text-kc-muted">Checking your access…</p>
@@ -88,12 +98,22 @@ function AdminLayout() {
       <Shell>
         <h1 className="font-display text-2xl">Not an admin account</h1>
         <p className="mt-3 text-sm text-kc-charcoal">
-          You are signed in as {user.email}, which does not have admin access. If that is wrong, the
-          role is granted in Supabase — see <code>src/lib/auth/verify.ts</code>.
+          You are signed in as {user.email}, and the server does not list that account as staff.
         </p>
+        <p className="mt-3 text-sm text-kc-charcoal">
+          If the role was granted after you last signed in, signing out and back in will pick it up.
+          Otherwise it is granted in Supabase — see <code>docs/LAUNCH-CHECKLIST.md</code>.
+        </p>
+        <button
+          type="button"
+          onClick={() => void signOut()}
+          className="mt-6 inline-flex min-h-11 items-center justify-center bg-kc-ink px-6 text-sm tracking-wide text-kc-white"
+        >
+          Sign out and try again
+        </button>
         <AppLink
           href="/"
-          className="mt-6 inline-flex min-h-11 items-center justify-center border border-kc-line px-6 text-sm tracking-wide text-kc-ink"
+          className="mt-3 inline-flex min-h-11 items-center justify-center border border-kc-line px-6 text-sm tracking-wide text-kc-ink"
         >
           Back to the shop
         </AppLink>

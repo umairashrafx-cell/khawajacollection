@@ -26,7 +26,7 @@ import { AppLink } from "@/components/layout/AppLink";
 import { OrderStatusSteps } from "@/components/account/OrderStatusSteps";
 import { ORDER_STEPS } from "@/lib/order-steps";
 import { fetchAdminOrder, updateOrderStatus } from "@/lib/auth/admin-api";
-import { useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatDate, formatPKR } from "@/lib/format";
 import { paymentMethods } from "@/config/site";
 import type { OrderStatus } from "@/types";
@@ -49,7 +49,9 @@ function nextStatus(current: OrderStatus): OrderStatus | null {
 
 function AdminOrderDetail() {
   const { orderNumber } = Route.useParams();
-  const isAdmin = useIsAdmin();
+  // Server-authoritative, so these queries still fire for an admin whose
+  // token predates the role. See src/hooks/useAdminAccess.ts.
+  const { isAdmin } = useAdminAccess();
   const queryClient = useQueryClient();
   const [showAll, setShowAll] = useState(false);
   const [error, setError] = useState<string | null>(null);

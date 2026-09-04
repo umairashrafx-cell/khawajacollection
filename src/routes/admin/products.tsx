@@ -31,7 +31,7 @@ import {
   type AdminProduct,
   type AdminVariant,
 } from "@/lib/auth/admin-api";
-import { useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatPKR } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/products")({
@@ -49,7 +49,9 @@ export const Route = createFileRoute("/admin/products")({
 function AdminProducts() {
   const { q, filter, page } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const isAdmin = useIsAdmin();
+  // Server-authoritative, so these queries still fire for an admin whose
+  // token predates the role. See src/hooks/useAdminAccess.ts.
+  const { isAdmin } = useAdminAccess();
   const [term, setTerm] = useState(q ?? "");
 
   const { data, isPending, error, isPlaceholderData } = useQuery({

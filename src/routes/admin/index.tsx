@@ -18,7 +18,7 @@ import { ArrowRight, PackageCheck, PackageX, Wallet } from "lucide-react";
 import { AppLink } from "@/components/layout/AppLink";
 import { ORDER_STEPS } from "@/lib/order-steps";
 import { fetchAdminOrders, fetchAdminProducts } from "@/lib/auth/admin-api";
-import { useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatDate, formatPKR } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/")({
@@ -32,7 +32,9 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminDashboard() {
-  const isAdmin = useIsAdmin();
+  // Server-authoritative, so these queries still fire for an admin whose
+  // token predates the role. See src/hooks/useAdminAccess.ts.
+  const { isAdmin } = useAdminAccess();
 
   const { data, isPending, error } = useQuery({
     queryKey: ["admin-dashboard"],

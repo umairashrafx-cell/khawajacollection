@@ -20,7 +20,7 @@ import { AppLink } from "@/components/layout/AppLink";
 import { OrderStatusBadge } from "@/components/account/OrderStatusSteps";
 import { ORDER_STEPS } from "@/lib/order-steps";
 import { downloadOrdersCsv, fetchAdminOrders } from "@/lib/auth/admin-api";
-import { useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatDate, formatPKR } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/orders/")({
@@ -44,7 +44,9 @@ const FILTERS = [
 function AdminOrders() {
   const { status, q, page } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const isAdmin = useIsAdmin();
+  // Server-authoritative, so these queries still fire for an admin whose
+  // token predates the role. See src/hooks/useAdminAccess.ts.
+  const { isAdmin } = useAdminAccess();
   const [term, setTerm] = useState(q ?? "");
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);

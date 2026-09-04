@@ -189,3 +189,30 @@ export async function downloadOrdersCsv(params: {
   link.remove();
   URL.revokeObjectURL(url);
 }
+
+/* --- Access ---------------------------------------------------------- */
+
+export interface AdminWhoami {
+  isAdmin: boolean;
+  email: string | null;
+}
+
+/**
+ * Asks the SERVER whether this session is an admin, rather than reading the
+ * role out of a token the browser has been holding since sign-in. See the
+ * note in src/routes/api/admin/whoami.ts — a token issued before the role was
+ * granted does not carry it, which made freshly-promoted admins look locked
+ * out of a panel that would have served them.
+ */
+export async function fetchAdminAccess(): Promise<AdminWhoami> {
+  const token = accessToken();
+  if (!token) return { isAdmin: false, email: null };
+
+  const response = await fetch("/api/admin/whoami", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) return { isAdmin: false, email: null };
+
+  const body = (await response.json()) as AdminWhoami;
+  return { isAdmin: body.isAdmin === true, email: body.email ?? null };
+}

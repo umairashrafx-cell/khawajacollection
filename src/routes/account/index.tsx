@@ -17,7 +17,8 @@ import { AppLink } from "@/components/layout/AppLink";
 import { FormError } from "@/components/account/AuthShell";
 import { Field } from "@/components/forms/Field";
 import { inputClass } from "@/components/forms/input-class";
-import { useAuth, useIsAdmin } from "@/lib/auth/session-store";
+import { useAdminAccess } from "@/hooks/useAdminAccess";
+import { useAuth } from "@/lib/auth/session-store";
 import { browserClient } from "@/lib/supabase/client";
 import { useWishlistCount, useWishlistHydrated } from "@/store/wishlist-store";
 
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/account/")({
 
 function ProfilePage() {
   const { user } = useAuth();
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useAdminAccess();
   const savedCount = useWishlistCount();
   const hydrated = useWishlistHydrated();
 
