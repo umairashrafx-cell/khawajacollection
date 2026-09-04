@@ -73,10 +73,41 @@ writeFileSync(
 const routingConfig = {
   version: 3,
   routes: [
-    // Hashed build assets are immutable; everything else revalidates normally.
+    /*
+     * CACHING FOR STATIC FILES HAS TO LIVE HERE, NOT IN vite.config.ts.
+     *
+     * The nitro `routeRules` in vite.config.ts only reach requests that go
+     * through the SSR function. Anything under public/ is served by Vercel's
+     * CDN straight off the filesystem, so those rules never run for it —
+     * verified against production, where /api/* correctly returned `no-store`
+     * from a route rule while /fonts/*.woff2 fell back to
+     * `max-age=0, must-revalidate` and re-downloaded 48 KB on every visit.
+     *
+     * These entries use `continue: true` so they only attach a header and let
+     * the request carry on to `handle: filesystem` below.
+     */
+
+    // Hashed by the bundler, so the URL changes whenever the bytes do.
     {
       src: "/assets/(.*)",
       headers: { "cache-control": "public, max-age=31536000, immutable" },
+      continue: true,
+    },
+
+    // Fonts are NOT content-hashed (scripts/fetch-fonts.mjs names them by
+    // family and weight), so a long TTL rather than immutable — re-running
+    // that script has to be able to take effect.
+    {
+      src: "/fonts/(.*)",
+      headers: { "cache-control": "public, max-age=2592000" },
+      continue: true,
+    },
+
+    // The Open Graph card and the placeholder imagery. A day, because both are
+    // scaffolding due to be replaced by real assets (Section 19).
+    {
+      src: "/(og|placeholders)/(.*)",
+      headers: { "cache-control": "public, max-age=86400" },
       continue: true,
     },
     { handle: "filesystem" },

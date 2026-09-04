@@ -69,6 +69,12 @@ export default defineConfig({
       // Fonts are NOT content-hashed (scripts/fetch-fonts.mjs names them by
       // family and weight), so they get a long TTL rather than immutable:
       // re-running that script must be able to take effect.
+      // These three only take effect where the SSR handler serves public/ —
+      // a node-server or Cloudflare build. On Vercel the CDN serves those
+      // files off the filesystem and never runs a route rule, so the real
+      // headers for them are written into .vercel/output/config.json by
+      // scripts/finalize-vercel-output.mjs. Both places, deliberately: the
+      // app should not cache differently depending on where it is deployed.
       "/fonts/**": { headers: { "cache-control": "public, max-age=2592000" } },
       "/og/**": { headers: { "cache-control": "public, max-age=86400" } },
       "/placeholders/**": { headers: { "cache-control": "public, max-age=86400" } },
@@ -77,7 +83,15 @@ export default defineConfig({
       // closest thing to ISR available here. Anything with a session or an
       // order in it must never be cached by a shared proxy.
       "/**": { headers: { "cache-control": "public, max-age=0, must-revalidate" } },
-      "/api/**": { headers: { "cache-control": "no-store" } },
+      // Scoped to the endpoints that carry personal data. A blanket
+      // "/api/**": no-store also silently overrode the deliberate
+      // `max-age=60` that /api/product sets for the wishlist size-picker,
+      // which is public catalogue data and worth caching. Public endpoints
+      // set their own headers; these override anything they might get wrong.
+      "/api/orders": { headers: { "cache-control": "no-store" } },
+      "/api/track-order": { headers: { "cache-control": "no-store" } },
+      "/api/newsletter": { headers: { "cache-control": "no-store" } },
+      "/api/account/**": { headers: { "cache-control": "no-store, private" } },
       "/account/**": { headers: { "cache-control": "no-store, private" } },
       "/checkout": { headers: { "cache-control": "no-store, private" } },
       "/cart": { headers: { "cache-control": "no-store, private" } },

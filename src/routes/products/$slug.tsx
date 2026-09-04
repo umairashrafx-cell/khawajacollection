@@ -26,6 +26,7 @@ import { ProductInfo } from "@/components/product/ProductInfo";
 import { RecentlyViewed } from "@/components/product/RecentlyViewed";
 import { hasRealReviews, site } from "@/config/site";
 import { absoluteUrl, type Crumb } from "@/lib/catalog-page";
+import { OG_IMAGE } from "@/lib/seo";
 import { labelFromSlug, resolvePrice } from "@/lib/format";
 import { totalStock } from "@/lib/product-variants";
 import { productRepository } from "@/lib/repositories";
@@ -69,6 +70,15 @@ function crumbsFor(product: Product): Crumb[] {
   return crumbs;
 }
 
+/**
+ * Open Graph needs a raster image. Anything else — today, the generated SVG
+ * placeholders — falls back to the site card.
+ */
+function socialImage(product: { images: { url: string }[] }): string {
+  const first = product.images[0]?.url;
+  return first && /\.(jpe?g|png|webp)$/i.test(first) ? first : OG_IMAGE.path;
+}
+
 function productHead(product: Product) {
   // Section 13 — "{Product Name} | Khawaja Collection", under 60 characters.
   const title = `${product.name} | ${site.name}`;
@@ -90,9 +100,14 @@ function productHead(product: Product) {
       { property: "og:description", content: product.shortDescription },
       { property: "og:type", content: "product" },
       { property: "og:url", content: absoluteUrl(path) },
-      ...(product.images[0]
-        ? [{ property: "og:image", content: absoluteUrl(product.images[0].url) }]
-        : []),
+      // A product photograph makes the better card — but ONLY if a social
+      // crawler can render it. Facebook and X both drop SVG silently: the
+      // markup validates, the preview comes out blank, and nobody finds out
+      // until a customer shares a product. Every image in the catalogue is a
+      // generated SVG placeholder today, so this falls back to the branded PNG
+      // and will start using real photography the moment it exists.
+      { property: "og:image", content: absoluteUrl(socialImage(product)) },
+      { property: "og:image:alt", content: product.images[0]?.alt ?? product.name },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],

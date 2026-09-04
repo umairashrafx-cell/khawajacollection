@@ -46,7 +46,12 @@ boundary.
 
 ## 2. Domain and hosting
 
-- [ ] `khawajacollection.com` pointed at Vercel, `www` redirecting to the apex (or vice versa — pick one and make the other a 301)
+- [x] Domain is live. **The apex 308-redirects to `www`, so `www` is the
+      canonical host** (decided 2026-09-04).
+- [ ] **Set `VITE_SITE_URL=https://www.khawajacollection.com` in Vercel and
+      redeploy.** It is currently the apex, so every canonical, every `og:url`
+      and all 93 sitemap URLs point at a host that redirects. Verified in
+      production. This is the single highest-value SEO fix outstanding.
 - [ ] HTTPS certificate issued and forced
 - [ ] Confirm the deployment actually serves the app. `vercel.json` + `scripts/finalize-vercel-output.mjs` exist because a previous deploy 404'd: the Lovable wrapper relocates nitro's output and drops the Build Output API config. If the site 404s again, that is the first place to look.
 - [ ] Check `/robots.txt` and `/sitemap.xml` both answer on the real domain
