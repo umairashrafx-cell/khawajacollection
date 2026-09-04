@@ -1286,6 +1286,23 @@ const CARE_BY_FABRIC: Record<string, string> = {
 const CATALOGUE_DATE = Date.UTC(2026, 7, 20); // 20 August 2026
 const DAY = 86_400_000;
 
+/**
+ * Bedsheets date from their own, later epoch.
+ *
+ * Dates are derived from position in `seeds`, newest first — which quietly
+ * assumes the array is in the order things arrived. Appending a whole
+ * department to the end therefore made the newest thing in the shop sort as
+ * the oldest: the twelve bedsheets landed six months before the lawn, and
+ * none of them reached the homepage's New In strip however new they were.
+ *
+ * Giving them their own epoch fixes it without renumbering the sixty products
+ * already seeded into Postgres, which is the other half of the point — a
+ * change to CATALOGUE_DATE would move every `created_at` in the catalogue and
+ * put the mock and the database out of step.
+ */
+const BEDSHEET_DATE = Date.UTC(2026, 8, 1); // 1 September 2026
+const FIRST_BEDSHEET = seeds.findIndex((seed) => seed.category === "bedsheets");
+
 function buildProduct(seed: Seed, index: number): Product {
   const heroToken = COLOR_BY_VALUE.get(seed.colors[0] ?? "");
   if (!heroToken) throw new Error(`${seed.id}: missing hero colour`);
@@ -1329,8 +1346,13 @@ function buildProduct(seed: Seed, index: number): Product {
     isNewArrival: seed.isNew === true,
     isBestSeller: seed.best === true,
     isOnSale: seed.sale != null,
-    // Newest first in seed order, one product every three days.
-    createdAt: new Date(CATALOGUE_DATE - index * 3 * DAY).toISOString(),
+    // Newest first in seed order, one product every three days, counted from
+    // the department's own epoch. See BEDSHEET_DATE.
+    createdAt: new Date(
+      seed.category === "bedsheets"
+        ? BEDSHEET_DATE - (index - FIRST_BEDSHEET) * 3 * DAY
+        : CATALOGUE_DATE - index * 3 * DAY,
+    ).toISOString(),
     ...(seed.madeToOrder ? { isMadeToOrder: true } : {}),
   };
 }
