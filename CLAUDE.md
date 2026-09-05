@@ -166,6 +166,34 @@ image load, no invented business facts.
       re-raise it as an open question — build the derivative pipeline once,
       against the real assets, and re-measure on Vercel then.
 
+## The seed catalogue is gone from production
+
+On 2026-09-06 Umair deleted all 71 placeholder products from Postgres, leaving
+one real product he had created through the admin. The criterion was "no
+uploaded photograph": every product whose images were all generated SVGs under
+/placeholders. Verified afterwards — 1 product, 1 image, 1 variant, zero
+orphaned rows, and both orders untouched, which is the order_items snapshot
+design working as intended.
+
+**src/data/products.ts STILL DEFINES ALL 72.** The mock catalogue was
+deliberately not touched: it is what `VITE_PRODUCT_REPOSITORY=mock` runs on,
+it is what `npm run catalogue` reports, and it is the only copy of the seed
+data if any of it is ever wanted back. So the two repositories NO LONGER AGREE
+about what is in the shop, and that is intentional rather than drift — the
+claim elsewhere in this file that they produce byte-identical listings is now
+true only of the code paths, not of the data.
+
+Practical consequences:
+
+- A local `mock` session shows 72 products and production shows 1. Do not read
+  that as a bug.
+- The prerender and the sitemap shrink to whatever is actually published. A
+  deploy is needed after any bulk catalogue change, or the static pages and
+  /sitemap.xml keep advertising URLs that now 404.
+- `supabase/migrations/0006_bedsheets.sql` and `scripts/emit-category-sql.mjs`
+  can regenerate the bedsheets; the other 60 come from
+  `scripts/seed-supabase.mjs`.
+
 ## Bedsheets
 
 A fourth department, added on request. `/bedsheets` plus
