@@ -31,6 +31,22 @@ export function hasRealOrigin(): boolean {
 
 /** Absolute when the origin is known, root-relative when it is not. See the note above. */
 export function absoluteUrl(path: string): string {
+  /*
+   * ALREADY ABSOLUTE MEANS LEAVE IT ALONE.
+   *
+   * This took a root-relative path for its whole life, because every image on
+   * the site was a file in /public. Product photographs uploaded through the
+   * admin are Supabase Storage URLs with their own origin, and prefixing one
+   * produced this, live, on a real product page:
+   *
+   *   https://www.khawajacollection.comhttps://vaiiwafricvgovxopjbs.supabase.co/...
+   *
+   * A broken og:image is invisible on the site itself and shows up only as a
+   * blank card when someone shares the product on WhatsApp, which is where
+   * this shop's traffic comes from.
+   */
+  if (/^https?:\/\//i.test(path)) return path;
+
   if (!hasRealOrigin()) return path;
   return `${String(site.url).replace(/\/$/, "")}${path}`;
 }

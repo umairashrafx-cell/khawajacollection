@@ -93,6 +93,9 @@ export async function loadCatalog(
 
 /** Absolute when the production domain is known, path-relative until then. */
 export function absoluteUrl(path: string): string {
+  // An absolute URL is returned untouched — see the long note on the twin of
+  // this function in src/lib/seo.ts, which had the same bug.
+  if (/^https?:\/\//i.test(path)) return path;
   return site.url === PLACEHOLDER ? path : `${String(site.url).replace(/\/$/, "")}${path}`;
 }
 
