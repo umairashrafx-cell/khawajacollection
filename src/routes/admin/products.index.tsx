@@ -71,7 +71,8 @@ function AdminProducts() {
         <div>
           <h1 className="font-display text-2xl text-kc-ink">Stock</h1>
           <p className="mt-1 text-sm text-kc-muted">
-            Changes save as you leave each box. Everything else is behind Edit.
+            Changes save as you leave each box. Everything else, including taking a piece off the
+            shop, is behind Edit.
           </p>
         </div>
         <AppLink
@@ -120,6 +121,10 @@ function AdminProducts() {
             {
               key: "low",
               label: `Low stock (${data.summary.lowStockVariants})`,
+            },
+            {
+              key: "unpublished",
+              label: `Unpublished (${data.summary.unpublishedProducts})`,
             },
             {
               key: "soldout",
@@ -222,11 +227,22 @@ function ProductStock({ product }: { product: AdminProduct }) {
           {product.name}
         </AppLink>
         <span className="kc-price text-xs text-kc-muted">{formatPKR(product.price)}</span>
-        <span
-          className={`ml-auto text-xs ${soldOut ? "font-medium text-kc-sale" : "text-kc-muted"}`}
-        >
-          {soldOut ? "Sold out" : `${product.totalStock} in stock`}
-        </span>
+        {/*
+          An unpublished product is not on the shop at all, so saying "4 in
+          stock" beside it would be answering a question nobody asked. The
+          badge replaces the count rather than sitting next to it.
+        */}
+        {!product.isActive ? (
+          <span className="ml-auto border border-kc-line px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] text-kc-muted">
+            Unpublished
+          </span>
+        ) : (
+          <span
+            className={`ml-auto text-xs ${soldOut ? "font-medium text-kc-sale" : "text-kc-muted"}`}
+          >
+            {soldOut ? "Sold out" : `${product.totalStock} in stock`}
+          </span>
+        )}
         <AppLink
           href={`/admin/products/${product.id}`}
           className="flex min-h-11 items-center gap-1.5 text-xs text-kc-charcoal underline-offset-4 hover:underline"

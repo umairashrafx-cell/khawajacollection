@@ -222,7 +222,10 @@ export const Route = createFileRoute("/api/admin/product")({
 
         if (!id) return json({ ok: true, categories });
 
-        const product = await productRepository.getById(id);
+        // getByIdForAdmin: unticking Published must not make a product
+        // unreachable from its own editor. That trap is why the checkbox
+        // was withheld until now.
+        const product = await productRepository.getByIdForAdmin(id);
         if (!product) return json({ ok: false, error: "Product not found." }, 404);
 
         return json({ ok: true, categories, product });

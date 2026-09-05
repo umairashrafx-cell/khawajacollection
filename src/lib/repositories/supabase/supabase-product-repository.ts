@@ -37,6 +37,7 @@ interface Row {
   short_description: string | null;
   price: number;
   sale_price: number | null;
+  is_active: boolean | null;
   category_slug: string | null;
   subcategory_slug: string | null;
   fabric: string | null;
@@ -69,7 +70,7 @@ interface Row {
 }
 
 const SELECT = `
-  id, slug, name, description, short_description, price, sale_price,
+  id, slug, name, description, short_description, price, sale_price, is_active,
   category_slug, subcategory_slug, fabric, pieces, care, tags, rating,
   review_count, is_featured, is_new_arrival, is_best_seller, is_made_to_order,
   created_at,
@@ -126,6 +127,9 @@ function toProduct(row: Row): Product {
     isOnSale: row.sale_price !== null,
     createdAt: row.created_at,
     ...(row.is_made_to_order ? { isMadeToOrder: true } : {}),
+    // Only the admin reads ever see `false` here — RLS keeps inactive rows
+    // away from every other path, so this is `true` on the storefront always.
+    isActive: row.is_active !== false,
   };
 }
 
@@ -162,6 +166,20 @@ async function fetchAll(): Promise<Product[]> {
   return ((data ?? []) as unknown as Row[]).map(toProduct);
 }
 
+/**
+ * Every product, published or not.
+ *
+ * Service role because RLS is the thing being stepped around, on purpose and
+ * in exactly one place. `browserClient` cannot see an unpublished row at all,
+ * which is the correct behaviour for the shop and the wrong one for the
+ * screen that has to put it back.
+ */
+async function fetchAllForAdmin(): Promise<Product[]> {
+  const { data, error } = await (await serviceClient()).from("products").select(SELECT);
+  if (error) throw new Error(`Supabase admin products query failed: ${error.message}`);
+  return ((data ?? []) as unknown as Row[]).map(toProduct);
+}
+
 export class SupabaseProductRepository implements ProductRepository {
   async list(query: ProductQuery): Promise<ProductListResult> {
     const all = await fetchAll();
@@ -189,6 +207,37 @@ export class SupabaseProductRepository implements ProductRepository {
       .maybeSingle();
 
     if (error) throw new Error(`Supabase product query failed: ${error.message}`);
+    return data ? toProduct(data as unknown as Row) : null;
+  }
+
+  async listForAdmin(query: ProductQuery): Promise<ProductListResult> {
+    const all = await fetchAllForAdmin();
+    const names = await taxonomyNames();
+    const sorted = filterAndSort(all, query, names);
+
+    const perPage = query.perPage ?? PER_PAGE;
+    const page = Math.max(1, query.page ?? 1);
+    const start = (page - 1) * perPage;
+
+    return {
+      items: sorted.slice(start, start + perPage),
+      total: sorted.length,
+      facets: buildFacets(all, query, names),
+    };
+  }
+
+  async getByIdForAdmin(id: string): Promise<Product | null> {
+    if (!UUID.test(id)) return null;
+
+    const { data, error } = await (
+      await serviceClient()
+    )
+      .from("products")
+      .select(SELECT)
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw new Error(`Supabase admin product query failed: ${error.message}`);
     return data ? toProduct(data as unknown as Row) : null;
   }
 

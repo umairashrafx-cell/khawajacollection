@@ -37,6 +37,8 @@ function toStockRow(product: Product) {
     price: product.salePrice ?? product.price,
     categorySlug: product.categorySlug,
     totalStock: inStock,
+    // Absent means published; see the note on Product.isActive.
+    isActive: product.isActive !== false,
     variants: product.variants.map((variant) => ({
       id: variant.id,
       sku: variant.sku,
@@ -70,7 +72,13 @@ export const Route = createFileRoute("/api/admin/products")({
          * thousand this belongs in a Postgres aggregate, and that is a change
          * to this file alone.
          */
-        const everything = await productRepository.list({ perPage: 1000, sort: "featured" });
+        // listForAdmin, not list: an unpublished product still has stock,
+        // still needs editing, and must not vanish from the one screen that
+        // can put it back on the shop.
+        const everything = await productRepository.listForAdmin({
+          perPage: 1000,
+          sort: "featured",
+        });
 
         let soldOutVariants = 0;
         let lowStockVariants = 0;
@@ -96,20 +104,24 @@ export const Route = createFileRoute("/api/admin/products")({
           return haystack.includes(q.toLowerCase());
         });
 
+        const unpublished = matching.filter((p) => p.isActive === false);
+
         const filtered =
-          filter === "soldout"
-            ? // BOTH FILTERS ARE ABOUT VARIANTS, NOT PRODUCTS. “Sold out” first
-              // meant “every size of this product is gone”, which rendered as
-              // “Sold out (0)” on a catalogue with 42 unbuyable sizes — the
-              // screen said nothing was wrong while a customer choosing
-              // Emerald got nothing. The size someone cannot buy is the thing
-              // worth restocking, so one empty size puts a product in the list.
-              matching.filter((p) => p.variants.some((v) => v.stock === 0))
-            : filter === "low"
-              ? matching.filter((p) =>
-                  p.variants.some((v) => v.stock > 0 && v.stock <= operations.lowStockThreshold),
-                )
-              : matching;
+          filter === "unpublished"
+            ? unpublished
+            : filter === "soldout"
+              ? // BOTH FILTERS ARE ABOUT VARIANTS, NOT PRODUCTS. “Sold out” first
+                // meant “every size of this product is gone”, which rendered as
+                // “Sold out (0)” on a catalogue with 42 unbuyable sizes — the
+                // screen said nothing was wrong while a customer choosing
+                // Emerald got nothing. The size someone cannot buy is the thing
+                // worth restocking, so one empty size puts a product in the list.
+                matching.filter((p) => p.variants.some((v) => v.stock === 0))
+              : filter === "low"
+                ? matching.filter((p) =>
+                    p.variants.some((v) => v.stock > 0 && v.stock <= operations.lowStockThreshold),
+                  )
+                : matching;
 
         const start = (page - 1) * perPage;
 
@@ -123,6 +135,7 @@ export const Route = createFileRoute("/api/admin/products")({
             soldOutVariants,
             lowStockVariants,
             soldOutProducts,
+            unpublishedProducts: everything.items.filter((p) => p.isActive === false).length,
             totalVariants,
             lowStockThreshold: operations.lowStockThreshold,
           },

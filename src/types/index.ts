@@ -57,6 +57,17 @@ export interface Product {
    * WhatsApp" — but the interface above never declares one.
    */
   isMadeToOrder?: boolean;
+
+  /**
+   * Whether the piece is on the shop.
+   *
+   * OPTIONAL, AND ABSENT MEANS TRUE. Every storefront read goes through RLS,
+   * which filters on `is_active`, so a Product reaching a customer-facing
+   * page is active by definition and the field would be noise there. It is
+   * populated only by the admin read paths, which deliberately bypass that
+   * filter so an unpublished product can still be found and put back.
+   */
+  isActive?: boolean;
 }
 
 export interface Category {

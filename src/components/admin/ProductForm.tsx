@@ -28,16 +28,30 @@
  * piece, and an order history with holes in it is worse than a shelf with an
  * old kurta on it.
  *
- * It cannot UNPUBLISH one either, and that is a limitation rather than a
- * choice. `products.is_active` exists and `saveProduct` writes it, but
- * 0002_rls.sql filters every read on `is_active` — so an unpublished product
- * would disappear from the stock screen and from this form at the same moment,
- * leaving no way back to it. A checkbox that hides a product from its own
- * editor is a trap, so it is not offered. Taking a piece off sale today means
- * setting its sizes to 0 on the stock screen, which shows it as sold out
- * rather than hiding it. Restoring the checkbox needs an admin read path that
- * uses the service role and ignores the is_active filter, in the repository
- * and in /api/admin/products both.
+ * IT CAN UNPUBLISH ONE, AND THAT IS WHAT "REMOVE" SHOULD MEAN HERE. Unticking
+ * Published takes the piece off the shop, out of search and out of the
+ * sitemap, while leaving it fully visible and editable in the admin and
+ * leaving every past order that referenced it intact.
+ *
+ * It could not do this until the admin gained a read path that bypasses the
+ * `is_active` filter in 0002_rls.sql (`listForAdmin` / `getByIdForAdmin`).
+ * Without those, unticking the box would have hidden the product from this
+ * very form at the same moment — a checkbox that hides a product from its own
+ * editor is a trap, which is why it was withheld rather than shipped broken.
+ *
+ * ONE HONEST LIMIT, MEASURED IN PRODUCTION RATHER THAN ASSUMED. Unpublishing
+ * takes effect IMMEDIATELY everywhere that is rendered per request — search,
+ * the sitemap, and the checkout, which refuses the item with a 409 — but the
+ * listing pages and the product page itself are PRERENDERED at build time, so
+ * a direct hit on one of those URLs keeps serving the old HTML until the next
+ * deploy. It cannot be bought from that stale page: /api/orders resolves every
+ * line through RLS and gets nothing back. Verified by unpublishing a live
+ * product, attempting to order it, and getting "One of these pieces is no
+ * longer available."
+ *
+ * Excluding /products/** from the prerender would close the gap and would slow
+ * the first byte on all seventy-odd product pages to fix a stale page nobody
+ * should be visiting. Not worth it. Redeploy if it matters.
  *
  * It has no COLLECTIONS field. Collections are curated across products rather
  * than per product, so they belong on a screen of their own rather than as a
@@ -77,7 +91,6 @@ export const EMPTY_PRODUCT: ProductFormValues = {
   isFeatured: false,
   isNewArrival: true,
   isMadeToOrder: false,
-  // Not editable — see the note at the top of this file.
   isActive: true,
   images: [],
   variants: [{ sku: "", size: "S", colorName: "", colorHex: "#F3EFE7", stock: "0" }],
@@ -218,7 +231,7 @@ export function ProductForm({
           <p className="mt-1 text-sm text-kc-muted">
             {editing
               ? "Saving replaces what is on the shop straight away."
-              : "It goes on the shop as soon as you save."}
+              : "It goes on the shop as soon as you save, unless you untick Published."}
           </p>
         </div>
         <div className="flex gap-2">
@@ -603,6 +616,11 @@ export function ProductForm({
         <div className="grid gap-3 sm:grid-cols-2">
           {(
             [
+              {
+                key: "isActive",
+                label: "Published",
+                hint: "Untick to take it off the shop. It stays here, editable. Its own page keeps working until the next deploy, but it cannot be bought.",
+              },
               { key: "isNewArrival", label: "New arrival", hint: "Shows in New In." },
               { key: "isFeatured", label: "Featured", hint: "Eligible for the homepage." },
               {

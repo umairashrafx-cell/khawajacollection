@@ -59,6 +59,22 @@ export class MockProductRepository implements ProductRepository {
     return BY_ID.get(id) ?? null;
   }
 
+  /*
+   * The mock has no RLS to step around, so these differ from `list` and
+   * `getById` only in that they will surface an unpublished product. Nothing
+   * in the seed data is unpublished, so today they return the same rows —
+   * which is the point of keeping both implementations honest: the admin
+   * screens behave identically under either flag, and a product taken off the
+   * shop in a mock session is still findable in the same session.
+   */
+  async listForAdmin(query: ProductQuery): Promise<ProductListResult> {
+    return this.list(query);
+  }
+
+  async getByIdForAdmin(id: string): Promise<Product | null> {
+    return BY_ID.get(id) ?? null;
+  }
+
   async getAllSlugs(): Promise<string[]> {
     return products.map((product) => product.slug);
   }

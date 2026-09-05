@@ -114,6 +114,8 @@ export interface AdminProduct {
   price: number;
   categorySlug: string;
   totalStock: number;
+  /** False when the piece has been taken off the shop but kept for editing. */
+  isActive: boolean;
   variants: AdminVariant[];
 }
 
@@ -121,6 +123,7 @@ export interface StockSummary {
   soldOutVariants: number;
   lowStockVariants: number;
   soldOutProducts: number;
+  unpublishedProducts: number;
   totalVariants: number;
   lowStockThreshold: number;
 }
@@ -281,6 +284,8 @@ export interface ProductFormData {
     isFeatured: boolean;
     isNewArrival: boolean;
     isMadeToOrder?: boolean;
+    /** Absent means published; see Product.isActive. */
+    isActive?: boolean;
     images: { url: string; alt: string }[];
     variants: {
       id: string;

@@ -360,10 +360,22 @@ long note in `src/lib/auth/verify.ts` before changing how admin is decided.
 nothing is written — same blocker as order placement. Stock edits, order status
 and CSV export need it too.
 
+Products can be UNPUBLISHED, which is what "remove" means here: off the shop,
+out of search, out of the sitemap, unbuyable, and still fully editable in the
+admin with every past order intact. It needed `listForAdmin` /
+`getByIdForAdmin` on the product repository — admin reads that use the service
+role and so step around the `is_active` filter in 0002_rls.sql. Without them
+the checkbox would have hidden a product from its own editor, which is why it
+was withheld until they existed.
+
+One measured limit: unpublishing is immediate on every per-request path
+(search, sitemap, checkout — which 409s) but the LISTING AND PRODUCT PAGES ARE
+PRERENDERED, so a direct hit serves stale HTML until the next deploy. Verified
+in production by unpublishing a live product and failing to buy it. Closing
+that would mean dropping /products/** from the prerender and slowing the first
+byte on every product page; not worth it.
+
 Known gaps, deliberate:
-- No unpublish. `products.is_active` is written but every read filters on it,
-  so unpublishing would hide a product from its own editor. See the header of
-  `src/components/admin/ProductForm.tsx`.
 - Removing an image from a product leaves the file in Storage. Orphaned bytes
   are cheaper than deleting a photo that a failed save then needed back.
 - No collections field, and no delete.

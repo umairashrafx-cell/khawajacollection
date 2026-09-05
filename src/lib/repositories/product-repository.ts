@@ -89,6 +89,21 @@ export interface ProductRepository {
    */
   saveProduct(input: ProductInput, id?: string): Promise<Product>;
 
+  /* --- Admin reads ----------------------------------------------------
+   *
+   * THE STOREFRONT CANNOT SEE AN UNPUBLISHED PRODUCT AND THE ADMIN MUST.
+   * 0002_rls.sql filters every public read on `is_active`, which is exactly
+   * right for a customer and useless for the person who just took a piece
+   * off the shop: without these, unticking Published would hide the product
+   * from its own editor and there would be no way back to it.
+   *
+   * They return `isActive` populated, and they are the ONLY reads that do.
+   * Every caller must have checked `adminFromRequest` first, for the same
+   * reason `listAll` on the order repository must.
+   */
+  listForAdmin(query: ProductQuery): Promise<ProductListResult>;
+  getByIdForAdmin(id: string): Promise<Product | null>;
+
   /**
    * Take `quantity` off a variant, atomically, and return what is left.
    * Returns null when the variant is gone or does not have enough.

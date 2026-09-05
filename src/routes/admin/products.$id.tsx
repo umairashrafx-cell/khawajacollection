@@ -48,9 +48,9 @@ function toFormValues(product: NonNullable<ProductFormData["product"]>): Product
     isFeatured: product.isFeatured,
     isNewArrival: product.isNewArrival,
     isMadeToOrder: product.isMadeToOrder === true,
-    // Only active products are readable through the repository today, so
-    // anything we managed to load is published.
-    isActive: true,
+    // Read from the product now that the admin has a path that can see an
+    // unpublished one. Absent means published — see Product.isActive.
+    isActive: product.isActive !== false,
     images: product.images.map((image) => ({ url: image.url, alt: image.alt })),
     variants: product.variants.map((variant) => ({
       id: variant.id,
