@@ -75,6 +75,14 @@ export class MockProductRepository implements ProductRepository {
     return BY_ID.get(id) ?? null;
   }
 
+  async deleteProduct(id: string): Promise<boolean> {
+    const at = products.findIndex((product) => product.id === id);
+    if (at < 0) return false;
+    products.splice(at, 1);
+    BY_ID.delete(id);
+    return true;
+  }
+
   async getAllSlugs(): Promise<string[]> {
     return products.map((product) => product.slug);
   }

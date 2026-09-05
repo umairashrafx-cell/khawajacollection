@@ -302,6 +302,17 @@ export function fetchProductForm(id?: string): Promise<ProductFormData> {
   return request<ProductFormData>(`/api/admin/product${id ? `?id=${encodeURIComponent(id)}` : ""}`);
 }
 
+/**
+ * Deletes a product. `confirmName` must be the product's exact name — the
+ * server checks it too, so the dialog is a courtesy rather than the guard.
+ */
+export async function deleteProduct(id: string, confirmName: string): Promise<void> {
+  await request<{ deleted: string }>(
+    `/api/admin/product?id=${encodeURIComponent(id)}&confirm=${encodeURIComponent(confirmName)}`,
+    { method: "DELETE" },
+  );
+}
+
 export async function saveProduct(
   values: ProductFormValues,
 ): Promise<{ slug: string; id: string }> {

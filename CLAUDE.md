@@ -378,7 +378,22 @@ byte on every product page; not worth it.
 Known gaps, deliberate:
 - Removing an image from a product leaves the file in Storage. Orphaned bytes
   are cheaper than deleting a photo that a failed save then needed back.
-- No collections field, and no delete.
+- No collections field.
+
+**Deleting a product does NOT damage order history**, and this file said the
+opposite twice before it was checked. `order_items` holds `product_id` and
+`variant_id` as bare uuids with NO foreign key, and snapshots name, size,
+colour and unit price at the moment of sale, so a past order renders
+identically whether the product still exists or not. Verified against
+information_schema: only product_images, product_variants, product_collections
+and wishlists reference products, all ON DELETE CASCADE.
+
+Delete lives in a collapsed danger zone on the edit page and needs the
+product's exact name typed. The NAME IS CHECKED ON THE SERVER, not only in the
+dialog — a destructive endpoint guarded by a modal is unguarded. Storage does
+not cascade, so `deleteProduct` removes the photographs first; a Storage
+failure is logged and does not block the delete, because an orphaned byte
+beats a product that cannot be removed.
 
 Categories can be created and renamed at `/admin/categories`. Two things to
 know before touching it:

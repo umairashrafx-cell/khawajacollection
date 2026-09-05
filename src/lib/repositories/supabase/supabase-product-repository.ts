@@ -69,6 +69,9 @@ interface Row {
   product_collections: { collection_slug: string }[];
 }
 
+/** Matches the bucket in 0005_product_images_storage.sql. */
+const IMAGE_BUCKET = "product-images";
+
 const SELECT = `
   id, slug, name, description, short_description, price, sale_price, is_active,
   category_slug, subcategory_slug, fabric, pieces, care, tags, rating,
@@ -224,6 +227,45 @@ export class SupabaseProductRepository implements ProductRepository {
       total: sorted.length,
       facets: buildFacets(all, query, names),
     };
+  }
+
+  /**
+   * Delete the product, and the photographs with it.
+   *
+   * THE DATABASE HANDLES ITS OWN CHILDREN: product_images, product_variants,
+   * product_collections and wishlists all cascade. `order_items` does not,
+   * because it has no foreign key at all [-] it snapshots what was sold, so a
+   * past order is unaffected.
+   *
+   * STORAGE DOES NOT CASCADE, which is the only reason this method is longer
+   * than one statement. A bucket is not a table; deleting the row that names
+   * a file leaves the file. Without this a shop that edits its catalogue for a
+   * year accumulates megabytes nothing references and nobody can identify.
+   *
+   * The files go FIRST and their failure is not fatal. If Storage errors we
+   * still delete the product: an orphaned image is a wasted byte, whereas a
+   * product that refuses to delete because of a storage hiccup is a shopkeeper
+   * stuck with something on their shop.
+   */
+  async deleteProduct(id: string): Promise<boolean> {
+    if (!UUID.test(id)) return false;
+
+    const supabase = await serviceClient();
+    const product = await this.getByIdForAdmin(id);
+    if (!product) return false;
+
+    const paths = product.images
+      .map((image) => image.url.split(`/${IMAGE_BUCKET}/`)[1])
+      .filter((path): path is string => Boolean(path));
+
+    if (paths.length > 0) {
+      const { error } = await supabase.storage.from(IMAGE_BUCKET).remove(paths);
+      if (error) console.error(`Could not remove images for ${product.slug}: ${error.message}`);
+    }
+
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) throw new Error(`Could not delete the product: ${error.message}`);
+    return true;
   }
 
   async getByIdForAdmin(id: string): Promise<Product | null> {

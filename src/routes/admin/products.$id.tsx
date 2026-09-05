@@ -12,8 +12,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { AppLink } from "@/components/layout/AppLink";
+import { DeleteProduct } from "@/components/admin/DeleteProduct";
 import { ProductForm } from "@/components/admin/ProductForm";
 import {
+  deleteProduct,
   fetchProductForm,
   saveProduct,
   type ProductFormData,
@@ -76,6 +78,17 @@ function EditProduct() {
     retry: false,
   });
 
+  const removal = useMutation({
+    mutationFn: (confirmName: string) => deleteProduct(id, confirmName),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      void navigate({
+        to: "/admin/products",
+        search: { q: undefined, filter: undefined, page: undefined },
+      });
+    },
+  });
+
   const mutation = useMutation({
     mutationFn: (values: ProductFormValues) => saveProduct({ ...values, id }),
     onSuccess: () => {
@@ -106,19 +119,33 @@ function EditProduct() {
   }
 
   return (
-    <ProductForm
-      categories={data.categories}
-      initial={toFormValues(data.product)}
-      editing
-      saving={mutation.isPending}
-      error={mutation.error instanceof Error ? mutation.error.message : null}
-      onSubmit={(values) => mutation.mutate(values)}
-      onCancel={() =>
-        void navigate({
-          to: "/admin/products",
-          search: { q: undefined, filter: undefined, page: undefined },
-        })
-      }
-    />
+    <div className="space-y-5">
+      <ProductForm
+        categories={data.categories}
+        initial={toFormValues(data.product)}
+        editing
+        saving={mutation.isPending}
+        error={mutation.error instanceof Error ? mutation.error.message : null}
+        onSubmit={(values) => mutation.mutate(values)}
+        onCancel={() =>
+          void navigate({
+            to: "/admin/products",
+            search: { q: undefined, filter: undefined, page: undefined },
+          })
+        }
+      />
+
+      {/*
+        Outside the form element on purpose. Nesting a delete button inside a
+        form whose other button saves is how a stray Enter key deletes a
+        product.
+      */}
+      <DeleteProduct
+        name={data.product.name}
+        deleting={removal.isPending}
+        error={removal.error instanceof Error ? removal.error.message : null}
+        onDelete={() => removal.mutate(data.product?.name ?? "")}
+      />
+    </div>
   );
 }

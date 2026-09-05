@@ -105,6 +105,25 @@ export interface ProductRepository {
   getByIdForAdmin(id: string): Promise<Product | null>;
 
   /**
+   * Delete a product for good, with its images, variants, collection links and
+   * any wishlist entries.
+   *
+   * THIS DOES NOT DAMAGE ORDER HISTORY, and the reason is worth stating because
+   * it was got wrong twice in this project's own notes. `order_items` holds
+   * `product_id` and `variant_id` as BARE UUIDs with no foreign key, and
+   * snapshots the name, size, colour and unit price at the moment of sale. A
+   * past order therefore renders identically whether the product still exists
+   * or not — which is the correct design for a shop, since the customer bought
+   * what the label said on the day, not whatever the catalogue says now.
+   *
+   * What it does cost: the URL starts returning 404, so anything indexed or
+   * linked breaks. Unpublishing is the better answer nearly every time. This
+   * exists for the case unpublishing does not cover — a product created by
+   * mistake, or the invented seed catalogue being cleared out before launch.
+   */
+  deleteProduct(id: string): Promise<boolean>;
+
+  /**
    * Take `quantity` off a variant, atomically, and return what is left.
    * Returns null when the variant is gone or does not have enough.
    *

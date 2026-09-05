@@ -231,6 +231,61 @@ export const Route = createFileRoute("/api/admin/product")({
         return json({ ok: true, categories, product });
       },
 
+      /**
+       * DELETE /api/admin/product?id=…&confirm=<the product's exact name>
+       *
+       * THE NAME IS THE CONFIRMATION, and it is checked on the SERVER rather
+       * than only in the dialog. A destructive endpoint whose only guard is a
+       * modal is a destructive endpoint with no guard: anything that can send
+       * a request can skip the modal. Requiring the caller to already know
+       * the exact name means a mistyped or guessed id cannot destroy anything.
+       *
+       * Order history is untouched by this — see the note on `deleteProduct`.
+       */
+      DELETE: async ({ request }) => {
+        const admin = await adminFromRequest(request);
+        if (!admin) return json({ ok: false, error: "Admin access required." }, 403);
+
+        const url = new URL(request.url);
+        const id = str(url.searchParams.get("id"));
+        const confirm = str(url.searchParams.get("confirm"));
+        if (!id) return fail("Which product?");
+
+        const product = await productRepository.getByIdForAdmin(id);
+        if (!product) return json({ ok: false, error: "Product not found." }, 404);
+
+        if (confirm !== product.name) {
+          return json(
+            {
+              ok: false,
+              error: `Type the product's name exactly to delete it: ${product.name}`,
+            },
+            409,
+          );
+        }
+
+        try {
+          const deleted = await productRepository.deleteProduct(id);
+          if (!deleted) return json({ ok: false, error: "Product not found." }, 404);
+          return json({ ok: true, deleted: product.name });
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "The product could not be deleted.";
+          if (message.includes("SUPABASE_SERVICE_ROLE_KEY")) {
+            return json(
+              {
+                ok: false,
+                error:
+                  "The shop cannot write to its own catalogue: the server is missing its " +
+                  "database key. Nothing was deleted.",
+              },
+              503,
+            );
+          }
+          return json({ ok: false, error: message }, 500);
+        }
+      },
+
       POST: async ({ request }) => {
         const admin = await adminFromRequest(request);
         if (!admin) return json({ ok: false, error: "Admin access required." }, 403);
