@@ -97,7 +97,7 @@ export function ProductAccordions({ product }: { product: Product }) {
         <ul className="space-y-1.5">
           <li>Unworn pieces with tags attached can be exchanged.</li>
           {commerce.exchangeWindow !== null ? (
-            <li>Exchanges are accepted within {commerce.exchangeWindow}.</li>
+            <li>Exchanges are accepted within {commerce.exchangeWindow} of delivery.</li>
           ) : null}
           <li>Made-to-order and altered pieces cannot be exchanged.</li>
           {email ? (

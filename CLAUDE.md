@@ -77,6 +77,13 @@ NITRO_PRESET=node-server npm run build && node .output/server/index.mjs
 9. Do not invent social media URLs, phone numbers, addresses, prices, delivery
    timelines or refund windows. Use the `PLACEHOLDER` constants in
    `src/config/site.ts` and say so in the summary.
+   Every COMMERCE placeholder is now filled: shipping rate, delivery estimate,
+   contact details, opening hours, and the exchange window (7 days, supplied
+   2026-09-05). What remains is LEGAL, and it renders as a visible
+   "Placeholder:" badge on the live site — registered business name and
+   address, governing and court jurisdiction, effective dates, refund
+   processing time, and the order retention period. Nine badges across
+   /terms, /privacy and /refund-policy. They are deliberately loud.
 10. Run `bun run build` before telling me a phase is done.
 
 ## Style

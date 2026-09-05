@@ -120,10 +120,14 @@ export const commerce = {
   /** Supplied 2026-09-04. Shown in the PDP trust row, /shipping and /faqs. */
   deliveryEstimate: "3 to 5 working days" as string | null,
   /**
-   * TODO(Umair): the real exchange window, e.g. "7 days from delivery".
-   * Same rule — the copy says "easy exchange" and no number until this is set.
+   * Supplied by Umair on 2026-09-05. The last commerce placeholder.
+   *
+   * "7 days" and not "7 days from delivery": every place this renders already
+   * supplies the second half — "within X of the parcel reaching you", "within
+   * X of delivery" — so a value carrying its own preposition would read
+   * "within 7 days from delivery of delivery".
    */
-  exchangeWindow: null as string | null,
+  exchangeWindow: "7 days" as string | null,
 } as const;
 
 /**
