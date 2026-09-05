@@ -80,10 +80,13 @@ NITRO_PRESET=node-server npm run build && node .output/server/index.mjs
    Every COMMERCE placeholder is now filled: shipping rate, delivery estimate,
    contact details, opening hours, and the exchange window (7 days, supplied
    2026-09-05). What remains is LEGAL, and it renders as a visible
-   "Placeholder:" badge on the live site — registered business name and
-   address, governing and court jurisdiction, effective dates, refund
-   processing time, and the order retention period. Nine badges across
-   /terms, /privacy and /refund-policy. They are deliberately loud.
+   "Placeholder:" badge on the live site. Those facts live in the `legal`
+   block of `src/config/site.ts` — one place, not inline in three route files
+   as they were. Business name, registered address and governing law were
+   supplied 2026-09-05, leaving FOUR badges: court jurisdiction, effective
+   date, refund processing time, order retention period. They are
+   deliberately loud, and `Fact` in ContentPage.tsx makes the fallback
+   impossible to forget at a new call site.
 10. Run `bun run build` before telling me a phase is done.
 
 ## Style
