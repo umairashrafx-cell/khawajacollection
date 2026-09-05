@@ -152,4 +152,20 @@ export class MockOrderRepository implements OrderRepository {
     orders.set(key, updated);
     return updated;
   }
+
+  async markPayment(
+    orderNumber: string,
+    paymentStatus: Order["paymentStatus"],
+  ): Promise<Order | null> {
+    const key = normalise(orderNumber);
+    const order = orders.get(key);
+    if (!order) return null;
+
+    // The reference is accepted and dropped: `Order` has nowhere to put it,
+    // and inventing a field here that the Supabase implementation reads from a
+    // real column would make the two disagree about what an Order is.
+    const updated: Order = { ...order, paymentStatus };
+    orders.set(key, updated);
+    return updated;
+  }
 }

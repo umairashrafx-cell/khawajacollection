@@ -278,6 +278,60 @@ certainly still on the shelf. There is no `returned` status in
 `OrderStatus`; if one is ever added, returned goods should NOT auto-restock
 (they may come back damaged) — count them in by hand.
 
+## JazzCash and Easypaisa
+
+Built on request. **Neither has ever been run against a sandbox** — no merchant
+credentials existed when they were written — so the code follows each published
+spec and has taken exactly zero real payments. Read the warning at the top of
+`src/lib/payments/jazzcash.ts` and `easypaisa.ts` before switching either on.
+
+Both are HOSTED REDIRECTS, not direct APIs. The customer pays on the gateway's
+own domain; this shop never sees a wallet PIN. The direct mode exists and was
+not used: it would put us in the business of handling other people's PINs, for
+no gain a customer would notice.
+
+TWO LOCKS, deliberately in different places:
+
+- `VITE_PAYMENTS_JAZZCASH` / `VITE_PAYMENTS_EASYPAISA` are PUBLIC switches that
+  decide whether the option is offered at checkout.
+- The merchant credentials are server-only, read at call time, and checked
+  again before any order is sent to a gateway.
+
+Flipping the public flag alone cannot make the shop accept money it cannot
+collect. Verified after the build that no credential name, no crypto call and
+neither gateway hostname appears in any client asset.
+
+THE ORDER IS NOW WRITTEN BEFORE PAYMENT STARTS, which reversed the order of
+`/api/orders`. A gateway needs a reference that is unique, survives a round
+trip through someone else's site, and can be matched against a callback twenty
+minutes later; only the order number is all three, and it does not exist until
+the row does. An unpaid order is a `pending` row we can chase; a payment we
+cannot tie to an order is money in limbo.
+
+`markPayment` is separate from `updateStatus` because `status` is where the
+parcel is and `paymentStatus` is whether the money arrived. A COD order is
+`delivered` and `pending` at once, quite legitimately.
+
+Gotchas worth knowing before the sandbox run:
+
+- Both gateways timestamp in **PKT, not UTC**, and reject anything outside a
+  window around their own clock. Vercel runs in the US or Europe. `pktStamp`
+  exists for that.
+- JazzCash wants **paisa as an integer**; Easypaisa wants **rupees with two
+  decimals**. Same money, two formats.
+- JazzCash signs with **HMAC-SHA256**; Easypay encrypts with **AES-128-ECB**.
+  The second one looks like a mistake next to the first. It is not.
+- Easypay calls back **twice**: an `auth_token` ticket first, the real result
+  only after we post that back to Confirm.jsf. Treating the first hit as
+  success marks every abandoned payment as paid.
+- The JazzCash callback is signed and is verified; the Easypay result post is
+  not signed the same way. A forged Easypaisa callback could claim an order is
+  paid, though it cannot change what the order costs. **Reconcile against the
+  merchant portal before dispatching a prepaid order.**
+
+0008_payment_reference.sql adds `orders.payment_reference` so a customer saying
+"I paid" can be checked against the gateway's own records. Not yet applied.
+
 ## Admin panel
 
 Not a spec phase — built on request, at `/admin`, behind the `admins` table

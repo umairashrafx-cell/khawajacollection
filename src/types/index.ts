@@ -131,7 +131,13 @@ export type Province =
   | "Islamabad Capital Territory";
 
 /** Section 11.5 — only `cod` is live at launch. */
-export type PaymentMethodId = "cod" | "card" | "bank_transfer";
+export type PaymentMethodId =
+  | "cod"
+  | "card"
+  | "bank_transfer"
+  /** Pakistan's two mobile wallets. Both are hosted redirects — see src/lib/payments/. */
+  | "jazzcash"
+  | "easypaisa";
 
 /** Section 11.6 — the six-step tracking timeline, plus `cancelled`. */
 export type OrderStatus =

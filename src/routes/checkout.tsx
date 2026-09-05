@@ -17,7 +17,7 @@ import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Banknote, CreditCard, Landmark, Lock } from "lucide-react";
+import { Banknote, CreditCard, Landmark, Lock, Smartphone, Wallet } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { CartTotals } from "@/components/cart/CartSummary";
@@ -45,7 +45,13 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-const PAYMENT_ICON = { cod: Banknote, card: CreditCard, bank_transfer: Landmark } as const;
+const PAYMENT_ICON = {
+  cod: Banknote,
+  card: CreditCard,
+  bank_transfer: Landmark,
+  jazzcash: Wallet,
+  easypaisa: Smartphone,
+} as const;
 
 function CheckoutPage() {
   const lines = useCartLines();
@@ -92,6 +98,8 @@ function CheckoutPage() {
         ok?: boolean;
         error?: string;
         orderNumber?: string;
+        /** Set only by the redirect gateways. See /api/orders. */
+        redirectUrl?: string;
       };
 
       if (!response.ok || !result.ok || !result.orderNumber) {
@@ -101,6 +109,23 @@ function CheckoutPage() {
       }
 
       clearCart();
+
+      /*
+       * A gateway takes over from here.
+       *
+       * `window.location` rather than the router, deliberately: the
+       * destination posts a signed form to another origin, so it has to be a
+       * real document load and not a client-side route change. The bag is
+       * cleared first because the order already exists — if they abandon the
+       * payment the order is cancelled and the stock released by the callback,
+       * and a bag that survived would let them buy the same thing twice.
+       */
+      if (result.redirectUrl) {
+        announce(`Order ${result.orderNumber} created. Taking you to the payment page.`);
+        window.location.assign(result.redirectUrl);
+        return;
+      }
+
       announce(`Order ${result.orderNumber} placed.`);
       void navigate({
         to: "/orders/$orderNumber",

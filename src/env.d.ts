@@ -32,6 +32,15 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   /** The publishable key. Public by design; everything it reaches is under RLS. */
   readonly VITE_SUPABASE_ANON_KEY?: string;
+  /**
+   * "on" to offer the wallet at checkout. A SWITCH, NOT A SECRET — it says
+   * "this shop takes JazzCash", which is on the footer of every Pakistani
+   * storefront. The merchant credentials are server-only and are checked
+   * again before any order is sent to the gateway; see src/lib/payments/.
+   */
+  readonly VITE_PAYMENTS_JAZZCASH?: string;
+  /** "on" to offer Easypaisa. Same reasoning as above. */
+  readonly VITE_PAYMENTS_EASYPAISA?: string;
 }
 
 interface ImportMeta {

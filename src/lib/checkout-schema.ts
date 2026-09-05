@@ -65,7 +65,7 @@ export const checkoutSchema = z.object({
     .optional()
     .or(z.literal("").transform(() => undefined)),
 
-  paymentMethod: z.enum(["cod", "card", "bank_transfer"]),
+  paymentMethod: z.enum(["cod", "card", "bank_transfer", "jazzcash", "easypaisa"]),
 });
 
 export type CheckoutInput = z.input<typeof checkoutSchema>;

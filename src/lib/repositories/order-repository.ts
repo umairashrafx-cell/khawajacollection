@@ -53,6 +53,26 @@ export interface OrderRepository {
    */
   listAll(query: AdminOrderQuery): Promise<AdminOrderPage>;
   updateStatus(orderNumber: string, status: OrderStatus): Promise<Order | null>;
+
+  /**
+   * Record the outcome of a payment.
+   *
+   * SEPARATE FROM `updateStatus` BECAUSE THEY ANSWER DIFFERENT QUESTIONS.
+   * `status` is where the parcel is; `paymentStatus` is whether the money
+   * arrived. A cash-on-delivery order is `delivered` and `pending` at the same
+   * moment quite legitimately, and a prepaid order is `paid` long before it is
+   * `shipped`. Collapsing them would make one of those two states impossible
+   * to express.
+   *
+   * `reference` is the gateway's transaction id, kept so that a customer
+   * saying "I paid" can be checked against the merchant portal. Cash on
+   * delivery passes nothing.
+   */
+  markPayment(
+    orderNumber: string,
+    paymentStatus: Order["paymentStatus"],
+    reference?: string,
+  ): Promise<Order | null>;
 }
 
 export interface AdminOrderQuery {

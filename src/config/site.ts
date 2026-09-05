@@ -175,6 +175,37 @@ export const paymentMethods: readonly {
   note?: string;
 }[] = [
   { id: "cod", label: "Cash on Delivery", isEnabled: true },
+  /*
+   * The two wallets are switched by a PUBLIC env flag, not hardcoded, because
+   * they go live the moment merchant credentials exist and not a deploy
+   * sooner. The flag only decides whether the option is rendered — the server
+   * checks the credentials again before sending anyone to a gateway, so
+   * flipping this alone cannot make the shop accept money it cannot collect.
+   * See src/lib/payments/gateway.ts.
+   */
+  {
+    id: "jazzcash",
+    label: "JazzCash",
+    isEnabled: import.meta.env.VITE_PAYMENTS_JAZZCASH === "on",
+    // The note follows the switch. The footer lists every method whether or
+    // not it is live, so a fixed "Pay with your JazzCash wallet" would
+    // advertise a method the shop cannot actually take — which is worse than
+    // not mentioning it, because a customer picks the shop on the strength of
+    // it and finds out at checkout.
+    note:
+      import.meta.env.VITE_PAYMENTS_JAZZCASH === "on"
+        ? "Pay with your JazzCash wallet"
+        : "Coming soon",
+  },
+  {
+    id: "easypaisa",
+    label: "Easypaisa",
+    isEnabled: import.meta.env.VITE_PAYMENTS_EASYPAISA === "on",
+    note:
+      import.meta.env.VITE_PAYMENTS_EASYPAISA === "on"
+        ? "Pay with your Easypaisa wallet"
+        : "Coming soon",
+  },
   { id: "card", label: "Card", isEnabled: false, note: "Coming soon" },
   { id: "bank_transfer", label: "Bank Transfer", isEnabled: false, note: "Coming soon" },
 ];

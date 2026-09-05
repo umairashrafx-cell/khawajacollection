@@ -20,7 +20,9 @@ import {
   Music2,
   Youtube,
   RefreshCw,
+  Smartphone,
   Truck,
+  Wallet,
 } from "lucide-react";
 
 import { footerNav } from "@/config/nav";
@@ -40,6 +42,11 @@ const PAYMENT_ICON = {
   cod: Banknote,
   card: CreditCard,
   bank_transfer: Landmark,
+  // A generic wallet glyph rather than a brand mark. JazzCash and Easypaisa
+  // both have logos with licence terms attached, and the label beside this
+  // already says which one it is.
+  jazzcash: Wallet,
+  easypaisa: Smartphone,
 } as const;
 
 export default function Footer() {

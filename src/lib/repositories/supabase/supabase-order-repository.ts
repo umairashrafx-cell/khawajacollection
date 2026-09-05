@@ -340,4 +340,38 @@ export class SupabaseOrderRepository implements OrderRepository {
     const [order] = await hydrate([data as unknown as OrderRow]);
     return order ?? null;
   }
+
+  /**
+   * Record a payment outcome. Service role, like every other write here.
+   *
+   * GUARDED ON `payment_status = 'pending'`, and that guard is the whole point.
+   * Gateways retry callbacks, and a customer refreshing a return URL can fire
+   * one again. Without the guard, a retry arriving after a refund had been
+   * recorded would quietly mark the order paid a second time. With it, the
+   * first answer wins and every later one is a no-op that returns null.
+   */
+  async markPayment(
+    orderNumber: string,
+    paymentStatus: Order["paymentStatus"],
+    reference?: string,
+  ): Promise<Order | null> {
+    const { data, error } = await (
+      await serviceClient()
+    )
+      .from("orders")
+      .update({
+        payment_status: paymentStatus,
+        ...(reference ? { payment_reference: reference } : {}),
+      })
+      .ilike("order_number", tidy(orderNumber))
+      .eq("payment_status", "pending")
+      .select(SELECT)
+      .maybeSingle();
+
+    if (error) throw new Error(`Payment status update failed: ${error.message}`);
+    if (!data) return null;
+
+    const [order] = await hydrate([data as unknown as OrderRow]);
+    return order ?? null;
+  }
 }

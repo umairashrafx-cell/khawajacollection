@@ -191,12 +191,6 @@ export const Route = createFileRoute("/api/orders")({
           paymentMethod: input.paymentMethod,
         };
 
-        const initiated = await provider.initiate(draft);
-        if (!initiated.ok) {
-          await releaseAll();
-          return json({ ok: false, error: initiated.message ?? "Payment could not start." }, 400);
-        }
-
         // Guest checkout stays first-class: an unverified or absent token
         // means the order is simply not attached to an account, never that
         // the order is refused. Attaching it to whatever id the client
@@ -237,9 +231,59 @@ export const Route = createFileRoute("/api/orders")({
           );
         }
 
+        /*
+         * PAYMENT STARTS ONLY ONCE THE ORDER EXISTS, and that ordering is the
+         * whole reason this block moved below the write.
+         *
+         * A hosted gateway needs a reference that is unique, survives a round
+         * trip through someone else's website, and can be matched against a
+         * callback twenty minutes later. The order number is the only thing
+         * that satisfies all three, and it does not exist until the row does.
+         *
+         * The failure direction matters too. An order that exists but was
+         * never paid is a `pending` row we can see, chase, or cancel. A
+         * payment we cannot tie back to an order is money in limbo and a
+         * customer with a receipt we cannot match. So: write first, then take
+         * the money.
+         */
+        let initiated;
+        try {
+          initiated = await provider.initiate(order);
+        } catch (cause) {
+          // A gateway that is switched on but unconfigured throws here. That
+          // is our misconfiguration, not the shopper's mistake, so it reads
+          // as "this method is unavailable" rather than blaming their card.
+          console.error("Payment initiation failed", cause);
+          initiated = { ok: false, message: `${provider.label} is unavailable right now.` };
+        }
+
+        if (!initiated.ok) {
+          /*
+           * The order is written but cannot be paid, so it is cancelled here
+           * rather than left `placed`. Leaving it would put an unpayable order
+           * in the order book that looks exactly like a real one, and hold its
+           * stock off the shelf indefinitely.
+           *
+           * Cancelling through the repository does NOT restock — that lives in
+           * the admin route, deliberately — so the release is explicit.
+           */
+          await orderRepository.updateStatus(order.orderNumber, "cancelled");
+          await releaseAll();
+          return json({ ok: false, error: initiated.message ?? "Payment could not start." }, 400);
+        }
+
         return json({
           ok: true,
           orderNumber: order.orderNumber,
+          /*
+           * Present only for the redirect gateways. Cash on Delivery omits it
+           * and the browser goes straight to the confirmation page, which is
+           * why checkout treats it as optional rather than branching on the
+           * payment method — the method is the server's business, and a client
+           * that has to know which methods redirect is a client that will be
+           * wrong the next time one is added.
+           */
+          ...(initiated.redirectUrl ? { redirectUrl: initiated.redirectUrl } : {}),
           total: order.totals.total,
           paymentMessage: initiated.message,
         });

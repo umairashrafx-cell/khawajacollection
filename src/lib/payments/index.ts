@@ -5,9 +5,17 @@
  * 'not configured'." Cash on Delivery is the only live method at launch
  * (Section 16); card and bank transfer render as disabled "Coming soon" and
  * refuse loudly if anything ever routes an order to them.
+ *
+ * JazzCash and Easypaisa were added later, as hosted redirects. They are
+ * SWITCHED OFF unless VITE_PAYMENTS_* says otherwise, and they refuse a second
+ * time if their server-side credentials are missing. Neither has been run
+ * against a sandbox — read the warning at the top of each file before turning
+ * one on.
  */
 
-import type { PaymentMethodId, OrderDraft } from "@/types";
+import { easypaisaProvider } from "./easypaisa";
+import { jazzcashProvider } from "./jazzcash";
+import type { PaymentMethodId, Order } from "@/types";
 import type { PaymentProvider, PaymentInitResult, PaymentStatus } from "./types";
 
 /**
@@ -20,7 +28,7 @@ export const codProvider: PaymentProvider = {
   label: "Cash on Delivery",
   isEnabled: true,
 
-  async initiate(order: OrderDraft): Promise<PaymentInitResult> {
+  async initiate(order: Order): Promise<PaymentInitResult> {
     // Nothing is charged here and no third party is contacted. The only
     // sanity check worth making is that the order is actually payable on
     // delivery — an empty basket is not.
@@ -73,6 +81,8 @@ const providers: Record<PaymentMethodId, PaymentProvider> = {
   cod: codProvider,
   card: mockCardProvider,
   bank_transfer: bankTransferProvider,
+  jazzcash: jazzcashProvider,
+  easypaisa: easypaisaProvider,
 };
 
 export function getPaymentProvider(id: PaymentMethodId): PaymentProvider {
@@ -85,3 +95,5 @@ export function enabledPaymentMethods(): PaymentMethodId[] {
 }
 
 export type { PaymentProvider, PaymentInitResult, PaymentStatus } from "./types";
+export { jazzcashProvider } from "./jazzcash";
+export { easypaisaProvider } from "./easypaisa";

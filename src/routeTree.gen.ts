@@ -72,6 +72,10 @@ import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminProductRouteImport } from './routes/api/admin/product'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
 import { Route as ApiAdminWhoamiRouteImport } from './routes/api/admin/whoami'
+import { Route as ApiPaymentsEasypaisaCallbackRouteImport } from './routes/api/payments/easypaisa.callback'
+import { Route as ApiPaymentsEasypaisaStartRouteImport } from './routes/api/payments/easypaisa.start'
+import { Route as ApiPaymentsJazzcashCallbackRouteImport } from './routes/api/payments/jazzcash.callback'
+import { Route as ApiPaymentsJazzcashStartRouteImport } from './routes/api/payments/jazzcash.start'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -389,6 +393,30 @@ const ApiAdminWhoamiRoute = ApiAdminWhoamiRouteImport.update({
   path: '/api/admin/whoami',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPaymentsEasypaisaCallbackRoute =
+  ApiPaymentsEasypaisaCallbackRouteImport.update({
+    id: '/api/payments/easypaisa/callback',
+    path: '/api/payments/easypaisa/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPaymentsEasypaisaStartRoute =
+  ApiPaymentsEasypaisaStartRouteImport.update({
+    id: '/api/payments/easypaisa/start',
+    path: '/api/payments/easypaisa/start',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPaymentsJazzcashCallbackRoute =
+  ApiPaymentsJazzcashCallbackRouteImport.update({
+    id: '/api/payments/jazzcash/callback',
+    path: '/api/payments/jazzcash/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPaymentsJazzcashStartRoute =
+  ApiPaymentsJazzcashStartRouteImport.update({
+    id: '/api/payments/jazzcash/start',
+    path: '/api/payments/jazzcash/start',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -454,6 +482,10 @@ export interface FileRoutesByFullPath {
   '/account/orders/': typeof AccountOrdersIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/api/payments/easypaisa/callback': typeof ApiPaymentsEasypaisaCallbackRoute
+  '/api/payments/easypaisa/start': typeof ApiPaymentsEasypaisaStartRoute
+  '/api/payments/jazzcash/callback': typeof ApiPaymentsJazzcashCallbackRoute
+  '/api/payments/jazzcash/start': typeof ApiPaymentsJazzcashStartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -517,6 +549,10 @@ export interface FileRoutesByTo {
   '/account/orders': typeof AccountOrdersIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/api/payments/easypaisa/callback': typeof ApiPaymentsEasypaisaCallbackRoute
+  '/api/payments/easypaisa/start': typeof ApiPaymentsEasypaisaStartRoute
+  '/api/payments/jazzcash/callback': typeof ApiPaymentsJazzcashCallbackRoute
+  '/api/payments/jazzcash/start': typeof ApiPaymentsJazzcashStartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -583,6 +619,10 @@ export interface FileRoutesById {
   '/account/orders/': typeof AccountOrdersIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/api/payments/easypaisa/callback': typeof ApiPaymentsEasypaisaCallbackRoute
+  '/api/payments/easypaisa/start': typeof ApiPaymentsEasypaisaStartRoute
+  '/api/payments/jazzcash/callback': typeof ApiPaymentsJazzcashCallbackRoute
+  '/api/payments/jazzcash/start': typeof ApiPaymentsJazzcashStartRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -650,6 +690,10 @@ export interface FileRouteTypes {
     | '/account/orders/'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/api/payments/easypaisa/callback'
+    | '/api/payments/easypaisa/start'
+    | '/api/payments/jazzcash/callback'
+    | '/api/payments/jazzcash/start'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -713,6 +757,10 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/admin/orders'
     | '/admin/products'
+    | '/api/payments/easypaisa/callback'
+    | '/api/payments/easypaisa/start'
+    | '/api/payments/jazzcash/callback'
+    | '/api/payments/jazzcash/start'
   id:
     | '__root__'
     | '/'
@@ -778,6 +826,10 @@ export interface FileRouteTypes {
     | '/account/orders/'
     | '/admin/orders/'
     | '/admin/products/'
+    | '/api/payments/easypaisa/callback'
+    | '/api/payments/easypaisa/start'
+    | '/api/payments/jazzcash/callback'
+    | '/api/payments/jazzcash/start'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -833,6 +885,10 @@ export interface RootRouteChildren {
   ApiAdminProductRoute: typeof ApiAdminProductRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminWhoamiRoute: typeof ApiAdminWhoamiRoute
+  ApiPaymentsEasypaisaCallbackRoute: typeof ApiPaymentsEasypaisaCallbackRoute
+  ApiPaymentsEasypaisaStartRoute: typeof ApiPaymentsEasypaisaStartRoute
+  ApiPaymentsJazzcashCallbackRoute: typeof ApiPaymentsJazzcashCallbackRoute
+  ApiPaymentsJazzcashStartRoute: typeof ApiPaymentsJazzcashStartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1278,6 +1334,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminWhoamiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/payments/easypaisa/callback': {
+      id: '/api/payments/easypaisa/callback'
+      path: '/api/payments/easypaisa/callback'
+      fullPath: '/api/payments/easypaisa/callback'
+      preLoaderRoute: typeof ApiPaymentsEasypaisaCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/easypaisa/start': {
+      id: '/api/payments/easypaisa/start'
+      path: '/api/payments/easypaisa/start'
+      fullPath: '/api/payments/easypaisa/start'
+      preLoaderRoute: typeof ApiPaymentsEasypaisaStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/jazzcash/callback': {
+      id: '/api/payments/jazzcash/callback'
+      path: '/api/payments/jazzcash/callback'
+      fullPath: '/api/payments/jazzcash/callback'
+      preLoaderRoute: typeof ApiPaymentsJazzcashCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/jazzcash/start': {
+      id: '/api/payments/jazzcash/start'
+      path: '/api/payments/jazzcash/start'
+      fullPath: '/api/payments/jazzcash/start'
+      preLoaderRoute: typeof ApiPaymentsJazzcashStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1373,6 +1457,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminProductRoute: ApiAdminProductRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminWhoamiRoute: ApiAdminWhoamiRoute,
+  ApiPaymentsEasypaisaCallbackRoute: ApiPaymentsEasypaisaCallbackRoute,
+  ApiPaymentsEasypaisaStartRoute: ApiPaymentsEasypaisaStartRoute,
+  ApiPaymentsJazzcashCallbackRoute: ApiPaymentsJazzcashCallbackRoute,
+  ApiPaymentsJazzcashStartRoute: ApiPaymentsJazzcashStartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
