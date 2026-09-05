@@ -75,12 +75,14 @@ export const Route = createFileRoute("/api/admin/categories")({
             slug: parent.slug,
             name: parent.name,
             description: parent.description ?? null,
+            imageUrl: parent.image?.url ?? null,
             sortOrder: parent.sortOrder,
             productCount: counts.get(parent.slug) ?? 0,
             children: parent.children.map((child) => ({
               slug: child.slug,
               name: child.name,
               description: child.description ?? null,
+              imageUrl: child.image?.url ?? null,
               sortOrder: child.sortOrder,
               productCount: counts.get(child.slug) ?? 0,
               /** The bit that appears in the URL: `women-unstitched` → `unstitched`. */

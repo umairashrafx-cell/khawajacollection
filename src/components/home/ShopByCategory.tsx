@@ -14,24 +14,34 @@ import { Image } from "@/components/media/Image";
 import { AppLink } from "@/components/layout/AppLink";
 import { shopByCategory } from "@/config/nav";
 
-/** Card art is generated locally; see scripts/generate-placeholders.mjs. */
-function cardImage(href: string) {
+/**
+ * The card for a tile: whatever the admin uploaded, else the generated
+ * placeholder.
+ *
+ * FOUR OF THE EIGHT TILES CAN HAVE AN UPLOADED CARD and four cannot, which is
+ * worth knowing before wondering why. Women, Men, Accessories and Bedsheets
+ * are rows in the `categories` table and can therefore hold an image_url.
+ * Unstitched, Ready to Wear, Bridal and Sale are not categories at all — they
+ * are tag and filter listings — so there is no row to attach a picture to, and
+ * they keep the placeholder until something gives them one.
+ */
+function cardImage(href: string, uploaded: string | undefined) {
   const slug = href.replace(/^\//, "");
   return {
-    src: `/placeholders/category-${slug}-4x5.svg`,
+    src: uploaded ?? `/placeholders/category-${slug}-4x5.svg`,
     width: 960,
     height: 1200,
   };
 }
 
-export function ShopByCategory() {
+export function ShopByCategory({ cards = {} }: { cards?: Record<string, string> }) {
   return (
     <ul
       className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:gap-x-4 md:gap-y-6 lg:gap-6 md:overflow-visible md:px-0 md:pb-0"
       aria-label="Shop by category"
     >
       {shopByCategory.map((category) => {
-        const image = cardImage(category.href);
+        const image = cardImage(category.href, cards[category.href.replace(/^\//, "")]);
         return (
           <li
             key={category.href}

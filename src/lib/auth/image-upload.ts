@@ -30,9 +30,21 @@ import { browserClient } from "@/lib/supabase/client";
 
 const BUCKET = "product-images";
 
-/** 3:4, matching the frame the storefront reserves. */
-const TARGET_WIDTH = 1200;
-const TARGET_HEIGHT = 1600;
+/**
+ * The two shapes this shop reserves space for.
+ *
+ * PRODUCT is 3:4, the frame every product grid and PDP leaves for a photo.
+ * CATEGORY is 4:5, the shape of the homepage "Shop by category" tiles
+ * (Section 6.4). Uploading the wrong ratio into either reintroduces exactly
+ * the layout shift those fixed frames exist to prevent, so the crop is chosen
+ * by the caller rather than guessed from the file.
+ */
+export const IMAGE_SHAPES = {
+  product: { width: 1200, height: 1600 },
+  category: { width: 960, height: 1200 },
+} as const;
+
+export type ImageShape = keyof typeof IMAGE_SHAPES;
 
 /**
  * WebP where the browser can encode it, JPEG otherwise. WebP is roughly 30%
@@ -71,8 +83,12 @@ async function loadImage(file: File): Promise<HTMLImageElement> {
  * letterboxing a garment inside white bars looks like a mistake, whereas
  * trimming the edges of an over-wide photo rarely loses the piece.
  */
-async function normalise(file: File): Promise<{ blob: Blob; extension: string }> {
+async function normalise(
+  file: File,
+  shape: ImageShape,
+): Promise<{ blob: Blob; extension: string }> {
   const image = await loadImage(file);
+  const { width: TARGET_WIDTH, height: TARGET_HEIGHT } = IMAGE_SHAPES[shape];
 
   const canvas = document.createElement("canvas");
   canvas.width = TARGET_WIDTH;
@@ -129,18 +145,34 @@ export interface UploadedImage {
  * a human looking for a particular product's photos.
  */
 export async function uploadProductImage(file: File, productSlug: string): Promise<UploadedImage> {
+  return uploadImage(file, "product", productSlug);
+}
+
+/**
+ * A category card. 4:5 rather than 3:4, and filed under `category/` in the
+ * same bucket so one storage policy covers both.
+ */
+export async function uploadCategoryImage(
+  file: File,
+  categorySlug: string,
+): Promise<UploadedImage> {
+  return uploadImage(file, "category", `category/${categorySlug}`);
+}
+
+async function uploadImage(file: File, shape: ImageShape, folder: string): Promise<UploadedImage> {
   if (!file.type.startsWith("image/")) {
     throw new Error("Choose an image file.");
   }
 
-  const { blob, extension } = await normalise(file);
+  const { blob, extension } = await normalise(file, shape);
   const supabase = await browserClient();
 
   // Random suffix so re-uploading a photo with the same name never overwrites
   // the one already on a live product page.
-  const path = `${safeSlug(productSlug)}/${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 8)}.${extension}`;
+  const path = `${folder
+    .split("/")
+    .map(safeSlug)
+    .join("/")}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
     contentType: blob.type,

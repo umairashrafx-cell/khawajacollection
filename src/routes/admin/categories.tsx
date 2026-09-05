@@ -20,7 +20,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronRight, FolderPlus, Loader2, Pencil, Plus } from "lucide-react";
+import { ChevronRight, FolderPlus, ImagePlus, Loader2, Pencil, Plus } from "lucide-react";
 
 import { AppLink } from "@/components/layout/AppLink";
 import {
@@ -29,6 +29,7 @@ import {
   type AdminCategoryNode,
   type CategorySaveInput,
 } from "@/lib/auth/admin-api";
+import { uploadCategoryImage } from "@/lib/auth/image-upload";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 
 export const Route = createFileRoute("/admin/categories")({
@@ -52,7 +53,14 @@ function slugify(value: string): string {
 
 type FormState =
   | { mode: "new"; parentSlug: string | null }
-  | { mode: "edit"; parentSlug: string | null; slug: string; name: string; description: string };
+  | {
+      mode: "edit";
+      parentSlug: string | null;
+      slug: string;
+      name: string;
+      description: string;
+      imageUrl: string | null;
+    };
 
 function AdminCategories() {
   const queryClient = useQueryClient();
@@ -130,6 +138,7 @@ function AdminCategories() {
                     slug: parent.slug,
                     name: parent.name,
                     description: parent.description ?? "",
+                    imageUrl: parent.imageUrl,
                   })
                 }
               />
@@ -148,6 +157,7 @@ function AdminCategories() {
                           slug: child.slug,
                           name: child.name,
                           description: child.description ?? "",
+                          imageUrl: child.imageUrl,
                         })
                       }
                     />
@@ -187,7 +197,12 @@ function AdminCategories() {
                     key={form.slug}
                     parentSlug={form.parentSlug}
                     parentName={form.parentSlug ? parent.name : null}
-                    editing={{ slug: form.slug, name: form.name, description: form.description }}
+                    editing={{
+                      slug: form.slug,
+                      name: form.name,
+                      description: form.description,
+                      imageUrl: form.imageUrl,
+                    }}
                     saving={mutation.isPending}
                     error={mutation.error instanceof Error ? mutation.error.message : null}
                     onCancel={() => setForm(null)}
@@ -272,7 +287,7 @@ function CategoryForm({
 }: {
   parentSlug: string | null;
   parentName: string | null;
-  editing?: { slug: string; name: string; description: string };
+  editing?: { slug: string; name: string; description: string; imageUrl: string | null };
   saving: boolean;
   error: string | null;
   onSubmit: (input: CategorySaveInput) => void;
@@ -280,6 +295,9 @@ function CategoryForm({
 }) {
   const [name, setName] = useState(editing?.name ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
+  const [imageUrl, setImageUrl] = useState<string | null>(editing?.imageUrl ?? null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // What the address will actually be, shown while it is still changeable.
   const segment = editing
@@ -295,6 +313,9 @@ function CategoryForm({
           name,
           parentSlug,
           description,
+          // Omitted when unchanged, so the API keeps whatever card is there
+          // rather than clearing it on every rename.
+          ...(imageUrl && imageUrl !== editing?.imageUrl ? { imageUrl } : {}),
           ...(editing ? { segment, allowRename: true } : {}),
         });
       }}
@@ -328,6 +349,73 @@ function CategoryForm({
             {segment ? href : "—"}
           </span>
         </label>
+      </div>
+
+      {/*
+        THE CARD, not "an image". This is the 4:5 tile on the homepage's Shop
+        by Category strip, and saying which picture it is stops someone
+        uploading a product shot and wondering where it went. Cropped to 4:5
+        in the browser before upload, for the same reason product photos are
+        cropped to 3:4 — the grid reserves the frame and a different ratio
+        reintroduces the layout shift.
+      */}
+      <div>
+        <span className={LABEL}>Homepage card</span>
+        <span className="mt-0.5 block text-xs text-kc-muted">
+          The 4:5 picture on the Shop by category tiles. Without one, the generated KC placeholder
+          is used.
+        </span>
+        <div className="mt-1.5 flex items-start gap-3">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt=""
+              width={96}
+              height={120}
+              className="h-[120px] w-24 shrink-0 border border-kc-line object-cover"
+            />
+          ) : (
+            <div className="flex h-[120px] w-24 shrink-0 items-center justify-center border border-dashed border-kc-line text-[10px] uppercase tracking-wide text-kc-muted">
+              None
+            </div>
+          )}
+          <div>
+            <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 border border-kc-line bg-kc-white px-4 text-sm text-kc-ink">
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <ImagePlus className="h-4 w-4" aria-hidden="true" />
+              )}
+              {uploading ? "Uploading…" : imageUrl ? "Replace picture" : "Choose picture"}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={uploading}
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (!file) return;
+                  setUploadError(null);
+                  setUploading(true);
+                  try {
+                    const uploaded = await uploadCategoryImage(file, segment || slugify(name));
+                    setImageUrl(uploaded.url);
+                  } catch (cause) {
+                    setUploadError(cause instanceof Error ? cause.message : "That upload failed.");
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+              />
+            </label>
+            {uploadError ? (
+              <p role="alert" className="mt-2 text-xs text-kc-sale">
+                {uploadError}
+              </p>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       <label className="block">

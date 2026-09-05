@@ -23,7 +23,7 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { edits, featuredCollection, hero, sale, socialSection } from "@/config/home";
 import { site } from "@/config/site";
 import { seoHead } from "@/lib/seo";
-import { productRepository } from "@/lib/repositories";
+import { categoryRepository, productRepository } from "@/lib/repositories";
 
 const title = "Khawaja Collection — Premium Pakistani Fashion";
 const description =
@@ -31,12 +31,16 @@ const description =
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [newArrivals, trending, womenEdit, menEdit, saleItems] = await Promise.all([
+    const [newArrivals, trending, womenEdit, menEdit, saleItems, categories] = await Promise.all([
       productRepository.list({ isNewArrival: true, sort: "newest", perPage: 8 }),
       productRepository.list({ isBestSeller: true, sort: "best-selling", perPage: 8 }),
       productRepository.list({ category: "women", sort: "featured", perPage: 4 }),
       productRepository.list({ category: "men", sort: "featured", perPage: 4 }),
       productRepository.list({ onSale: true, sort: "featured", perPage: 6 }),
+      // For the Shop by Category cards. Cheap — fifteen rows, and cached for a
+      // minute by the repository — and it is what lets those tiles be changed
+      // from the admin instead of by a deploy.
+      categoryRepository.list(),
     ]);
 
     return {
@@ -45,6 +49,15 @@ export const Route = createFileRoute("/")({
       womenEdit: womenEdit.items,
       menEdit: menEdit.items,
       sale: saleItems.items,
+      /*
+       * Only what the tiles need. The whole Category object would put every
+       * description and sort order into the HTML for no reason.
+       */
+      categoryCards: Object.fromEntries(
+        categories
+          .filter((category) => category.image?.url)
+          .map((category) => [category.slug, category.image?.url as string]),
+      ),
     };
   },
 
@@ -79,7 +92,14 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { newArrivals, trending, womenEdit, menEdit, sale: saleItems } = Route.useLoaderData();
+  const {
+    newArrivals,
+    trending,
+    womenEdit,
+    menEdit,
+    sale: saleItems,
+    categoryCards,
+  } = Route.useLoaderData();
   const [womenEditContent, menEditContent] = edits;
 
   return (
@@ -91,7 +111,7 @@ function HomePage() {
       <Container>
         <Section>
           <SectionHeader eyebrow="Browse" title="Shop by category" />
-          <ShopByCategory />
+          <ShopByCategory cards={categoryCards} />
         </Section>
       </Container>
 

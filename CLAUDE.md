@@ -471,6 +471,35 @@ write categories, at which point a row Postgres held and the site never read
 would have been a lie on a form. Reads are anon-key and cached for 60s;
 `saveCategory` uses the service role and drops the cache.
 
+## Category cards come from the admin now
+
+The homepage "Shop by category" tiles used to derive their art from the URL:
+`/placeholders/category-<slug>-4x5.svg`, hardcoded. Meanwhile `categories`
+had an `image_url` column, `saveCategory` wrote it and `toCategory` mapped it
+— and NOTHING READ IT. The plumbing existed end to end except for the last
+inch.
+
+Now: `/admin/categories` uploads a 4:5 card per category, the homepage loader
+reads the taxonomy, and `ShopByCategory` prefers an uploaded card and falls
+back to the placeholder.
+
+`uploadCategoryImage` sits beside `uploadProductImage`. Both go through one
+`uploadImage(file, shape, folder)`, because the CROP RATIO DIFFERS: products
+are 3:4 and category cards 4:5, and uploading one shape into the other's frame
+reintroduces exactly the layout shift the fixed frames exist to prevent. Cards
+are filed under `category/<slug>/` in the same `product-images` bucket, so one
+storage policy covers both.
+
+**Only four of the eight tiles can have an uploaded card.** Women, Men,
+Accessories and Bedsheets are rows in `categories`. Unstitched, Ready to Wear,
+Bridal and Sale are tag and filter listings with no row to attach a picture
+to, so they keep the placeholder. Giving them one means either inventing
+category rows that nothing else would use, or a separate "site images" concept
+— neither was worth doing on a guess.
+
+Verified by putting a real Storage URL on `women` and rebuilding: that tile
+rendered the uploaded webp and the other seven fell back to placeholders.
+
 ## Prerender coverage is best-effort, not guaranteed
 
 `vite.config.ts` sets `crawlLinks: true` with `failOnError: false`, so the

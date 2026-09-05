@@ -335,6 +335,7 @@ export interface AdminCategoryChild {
   slug: string;
   name: string;
   description: string | null;
+  imageUrl: string | null;
   sortOrder: number;
   productCount: number;
   /** The part that appears in the URL: `women-unstitched` -> `unstitched`. */
@@ -345,6 +346,8 @@ export interface AdminCategoryNode {
   slug: string;
   name: string;
   description: string | null;
+  /** The card shown on the homepage tile. Null means the generated placeholder. */
+  imageUrl: string | null;
   sortOrder: number;
   productCount: number;
   children: AdminCategoryChild[];
@@ -354,6 +357,8 @@ export interface CategorySaveInput {
   name: string;
   parentSlug: string | null;
   description: string;
+  /** Omit to leave the existing card alone; the API keeps what is there. */
+  imageUrl?: string;
   /** Only sent when editing; a new one derives its segment from the name. */
   segment?: string;
   /** Required to write over an existing slug, so a rename has to be meant. */
