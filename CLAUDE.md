@@ -370,6 +370,33 @@ Gotchas worth knowing before the sandbox run:
 0008_payment_reference.sql adds `orders.payment_reference` so a customer saying
 "I paid" can be checked against the gateway's own records. Not yet applied.
 
+## Sizes are optional, because most of this shop has none
+
+Unstitched cloth is sold by the length, a dupatta has no size, and a bedsheet's
+size is the bed. The admin form nevertheless demanded a size per variant, so
+the first real product created through it ended up with a size called "Free".
+
+The product form now asks HOW IS IT SOLD before anything else in that section:
+
+- **One size** (the default for a new product) hides the size column, offers a
+  "Sold as" choice of `Unstitched` or `One Size`, and collapses to one row
+- **In sizes** is the old table
+
+`sized` is DERIVED, not stored. The database has no column for it and does not
+need one: "one size" is already a single variant whose size is one of those two
+sentinels, which `src/data/products.ts` has used since Phase 1 and which the
+PDP already understands (`needsSize = sizes.length > 1`). A stored flag would be
+a second source of truth able to disagree with the variants themselves.
+
+Two things that only surfaced by driving the form:
+
+- The SKU input was `required`, and the browser runs `required` BEFORE any
+  submit handler — so in one-size mode, where no size box exists to blur out
+  of and nothing auto-filled the SKU, the form could not be submitted at all.
+  The handler fills a blank SKU; the server still refuses an empty one.
+- `suggestSku` joined its parts unconditionally, so an empty size produced
+  "KC-3-PIECE-". Empty segments are dropped now.
+
 ## Admin panel
 
 Not a spec phase — built on request, at `/admin`, behind the `admins` table

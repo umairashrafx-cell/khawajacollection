@@ -93,7 +93,12 @@ export const EMPTY_PRODUCT: ProductFormValues = {
   isMadeToOrder: false,
   isActive: true,
   images: [],
-  variants: [{ sku: "", size: "S", colorName: "", colorHex: "#F3EFE7", stock: "0" }],
+  /*
+   * A NEW PRODUCT STARTS UNSIZED. Most of what this shop sells — unstitched
+   * lawn, dupattas, stoles, fabric by the metre — has no size at all, and
+   * defaulting to "S" made the common case the one you had to correct.
+   */
+  variants: [{ sku: "", size: "One Size", colorName: "", colorHex: "#F3EFE7", stock: "0" }],
 };
 
 /** Matches the server's `normaliseSlug`, so what you see is what is saved. */
@@ -104,10 +109,23 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * The two sizes that mean "this is not sold in sizes".
+ *
+ * Not invented here: src/data/products.ts has used exactly these strings since
+ * Phase 1, filters.ts exports UNSTITCHED_SIZE, and the PDP already hides the
+ * size picker when a product has one variant. The admin was the only place
+ * that did not know about them, which is why an unstitched three-piece ended
+ * up with a size called "Free".
+ */
+const UNSIZED = ["Unstitched", "One Size"] as const;
+
 /** KC-GULBAHAR-M. Readable on a packing slip, which is where it is read. */
 function suggestSku(slug: string, size: string): string {
   const stem = slugify(slug).split("-").slice(0, 2).join("-");
-  return `KC-${stem}-${slugify(size)}`.toUpperCase();
+  // Empty segments are dropped rather than joined, or an unsized product gets
+  // a SKU ending in a hyphen — "KC-3-PIECE-", which is what happened.
+  return ["KC", stem, slugify(size)].filter(Boolean).join("-").toUpperCase();
 }
 
 const FIELD =
@@ -176,6 +194,20 @@ export function ProductForm({
    * 404 every link to it — including the ones in Google.
    */
   const [slugLocked, setSlugLocked] = useState(editing);
+
+  /*
+   * Whether this product is sold in sizes at all.
+   *
+   * Derived rather than stored, because the database has no column for it and
+   * does not need one: "one size" is already expressed as a single variant
+   * whose size is one of the sentinels. Adding a flag would create a second
+   * source of truth that could disagree with the variants themselves.
+   */
+  const [sized, setSized] = useState(
+    () =>
+      initial.variants.length > 1 ||
+      !UNSIZED.includes((initial.variants[0]?.size ?? "") as (typeof UNSIZED)[number]),
+  );
   const errorRef = useRef<HTMLParagraphElement>(null);
 
   // The server's refusal is the one thing that must not be missed, so focus
@@ -212,9 +244,20 @@ export function ProductForm({
         // Alt text falls back to the product name here rather than being left
         // empty: an undescribed product photo fails Section 15, and the person
         // filling this in has better things to type eight times.
+        const slug = slugify(values.slug || values.name);
         onSubmit({
           ...values,
-          slug: slugify(values.slug || values.name),
+          slug,
+          /*
+           * SKUs are filled in HERE as well as on blur, because the unsized
+           * layout has no size box to blur out of — so the only suggestion
+           * that ever fired did not exist in the mode that needed it most.
+           * Anything already typed is left alone.
+           */
+          variants: values.variants.map((variant) => ({
+            ...variant,
+            sku: variant.sku.trim() || suggestSku(slug, sized ? variant.size : ""),
+          })),
           images: values.images.map((image) => ({
             url: image.url,
             alt: image.alt.trim() || values.name,
@@ -468,13 +511,107 @@ export function ProductForm({
       </Section>
 
       <Section title="Sizes and stock">
+        {/*
+          THE QUESTION COMES FIRST, because for most of this shop the answer is
+          no. Unstitched cloth is sold by the length, a dupatta has no size, and
+          a bedsheet's "size" is the bed. Forcing a size box on all of those is
+          what produced a variant called "Free".
+        */}
+        <fieldset>
+          <legend className="text-xs uppercase tracking-[0.12em] text-kc-charcoal">
+            How is it sold?
+          </legend>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {(
+              [
+                {
+                  value: false,
+                  label: "One size",
+                  hint: "Unstitched cloth, dupattas, anything not cut to a size.",
+                },
+                {
+                  value: true,
+                  label: "In sizes",
+                  hint: "Stitched pieces: S, M, L, or a bed size.",
+                },
+              ] as const
+            ).map((option) => (
+              <label
+                key={String(option.value)}
+                className="flex min-h-11 cursor-pointer items-start gap-3 border border-kc-line p-3"
+              >
+                <input
+                  type="radio"
+                  name="kc-sized"
+                  checked={sized === option.value}
+                  onChange={() => {
+                    setSized(option.value);
+                    if (!option.value) {
+                      /*
+                       * Collapsing to one row DISCARDS the other size rows, so
+                       * it only ever keeps the first. Silently merging their
+                       * stock would invent inventory; keeping them all would
+                       * contradict the answer just given.
+                       */
+                      setValues((prev) => {
+                        const first = prev.variants[0];
+                        if (!first) return prev;
+                        return {
+                          ...prev,
+                          variants: [
+                            {
+                              ...first,
+                              size: UNSIZED.includes(first.size as (typeof UNSIZED)[number])
+                                ? first.size
+                                : "One Size",
+                            },
+                          ],
+                        };
+                      });
+                    }
+                  }}
+                  className="mt-0.5 h-5 w-5 accent-kc-ink"
+                />
+                <span>
+                  <span className="block text-sm text-kc-ink">{option.label}</span>
+                  <span className="block text-xs text-kc-muted">{option.hint}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {!sized ? (
+          <Field
+            id="pf-unsized-label"
+            label="Sold as"
+            hint="What the customer sees where a size would be. Unstitched cloth is sold by length."
+          >
+            <select
+              id="pf-unsized-label"
+              aria-describedby="pf-unsized-label-hint"
+              value={values.variants[0]?.size ?? "One Size"}
+              onChange={(event) => setVariant(0, { size: event.target.value })}
+              className={FIELD}
+            >
+              {UNSIZED.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
+
         <div className="overflow-x-auto">
           <table className="w-full min-w-[620px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-kc-line text-left text-xs uppercase tracking-[0.12em] text-kc-charcoal">
-                <th scope="col" className="py-2 pr-3 font-normal">
-                  Size
-                </th>
+                {sized ? (
+                  <th scope="col" className="py-2 pr-3 font-normal">
+                    Size
+                  </th>
+                ) : null}
                 <th scope="col" className="py-2 pr-3 font-normal">
                   Colour
                 </th>
@@ -495,25 +632,27 @@ export function ProductForm({
             <tbody>
               {values.variants.map((variant, index) => (
                 <tr key={index} className="border-b border-kc-line/60">
-                  <td className="py-2 pr-3">
-                    <input
-                      type="text"
-                      required
-                      value={variant.size}
-                      onChange={(event) => setVariant(index, { size: event.target.value })}
-                      onBlur={() => {
-                        // Filled in on blur, not on every keystroke, so a SKU
-                        // typed by hand is never overwritten mid-word.
-                        if (!variant.sku.trim()) {
-                          setVariant(index, {
-                            sku: suggestSku(values.slug || values.name, variant.size),
-                          });
-                        }
-                      }}
-                      aria-label={`Size for row ${index + 1}`}
-                      className={`${FIELD} min-w-[5rem]`}
-                    />
-                  </td>
+                  {sized ? (
+                    <td className="py-2 pr-3">
+                      <input
+                        type="text"
+                        required
+                        value={variant.size}
+                        onChange={(event) => setVariant(index, { size: event.target.value })}
+                        onBlur={() => {
+                          // Filled in on blur, not on every keystroke, so a SKU
+                          // typed by hand is never overwritten mid-word.
+                          if (!variant.sku.trim()) {
+                            setVariant(index, {
+                              sku: suggestSku(values.slug || values.name, variant.size),
+                            });
+                          }
+                        }}
+                        aria-label={`Size for row ${index + 1}`}
+                        className={`${FIELD} min-w-[5rem]`}
+                      />
+                    </td>
+                  ) : null}
                   <td className="py-2 pr-3">
                     <input
                       type="text"
@@ -534,9 +673,16 @@ export function ProductForm({
                     />
                   </td>
                   <td className="py-2 pr-3">
+                    {/*
+                      NOT `required`. The submit handler fills a blank SKU from
+                      the slug, and the browser runs `required` BEFORE any
+                      submit handler — so marking it required made the form
+                      unsubmittable in one-size mode, where there is no size
+                      box to blur out of and nothing ever filled it. The server
+                      still refuses an empty SKU, so nothing is weakened.
+                    */}
                     <input
                       type="text"
-                      required
                       value={variant.sku}
                       onChange={(event) => setVariant(index, { sku: event.target.value })}
                       aria-label={`SKU for row ${index + 1}`}
@@ -577,35 +723,37 @@ export function ProductForm({
           </table>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setValues((prev) => {
-              const last = prev.variants[prev.variants.length - 1];
-              return {
-                ...prev,
-                variants: [
-                  ...prev.variants,
-                  {
-                    sku: "",
-                    size: "",
-                    // Colour carries over: most products are one colour in
-                    // several sizes, so repeating it is the common case.
-                    colorName: last?.colorName ?? "",
-                    colorHex: last?.colorHex ?? "#F3EFE7",
-                    stock: "0",
-                  },
-                ],
-              };
-            })
-          }
-          className="flex min-h-11 items-center gap-2 border border-kc-line px-4 text-sm text-kc-ink"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Add a size
-        </button>
+        {sized ? (
+          <button
+            type="button"
+            onClick={() =>
+              setValues((prev) => {
+                const last = prev.variants[prev.variants.length - 1];
+                return {
+                  ...prev,
+                  variants: [
+                    ...prev.variants,
+                    {
+                      sku: "",
+                      size: "",
+                      // Colour carries over: most products are one colour in
+                      // several sizes, so repeating it is the common case.
+                      colorName: last?.colorName ?? "",
+                      colorHex: last?.colorHex ?? "#F3EFE7",
+                      stock: "0",
+                    },
+                  ],
+                };
+              })
+            }
+            className="flex min-h-11 items-center gap-2 border border-kc-line px-4 text-sm text-kc-ink"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Add a size
+          </button>
+        ) : null}
 
-        {editing ? (
+        {editing && sized ? (
           <p className="text-xs text-kc-muted">
             Removing a size row deletes that size. Set its stock to 0 instead if you expect it back.
           </p>
