@@ -117,6 +117,13 @@ export function seoHead(input: MetaInput): {
     { title: input.title },
     { name: "description", content: input.description },
 
+    /*
+     * en_PK, because WhatsApp and Facebook pick a locale for the card and
+     * default to en_US without this. It costs one tag and stops a Pakistani
+     * shop's previews being rendered as an American one's.
+     */
+    { property: "og:locale", content: "en_PK" },
+
     { property: "og:title", content: input.title },
     { property: "og:description", content: input.description },
     { property: "og:type", content: input.ogType ?? "website" },

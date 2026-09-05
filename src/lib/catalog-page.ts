@@ -145,6 +145,11 @@ export function catalogHead(
     meta: [
       { title },
       { name: "description", content: descriptor.description },
+      // en_PK on all three head builders. THERE ARE THREE, which is the real
+      // finding here — seoHead, catalogHead and the PDP each assemble their own
+      // meta, so a tag added to one silently misses two thirds of the site.
+      // Worth collapsing into seoHead the next time this file is opened.
+      { property: "og:locale", content: "en_PK" },
       { property: "og:title", content: title },
       { property: "og:description", content: descriptor.description },
       { property: "og:type", content: "website" },
@@ -257,7 +262,10 @@ export async function loadCollectionListing(
     path: `/collections/${collection.slug}`,
     h1: collection.name,
     metaTitle: `${collection.name} | Khawaja Collection`,
+    // metaDescription first: the tagline is display copy and runs about a
+    // third of the width a search result gives you.
     description:
+      collection.metaDescription ??
       collection.tagline ??
       `The ${collection.name} collection from Khawaja Collection, made in limited runs in Lahore.`,
     base: { collection: collection.slug },

@@ -96,6 +96,11 @@ function productHead(product: Product) {
     meta: [
       { title },
       { name: "description", content: product.shortDescription },
+      // en_PK on all three head builders. THERE ARE THREE, which is the real
+      // finding here — seoHead, catalogHead and the PDP each assemble their own
+      // meta, so a tag added to one silently misses two thirds of the site.
+      // Worth collapsing into seoHead the next time this file is opened.
+      { property: "og:locale", content: "en_PK" },
       { property: "og:title", content: title },
       { property: "og:description", content: product.shortDescription },
       { property: "og:type", content: "product" },
@@ -130,6 +135,17 @@ function productHead(product: Product) {
             priceCurrency: "PKR",
             availability,
             itemCondition: "https://schema.org/NewCondition",
+            /*
+             * Google warns about a missing priceValidUntil on every merchant
+             * listing and, worse, will quietly treat an offer without one as
+             * stale after a while.
+             *
+             * A YEAR OUT, ROLLING, RATHER THAN A REAL DATE, because there is
+             * no real date: nothing here expires. The alternative is a fixed
+             * date that silently passes and takes the rich result with it.
+             * Recomputed on each render, so it never goes stale.
+             */
+            priceValidUntil: new Date(Date.now() + 365 * 86_400_000).toISOString().slice(0, 10),
           },
           // Omitted while `hasRealReviews` is false — see src/config/site.ts.
           // Emitting AggregateRating over generated ratings is fabricated

@@ -82,7 +82,18 @@ export interface Category {
 export interface Collection {
   slug: string;
   name: string;
+  /** One line, shown under the heading on the collection page. */
   tagline?: string;
+  /**
+   * The meta description, 150–160 characters (Section 13).
+   *
+   * SEPARATE FROM `tagline` BECAUSE THEY HAVE DIFFERENT JOBS. A tagline earns
+   * its place by being short; a meta description earns its place by filling
+   * the width of a search result. Using the tagline for both produced 50
+   * characters of meta on four live pages — a third of the space Google was
+   * offering, and the rest given back.
+   */
+  metaDescription?: string;
   heroImage?: ProductImage;
   isActive: boolean;
 }
