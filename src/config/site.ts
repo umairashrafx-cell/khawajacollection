@@ -131,6 +131,50 @@ export const commerce = {
 } as const;
 
 /**
+ * Who the shop legally IS, for /terms, /privacy and /refund-policy.
+ *
+ * These were written inline in the three route files as `<TBC>` badges, which
+ * was right while nothing was known and wrong once anything was: the same
+ * business name appeared in two files and the address in two more, so filling
+ * them meant editing four places and hoping. One place now.
+ *
+ * ANYTHING STILL `null` RENDERS A VISIBLE RED BADGE ON THE LIVE SITE, and that
+ * is the intent. Hard Rule 9 forbids inventing a jurisdiction or a retention
+ * period, and a legal page that quietly states a plausible-sounding invention
+ * is far worse than one that admits a gap. The badge is the pressure to fill
+ * it.
+ *
+ * Supplied by Umair on 2026-09-05: name, address, governing law.
+ * Still outstanding: the court, the dates, the refund window and retention.
+ */
+export const legal = {
+  /** Trading name, as it should appear on an invoice. */
+  businessName: "Khawaja Collection" as string | null,
+  /**
+   * The registered address. Deliberately NOT `contact.address`: that one
+   * carries "Ameen Cloth House" because it is the shop a customer walks into,
+   * and the two can diverge without either being wrong.
+   */
+  registeredAddress: "Katchery Road, Main Sadar Bazar, Mandi Bahauddin" as string | null,
+  /** Renders as "governed by the laws of {X}". */
+  governingLaw: "Pakistan" as string | null,
+  /** Renders as "disputes fall to the courts of {X}". */
+  courtJurisdiction: null as string | null,
+  /** The date each policy takes effect. One date; they are published together. */
+  effectiveDate: null as string | null,
+  /** From approving a refund to the money leaving. e.g. "7 to 10 working days". */
+  refundProcessingTime: null as string | null,
+  /** How long order records are kept. Tax rules usually decide this. */
+  orderRetention: null as string | null,
+} as const;
+
+/** Name and address as one phrase, for the data-controller line in /privacy. */
+export function legalEntityLine(): string | null {
+  if (!legal.businessName || !legal.registeredAddress) return null;
+  return `${legal.businessName}, ${legal.registeredAddress}`;
+}
+
+/**
  * Whether `product.rating` and `product.reviewCount` come from real customers.
  *
  * They do not. They are generated values from the Phase 1 mock catalogue that

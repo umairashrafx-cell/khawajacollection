@@ -14,7 +14,8 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Bullets, ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
+import { Bullets, ContentPage, Fact, Inline, Section } from "@/components/content/ContentPage";
+import { legal } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
 const DESCRIPTION = pageDescription(
@@ -36,12 +37,14 @@ function TermsPage() {
     <ContentPage
       title="Terms of service"
       intro="The terms that apply when you order from us."
-      updated={<TBC what="effective date" />}
+      updated={<Fact value={legal.effectiveDate} what="effective date" />}
     >
       <Section heading="Who you are dealing with">
         <p>
-          This site is operated by <TBC what="registered business name" />, registered at{" "}
-          <TBC what="registered address" />. Referring to "we" or "us" below means that business.
+          This site is operated by{" "}
+          <Fact value={legal.businessName} what="registered business name" />, registered at{" "}
+          <Fact value={legal.registeredAddress} what="registered address" />. Referring to "we" or
+          "us" below means that business.
         </p>
       </Section>
 
@@ -114,8 +117,9 @@ function TermsPage() {
 
       <Section heading="Governing law">
         <p>
-          These terms are governed by the laws of <TBC what="governing jurisdiction" />, and
-          disputes fall to the courts of <TBC what="court jurisdiction" />.
+          These terms are governed by the laws of{" "}
+          <Fact value={legal.governingLaw} what="governing jurisdiction" />, and disputes fall to
+          the courts of <Fact value={legal.courtJurisdiction} what="court jurisdiction" />.
         </p>
       </Section>
 

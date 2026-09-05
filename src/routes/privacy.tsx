@@ -22,7 +22,8 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Bullets, ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
+import { Bullets, ContentPage, Fact, Inline, Section } from "@/components/content/ContentPage";
+import { legal, legalEntityLine } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
 const DESCRIPTION = pageDescription(
@@ -44,7 +45,7 @@ function PrivacyPage() {
     <ContentPage
       title="Privacy policy"
       intro="What we store, why, and what never leaves your own browser."
-      updated={<TBC what="policy date" />}
+      updated={<Fact value={legal.effectiveDate} what="policy date" />}
     >
       <Section heading="What stays on your device">
         <p>
@@ -123,7 +124,8 @@ function PrivacyPage() {
 
       <Section heading="How long we keep it">
         <p>
-          Order records are kept for <TBC what="order retention period" />, which we need for
+          Order records are kept for{" "}
+          <Fact value={legal.orderRetention} what="order retention period" />, which we need for
           accounting and for handling exchanges. Account data is kept until you ask us to delete it.
         </p>
       </Section>
@@ -136,7 +138,8 @@ function PrivacyPage() {
           but it does unlink them from you.
         </p>
         <p>
-          The data controller is <TBC what="registered business name and address" />.
+          The data controller is{" "}
+          <Fact value={legalEntityLine()} what="registered business name and address" />.
         </p>
       </Section>
     </ContentPage>

@@ -10,8 +10,8 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Bullets, ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
-import { commerce } from "@/config/site";
+import { Bullets, ContentPage, Fact, Inline, Section } from "@/components/content/ContentPage";
+import { commerce, legal } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
 const DESCRIPTION = pageDescription(
@@ -33,7 +33,7 @@ function RefundPolicyPage() {
     <ContentPage
       title="Refund policy"
       intro="We would rather exchange a piece than refund it, but where a refund is right, this is how it works."
-      updated={<TBC what="policy date" />}
+      updated={<Fact value={legal.effectiveDate} what="policy date" />}
     >
       <Section heading="When we refund">
         <Bullets
@@ -65,8 +65,9 @@ function RefundPolicyPage() {
           and never by any channel other than the one you contacted us on.
         </p>
         <p>
-          We aim to send it within <TBC what="refund processing time" /> of approving the request.
-          How long it then takes to appear is your bank's business, not ours.
+          We aim to send it within{" "}
+          <Fact value={legal.refundProcessingTime} what="refund processing time" /> of approving the
+          request. How long it then takes to appear is your bank's business, not ours.
         </p>
       </Section>
 

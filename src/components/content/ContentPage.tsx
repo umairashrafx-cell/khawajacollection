@@ -59,6 +59,18 @@ export function Section({ heading, children }: { heading: string; children: Reac
  * A business fact Umair has not supplied yet. Every instance is listed in
  * docs/LAUNCH-CHECKLIST.md.
  */
+/**
+ * A known fact, or the badge that says it is missing.
+ *
+ * The pattern `value ?? <TBC what="…" />` appeared at nine call sites across
+ * three legal pages, and every one of them had to remember both halves. This
+ * makes forgetting the fallback impossible: pass the config value and the
+ * label, and a null renders the badge automatically.
+ */
+export function Fact({ value, what }: { value: string | null; what: string }) {
+  return value ? <>{value}</> : <TBC what={what} />;
+}
+
 export function TBC({ what }: { what: string }) {
   return (
     <mark className="mx-0.5 inline-block border border-kc-sale bg-kc-white px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-kc-sale">
