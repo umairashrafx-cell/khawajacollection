@@ -14,10 +14,11 @@ import { useQuery } from "@tanstack/react-query";
 
 import { AppLink } from "@/components/layout/AppLink";
 import { OrderStatusSteps } from "@/components/account/OrderStatusSteps";
+import { ReviewPrompt } from "@/components/account/ReviewPrompt";
 import { fetchOrder } from "@/lib/auth/account-api";
 import { useUser } from "@/lib/auth/session-store";
 import { formatDate, formatPKR } from "@/lib/format";
-import { paymentMethods } from "@/config/site";
+import { paymentLabel as labelForPaymentMethod } from "@/config/site";
 
 export const Route = createFileRoute("/account/orders/$orderNumber")({
   head: ({ params }) => ({
@@ -46,10 +47,7 @@ function OrderDetailPage() {
     staleTime: 30_000,
   });
 
-  const paymentLabel =
-    paymentMethods.find((method) => method.id === order?.paymentMethod)?.label ??
-    order?.paymentMethod ??
-    "";
+  const paymentLabel = order?.paymentMethod ? labelForPaymentMethod(order.paymentMethod) : "";
 
   return (
     <div>
@@ -82,6 +80,8 @@ function OrderDetailPage() {
               <OrderStatusSteps status={order.status} />
             </div>
           </section>
+
+          <ReviewPrompt status={order.status} />
 
           <section>
             <h3 className="kc-eyebrow text-kc-muted">Items</h3>

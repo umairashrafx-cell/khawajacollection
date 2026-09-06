@@ -13,6 +13,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { OrderStatusSteps } from "@/components/account/OrderStatusSteps";
+import { ReviewPrompt } from "@/components/account/ReviewPrompt";
 import { Container } from "@/components/layout/Container";
 import { formatDate, formatPKR } from "@/lib/format";
 import type { OrderStatus, OrderTotals } from "@/types";
@@ -172,6 +173,17 @@ function Timeline({ order }: { order: TrackedOrder }) {
           <span>Total</span>
           <span className="kc-price">{formatPKR(order.totals.total)}</span>
         </p>
+      </div>
+
+      {/*
+        Below the items, not above the timeline. Someone opening this page is
+        answering "where is my order" — the ask waits until they have scrolled
+        past the answer, and only appears at all once the answer is "it
+        arrived". This page needs no account, so it is where most customers of
+        a cash-on-delivery shop will ever see it.
+      */}
+      <div className="mt-6">
+        <ReviewPrompt status={order.status} />
       </div>
     </section>
   );

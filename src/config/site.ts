@@ -335,44 +335,85 @@ export const provinces: readonly Province[] = [
  * Section 11.5 — Cash on Delivery is the default and the only live method at
  * launch. Card and Bank Transfer render but stay disabled.
  */
+/**
+ * Every method that has ever been recorded on an order, for LABELLING ONE.
+ *
+ * Separate from `paymentMethods` below, and the split is the point. That list
+ * is "what the shop offers today" and it shrinks; this one is "what a stored
+ * `payment_method` value means" and it must never shrink, because an order is
+ * a historical record. Both order-detail screens used to read the offer list
+ * for their label, so removing a method would have made a past order that used
+ * it display the raw column value — `bank_transfer` — to a customer.
+ *
+ * Typed as a complete Record, so adding a PaymentMethodId without a label is a
+ * compile error rather than a string nobody notices in an order they will
+ * never see.
+ */
+export const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
+  cod: "Cash on Delivery",
+  card: "Card",
+  bank_transfer: "Bank Transfer",
+  jazzcash: "JazzCash",
+  easypaisa: "Easypaisa",
+};
+
+/**
+ * The display name for a stored `payment_method`.
+ *
+ * TAKES A `string`, NOT A `PaymentMethodId`, because that is what an order
+ * actually carries: the value came out of a Postgres text column and through
+ * an API, and the compiler refused to index the record with it — correctly.
+ * An unrecognised value returns itself, which is what both screens did before
+ * and is the right answer: showing the raw column beats showing nothing, and
+ * it is legible enough for whoever has to work out where it came from.
+ */
+export function paymentLabel(id: string): string {
+  return (PAYMENT_LABELS as Record<string, string | undefined>)[id] ?? id;
+}
+
+/**
+ * What the shop actually takes. CASH ON DELIVERY, and nothing else.
+ *
+ * This listed five methods, four of them labelled "Coming soon" — in the
+ * footer of every page and again at checkout. Umair asked for them gone on
+ * 2026-09-07, and the request is right for a reason worth recording: "coming
+ * soon" is a promise with no date behind it. Card and bank transfer had no
+ * implementation at all, and the two wallets have never been run against a
+ * sandbox (see src/lib/payments/jazzcash.ts). A customer choosing this shop
+ * because it takes JazzCash would have found out at checkout that it does not.
+ *
+ * THE GATEWAY CODE IS NOT DELETED, only unlisted. The wallets return here the
+ * moment their env flag is on — that is the whole point of the flag, and it
+ * still cannot make the shop accept money it cannot collect, because the
+ * server checks the merchant credentials again before sending anyone to a
+ * gateway. Card and bank transfer are gone outright: there was nothing behind
+ * them to switch on.
+ */
 export const paymentMethods: readonly {
   id: PaymentMethodId;
   label: string;
   isEnabled: boolean;
   note?: string;
 }[] = [
-  { id: "cod", label: "Cash on Delivery", isEnabled: true },
-  /*
-   * The two wallets are switched by a PUBLIC env flag, not hardcoded, because
-   * they go live the moment merchant credentials exist and not a deploy
-   * sooner. The flag only decides whether the option is rendered — the server
-   * checks the credentials again before sending anyone to a gateway, so
-   * flipping this alone cannot make the shop accept money it cannot collect.
-   * See src/lib/payments/gateway.ts.
-   */
-  {
-    id: "jazzcash",
-    label: "JazzCash",
-    isEnabled: import.meta.env.VITE_PAYMENTS_JAZZCASH === "on",
-    // The note follows the switch. The footer lists every method whether or
-    // not it is live, so a fixed "Pay with your JazzCash wallet" would
-    // advertise a method the shop cannot actually take — which is worse than
-    // not mentioning it, because a customer picks the shop on the strength of
-    // it and finds out at checkout.
-    note:
-      import.meta.env.VITE_PAYMENTS_JAZZCASH === "on"
-        ? "Pay with your JazzCash wallet"
-        : "Coming soon",
-  },
-  {
-    id: "easypaisa",
-    label: "Easypaisa",
-    isEnabled: import.meta.env.VITE_PAYMENTS_EASYPAISA === "on",
-    note:
-      import.meta.env.VITE_PAYMENTS_EASYPAISA === "on"
-        ? "Pay with your Easypaisa wallet"
-        : "Coming soon",
-  },
-  { id: "card", label: "Card", isEnabled: false, note: "Coming soon" },
-  { id: "bank_transfer", label: "Bank Transfer", isEnabled: false, note: "Coming soon" },
+  { id: "cod", label: PAYMENT_LABELS.cod, isEnabled: true },
+  ...(import.meta.env.VITE_PAYMENTS_JAZZCASH === "on"
+    ? [
+        {
+          id: "jazzcash" as const,
+          label: PAYMENT_LABELS.jazzcash,
+          isEnabled: true,
+          note: "Pay with your JazzCash wallet",
+        },
+      ]
+    : []),
+  ...(import.meta.env.VITE_PAYMENTS_EASYPAISA === "on"
+    ? [
+        {
+          id: "easypaisa" as const,
+          label: PAYMENT_LABELS.easypaisa,
+          isEnabled: true,
+          note: "Pay with your Easypaisa wallet",
+        },
+      ]
+    : []),
 ];

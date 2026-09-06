@@ -28,7 +28,7 @@ import { ORDER_STEPS } from "@/lib/order-steps";
 import { fetchAdminOrder, updateOrderStatus } from "@/lib/auth/admin-api";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
 import { formatDate, formatPKR } from "@/lib/format";
-import { paymentMethods } from "@/config/site";
+import { paymentLabel as labelForPaymentMethod } from "@/config/site";
 import type { OrderStatus } from "@/types";
 
 export const Route = createFileRoute("/admin/orders/$orderNumber")({
@@ -93,8 +93,7 @@ function AdminOrderDetail() {
 
   const next = nextStatus(order.status);
   const nextLabel = ORDER_STEPS.find((s) => s.status === next)?.label;
-  const paymentLabel =
-    paymentMethods.find((m) => m.id === order.paymentMethod)?.label ?? order.paymentMethod;
+  const paymentLabel = labelForPaymentMethod(order.paymentMethod);
 
   return (
     <div>
