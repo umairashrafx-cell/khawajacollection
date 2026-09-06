@@ -142,9 +142,7 @@ function ContactPage() {
         iframe is below the fold on every screen size, so it costs nothing
         unless it is wanted.
       */}
-      <Section heading="Find the shop">
-        <ShopMap />
-      </Section>
+      <ShopMap />
 
       <Section heading="What to include">
         <p>

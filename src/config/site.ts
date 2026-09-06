@@ -132,6 +132,29 @@ export const contact = {
  * just makes the shop look unfinished. So it renders nothing at all.
  */
 export const googleBusiness = {
+  /**
+   * The map embed, from Google Maps -> Share -> Embed a map -> the `src` of
+   * the iframe it hands you. A `https://www.google.com/maps/embed?pb=...` URL.
+   *
+   * ⚠ DO NOT GO BACK TO BUILDING THIS FROM THE ADDRESS. It was tried on
+   * 2026-09-07 and shipped, and `?q=Khawaja Collection, Ameen Cloth House,
+   * Katchery Road, Main Sadar Bazar, Mandi Bahauddin, 50400, Pakistan`
+   * resolved to "K. Khadija & Kumail" — a different business, on a different
+   * street, whose name and 4.0 rating were then displayed on our own contact
+   * page. Google's geocoder is a guess, and in a bazaar with informal
+   * addressing it is a bad one. A Place ID is an identity; an address string
+   * is a search term, and a search term can return anything.
+   */
+  mapEmbedUrl: null as string | null,
+  /** Google Maps -> Share -> Copy link. A https://maps.app.goo.gl/... link. */
+  placeUrl: null as string | null,
+  /**
+   * Business Profile -> "Ask for reviews". A https://g.page/r/<id>/review link.
+   *
+   * ⚠ WHILE THIS IS null THE SITE ASKS NOBODY FOR A REVIEW, which is the
+   * biggest lever on local ranking left unpulled. It cannot be derived: Google
+   * keys it to the Place ID, which is not a function of the name or address.
+   */
   reviewUrl: null as string | null,
 } as const;
 
