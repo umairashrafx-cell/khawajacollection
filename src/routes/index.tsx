@@ -31,17 +31,34 @@ const description =
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [newArrivals, trending, womenEdit, menEdit, saleItems, categories] = await Promise.all([
-      productRepository.list({ isNewArrival: true, sort: "newest", perPage: 8 }),
-      productRepository.list({ isBestSeller: true, sort: "best-selling", perPage: 8 }),
-      productRepository.list({ category: "women", sort: "featured", perPage: 4 }),
-      productRepository.list({ category: "men", sort: "featured", perPage: 4 }),
-      productRepository.list({ onSale: true, sort: "featured", perPage: 6 }),
-      // For the Shop by Category cards. Cheap — fifteen rows, and cached for a
-      // minute by the repository — and it is what lets those tiles be changed
-      // from the admin instead of by a deploy.
-      categoryRepository.list(),
-    ]);
+    /*
+     * The featured collection's slug, taken from the one place it is written:
+     * the CTA's own href. Storing it a second time beside the link would be
+     * two values that must agree about which collection this block is for.
+     */
+    const featuredSlug = featuredCollection.cta.href.replace(/^\/collections\//, "");
+
+    const [newArrivals, trending, womenEdit, menEdit, saleItems, featured, categories] =
+      await Promise.all([
+        productRepository.list({ isNewArrival: true, sort: "newest", perPage: 8 }),
+        productRepository.list({ isBestSeller: true, sort: "best-selling", perPage: 8 }),
+        productRepository.list({ category: "women", sort: "featured", perPage: 4 }),
+        productRepository.list({ category: "men", sort: "featured", perPage: 4 }),
+        productRepository.list({ onSale: true, sort: "featured", perPage: 6 }),
+        /*
+         * Only the count is wanted, so one row is enough. This block is a
+         * full-width photograph and an "Explore the collection" button, and it
+         * pointed at /collections/the-new-season, which has nothing in it, is
+         * `noindex`, and is not in the sitemap — the same dead end the men's
+         * edit was, missed because this section runs on no product query at all
+         * and so was not caught by gating the ones that do.
+         */
+        productRepository.list({ collection: featuredSlug, perPage: 1 }),
+        // For the Shop by Category cards. Cheap — fifteen rows, and cached for a
+        // minute by the repository — and it is what lets those tiles be changed
+        // from the admin instead of by a deploy.
+        categoryRepository.list(),
+      ]);
 
     return {
       newArrivals: newArrivals.items,
@@ -49,6 +66,7 @@ export const Route = createFileRoute("/")({
       womenEdit: womenEdit.items,
       menEdit: menEdit.items,
       sale: saleItems.items,
+      hasFeaturedCollection: featured.total > 0,
       /*
        * Only what the tiles need. The whole Category object would put every
        * description and sort order into the HTML for no reason.
@@ -92,6 +110,7 @@ function HomePage() {
     womenEdit,
     menEdit,
     sale: saleItems,
+    hasFeaturedCollection,
     categoryCards,
   } = Route.useLoaderData();
   const [womenEditContent, menEditContent] = edits;
@@ -150,8 +169,18 @@ function HomePage() {
         </Container>
       ) : null}
 
-      {/* 5 — Featured collection */}
-      <EditorialSplit content={featuredCollection} />
+      {/*
+        5 — Featured collection.
+
+        A NAVIGATION LINK AND A PROMISE ARE NOT THE SAME THING. The category
+        strip above also links to listings that are currently empty, and stays:
+        it is how someone browses the shop, it mirrors the header nav, and an
+        empty listing answers honestly with its own empty state. This block is
+        different in kind — a full-width photograph and a button saying
+        "Explore the collection" is an advertisement for something to look at,
+        and there is nothing behind it.
+      */}
+      {hasFeaturedCollection ? <EditorialSplit content={featuredCollection} /> : null}
 
       {/* 6 — Trending Now */}
       {showTrending ? (
