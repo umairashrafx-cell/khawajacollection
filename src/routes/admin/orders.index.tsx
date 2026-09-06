@@ -17,6 +17,7 @@ import { ChevronRight, Download, Search } from "lucide-react";
 import { useState } from "react";
 
 import { AppLink } from "@/components/layout/AppLink";
+import { OrderCard } from "@/components/admin/OrderCard";
 import { OrderStatusBadge } from "@/components/account/OrderStatusSteps";
 import { ORDER_STEPS } from "@/lib/order-steps";
 import { downloadOrdersCsv, fetchAdminOrders } from "@/lib/auth/admin-api";
@@ -167,8 +168,28 @@ function AdminOrders() {
 
       {data && data.orders.length > 0 ? (
         <>
+          {/*
+            TWO LAYOUTS, NOT ONE THAT BENDS. The table is 42rem wide by
+            necessity — six columns of order data do not fit a phone, and
+            squeezing them produces a column of single characters. Below md it
+            is replaced outright by cards; see OrderCard for why scrolling the
+            table sideways was not good enough.
+          */}
+          <ul
+            className={`mt-6 space-y-3 md:hidden ${isPlaceholderData ? "opacity-60" : ""}`}
+            aria-label="Orders"
+          >
+            {data.orders.map((order) => (
+              <OrderCard
+                key={order.orderNumber}
+                order={order}
+                placedAt={formatDate(order.createdAt)}
+              />
+            ))}
+          </ul>
+
           <div
-            className={`mt-6 overflow-x-auto border border-kc-line bg-kc-white transition-opacity ${
+            className={`mt-6 hidden overflow-x-auto border border-kc-line bg-kc-white transition-opacity md:block ${
               isPlaceholderData ? "opacity-60" : ""
             }`}
           >

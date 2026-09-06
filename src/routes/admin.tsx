@@ -22,8 +22,8 @@
  */
 
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { Boxes, ClipboardList, FolderTree, LayoutDashboard, LogOut, Store } from "lucide-react";
 
+import { AdminNav } from "@/components/admin/AdminNav";
 import { AppLink } from "@/components/layout/AppLink";
 import { signOut } from "@/lib/auth/actions";
 import { useAdminAccess } from "@/hooks/useAdminAccess";
@@ -33,13 +33,6 @@ import { isSupabaseConfigured } from "@/lib/supabase/client";
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
-
-const NAV = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/orders", label: "Orders", icon: ClipboardList, exact: false },
-  { href: "/admin/products", label: "Stock", icon: Boxes, exact: false },
-  { href: "/admin/categories", label: "Categories", icon: FolderTree, exact: false },
-] as const;
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -124,54 +117,7 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-kc-sand">
-      <header className="bg-kc-ink text-kc-paper">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <span className="font-display text-lg tracking-[0.16em]">
-            KC<span className="text-kc-gold">.</span>
-            <span className="ml-2 align-middle text-[10px] uppercase tracking-[0.18em] text-kc-paper/60">
-              Admin
-            </span>
-          </span>
-
-          <nav aria-label="Admin" className="flex items-center gap-1">
-            {NAV.map((item) => {
-              const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-              const Icon = item.icon;
-              return (
-                <AppLink
-                  key={item.href}
-                  href={item.href}
-                  {...(active ? { "aria-current": "page" as const } : {})}
-                  className={`flex min-h-11 items-center gap-2 px-3 text-sm transition-colors ${
-                    active ? "text-kc-paper" : "text-kc-paper/60 hover:text-kc-paper"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  {item.label}
-                </AppLink>
-              );
-            })}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-1">
-            <AppLink
-              href="/"
-              className="flex min-h-11 items-center gap-2 px-3 text-sm text-kc-paper/60 transition-colors hover:text-kc-paper"
-            >
-              <Store className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">View shop</span>
-            </AppLink>
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="flex min-h-11 items-center gap-2 px-3 text-sm text-kc-paper/60 transition-colors hover:text-kc-paper"
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Sign out</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminNav pathname={pathname} onSignOut={() => void signOut()} />
 
       <main className="mx-auto max-w-6xl px-4 py-8">
         <Outlet />

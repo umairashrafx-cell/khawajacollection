@@ -500,6 +500,33 @@ category rows that nothing else would use, or a separate "site images" concept
 Verified by putting a real Storage URL on `women` and rebuilding: that tile
 rendered the uploaded webp and the other seven fell back to placeholders.
 
+## The admin works on a phone
+
+Three things did not, and all three were invisible in a desktop screenshot
+because nothing overflowed the page — the wide bits sat inside
+`overflow-x-auto` and simply scrolled off the right edge.
+
+- **Orders** was a `min-w-[42rem]` table on a 375px screen, so the total and
+  the way into an order were both off-screen. Below `md` it is now
+  `OrderCard`: number and total on one line, then the customer, a `tel:` link,
+  the status, and an Open row. Hard Rule 8 — designed for the phone, not the
+  table reflowed.
+- **The sizes editor** was `min-w-[620px]`, so the stock box, the field you
+  came to change, was off the edge. Below `md` the table stops being a table
+  (`block` rows, hidden `thead`, per-cell labels) rather than being duplicated
+  as cards, because two copies of six controlled inputs is two places for the
+  next change to be made in one of.
+- **The admin bar** held four labelled destinations in a non-wrapping flex,
+  about 447px of content. It now scrolls horizontally with the labels kept;
+  icons alone are not four distinguishable ideas. "View shop" and "Sign out"
+  stay pinned so they are never behind a scroll.
+
+`OrderCard` and `AdminNav` are separate components SO THEY CAN BE TESTED. A
+route's own component calls `Route.useSearch()` and throws outside its real
+match, and the admin layout is behind a guard needing a real Supabase session
+— so neither can be rendered in a harness. Presentational pieces can, and were,
+at 375px and 1280px.
+
 ## Prerender coverage is best-effort, not guaranteed
 
 `vite.config.ts` sets `crawlLinks: true` with `failOnError: false`, so the

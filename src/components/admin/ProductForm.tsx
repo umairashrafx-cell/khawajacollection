@@ -603,9 +603,24 @@ export function ProductForm({
           </Field>
         ) : null}
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[620px] border-collapse text-sm">
-            <thead>
+        {/*
+          ONE SET OF INPUTS, TWO LAYOUTS, done with display rules rather than
+          two blocks of JSX.
+
+          Six editable columns do not fit a 375px phone, and the table was
+          `min-w-[620px]` inside a scroller — so the stock box, which is the
+          field you actually came to change, sat off the right-hand edge.
+          Duplicating the row as cards would have meant two copies of six
+          controlled inputs, which is two places for the next change to be
+          made in one of.
+
+          So below `md` the table stops being a table: rows become bordered
+          blocks, cells become labelled lines, and the header is hidden because
+          each cell carries its own label. The inputs themselves are untouched.
+        */}
+        <div className="md:overflow-x-auto">
+          <table className="w-full border-collapse text-sm md:min-w-[620px]">
+            <thead className="hidden md:table-header-group">
               <tr className="border-b border-kc-line text-left text-xs uppercase tracking-[0.12em] text-kc-charcoal">
                 {sized ? (
                   <th scope="col" className="py-2 pr-3 font-normal">
@@ -629,11 +644,17 @@ export function ProductForm({
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block md:table-row-group">
               {values.variants.map((variant, index) => (
-                <tr key={index} className="border-b border-kc-line/60">
+                <tr
+                  key={index}
+                  className="mb-3 block border border-kc-line p-3 last:mb-0 md:mb-0 md:table-row md:border-x-0 md:border-b md:border-t-0 md:border-kc-line/60 md:p-0"
+                >
                   {sized ? (
-                    <td className="py-2 pr-3">
+                    <td className="md:table-cell md:py-2 md:pr-3 flex items-center justify-between gap-3 py-1">
+                      <span className="w-20 shrink-0 text-xs uppercase tracking-[0.12em] text-kc-charcoal md:hidden">
+                        Size
+                      </span>
                       <input
                         type="text"
                         required
@@ -653,7 +674,10 @@ export function ProductForm({
                       />
                     </td>
                   ) : null}
-                  <td className="py-2 pr-3">
+                  <td className="md:table-cell md:py-2 md:pr-3 flex items-center justify-between gap-3 py-1">
+                    <span className="w-20 shrink-0 text-xs uppercase tracking-[0.12em] text-kc-charcoal md:hidden">
+                      Colour
+                    </span>
                     <input
                       type="text"
                       value={variant.colorName}
@@ -663,7 +687,10 @@ export function ProductForm({
                       className={`${FIELD} min-w-[7rem]`}
                     />
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="md:table-cell md:py-2 md:pr-3 flex items-center justify-between gap-3 py-1">
+                    <span className="w-20 shrink-0 text-xs uppercase tracking-[0.12em] text-kc-charcoal md:hidden">
+                      Shade
+                    </span>
                     <input
                       type="color"
                       value={variant.colorHex}
@@ -672,7 +699,10 @@ export function ProductForm({
                       className="h-11 w-14 border border-kc-line bg-kc-white p-1"
                     />
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="md:table-cell md:py-2 md:pr-3 flex items-center justify-between gap-3 py-1">
+                    <span className="w-20 shrink-0 text-xs uppercase tracking-[0.12em] text-kc-charcoal md:hidden">
+                      SKU
+                    </span>
                     {/*
                       NOT `required`. The submit handler fills a blank SKU from
                       the slug, and the browser runs `required` BEFORE any
@@ -689,7 +719,10 @@ export function ProductForm({
                       className={`${FIELD} min-w-[10rem] font-mono text-xs`}
                     />
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="md:table-cell md:py-2 md:pr-3 flex items-center justify-between gap-3 py-1">
+                    <span className="w-20 shrink-0 text-xs uppercase tracking-[0.12em] text-kc-charcoal md:hidden">
+                      Stock
+                    </span>
                     <input
                       type="number"
                       min={0}
@@ -701,7 +734,7 @@ export function ProductForm({
                       className={`${FIELD} min-w-[5rem]`}
                     />
                   </td>
-                  <td className="py-2">
+                  <td className="md:table-cell md:py-2 flex items-center justify-between gap-3 py-1">
                     <button
                       type="button"
                       onClick={() =>
