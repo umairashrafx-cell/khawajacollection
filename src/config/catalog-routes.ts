@@ -78,7 +78,7 @@ export const newArrivalsCatalog: CatalogDescriptor = {
   h1: "New In",
   metaTitle: "New Arrivals | Khawaja Collection",
   description:
-    "The most recent pieces to reach the studio, newest first. Lawn, linen, silk and velvet for women and men, added in small runs through the season.",
+    "The most recent pieces to reach the shop, newest first. Lawn, linen, silk and velvet for women and men, added in small batches through the season.",
   base: { isNewArrival: true, sort: "newest" },
 };
 

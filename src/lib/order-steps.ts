@@ -11,7 +11,7 @@ import type { OrderStatus } from "@/types";
 export const ORDER_STEPS: { status: OrderStatus; label: string; description: string }[] = [
   { status: "placed", label: "Placed", description: "We have your order." },
   { status: "confirmed", label: "Confirmed", description: "Stock checked and reserved." },
-  { status: "processing", label: "Processing", description: "Being packed in the studio." },
+  { status: "processing", label: "Processing", description: "Being packed at the shop." },
   { status: "shipped", label: "Shipped", description: "Handed to the courier." },
   { status: "out_for_delivery", label: "Out for delivery", description: "With you today." },
   { status: "delivered", label: "Delivered", description: "Received. Thank you." },

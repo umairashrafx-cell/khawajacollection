@@ -96,6 +96,32 @@ function HomePage() {
   } = Route.useLoaderData();
   const [womenEditContent, menEditContent] = edits;
 
+  /*
+   * A RAIL WITH NOTHING IN IT DOES NOT RENDER.
+   *
+   * Every product section used to draw its heading, its "View all" and then an
+   * empty grid, which on a shop with one product left the homepage with two
+   * captioned holes in it — "Trending now" over roughly 400px of nothing,
+   * because the one product is not flagged a best seller, and the men's edit
+   * over the same, because it is a women's piece. Neither was a data bug: the
+   * queries were right and the answers were empty.
+   *
+   * The same judgement as the empty listing pages, one layer up. There it was
+   * "do not ask Google to index a page with nothing on it"; here it is "do not
+   * show a customer a title with nothing under it". Both self-heal: flag a
+   * product a best seller, or add a men's kurta, and the section comes back on
+   * its own.
+   *
+   * A men's edit with no menswear also links to /men, which is empty and
+   * `noindex` — advertising a department we have nothing in is worse than
+   * quietly not mentioning it yet.
+   */
+  const showNewArrivals = newArrivals.length > 0;
+  const showTrending = trending.length > 0;
+  const showWomenEdit = Boolean(womenEditContent) && womenEdit.length > 0;
+  const showMenEdit = Boolean(menEditContent) && menEdit.length > 0;
+  const showSale = saleItems.length > 0;
+
   return (
     <>
       {/* 2 — Hero */}
@@ -109,37 +135,50 @@ function HomePage() {
         </Section>
       </Container>
 
-      {/* 4 — New Arrivals */}
-      <Container>
-        <Section className="pt-0">
-          <SectionHeader
-            eyebrow="Just in"
-            title="New arrivals"
-            action={{ label: "View all", href: "/new-arrivals" }}
-          />
-          <ProductCarousel products={newArrivals} label="New arrivals" />
-        </Section>
-      </Container>
+      {/* 4 — New Arrivals. `pt-0` is safe unconditionally: Shop by category
+          above it maps a static list and always renders. */}
+      {showNewArrivals ? (
+        <Container>
+          <Section className="pt-0">
+            <SectionHeader
+              eyebrow="Just in"
+              title="New arrivals"
+              action={{ label: "View all", href: "/new-arrivals" }}
+            />
+            <ProductCarousel products={newArrivals} label="New arrivals" />
+          </Section>
+        </Container>
+      ) : null}
 
       {/* 5 — Featured collection */}
       <EditorialSplit content={featuredCollection} />
 
       {/* 6 — Trending Now */}
-      <Container>
-        <Section>
-          <SectionHeader
-            eyebrow="Most loved"
-            title="Trending now"
-            action={{ label: "View all", href: "/new-arrivals" }}
-          />
-          <ProductGrid products={trending} />
-        </Section>
-      </Container>
-
-      {/* 7 — Women's edit */}
-      {womenEditContent ? (
+      {showTrending ? (
         <Container>
-          <Section className="pt-0">
+          <Section>
+            <SectionHeader
+              eyebrow="Most loved"
+              title="Trending now"
+              action={{ label: "View all", href: "/new-arrivals" }}
+            />
+            <ProductGrid products={trending} />
+          </Section>
+        </Container>
+      ) : null}
+
+      {/*
+        7 — Women's edit.
+
+        `pt-0` IS NOW CONDITIONAL, and has to be. It exists to avoid stacking
+        two Sections' padding, which assumed the section above always rendered.
+        Now that Trending can vanish, a hardcoded pt-0 would butt this straight
+        against the editorial split with no breathing room — a spacing bug
+        introduced by the fix rather than by the data.
+      */}
+      {showWomenEdit && womenEditContent ? (
+        <Container>
+          <Section className={showTrending ? "pt-0" : ""}>
             <EditorialBanner content={womenEditContent} />
             <div className="mt-8">
               <ProductGrid products={womenEdit} columns={{ mobile: 2, tablet: 2, desktop: 4 }} />
@@ -151,10 +190,10 @@ function HomePage() {
         </Container>
       ) : null}
 
-      {/* 8 — Men's edit */}
-      {menEditContent ? (
+      {/* 8 — Men's edit. Same conditional padding, chained off section 7. */}
+      {showMenEdit && menEditContent ? (
         <Container>
-          <Section className="pt-0">
+          <Section className={showWomenEdit ? "pt-0" : ""}>
             <EditorialBanner content={menEditContent} />
             <div className="mt-8">
               <ProductGrid products={menEdit} columns={{ mobile: 2, tablet: 2, desktop: 4 }} />
@@ -166,25 +205,29 @@ function HomePage() {
         </Container>
       ) : null}
 
-      {/* 9 — Sale, visually distinct on ink */}
-      <section className="bg-kc-ink">
-        <Container>
-          <Section>
-            <SectionHeader
-              eyebrow={sale.eyebrow}
-              title={sale.headline}
-              description={sale.body}
-              action={{ label: sale.cta.label, href: sale.cta.href }}
-              tone="inverse"
-            />
-            <ProductGrid
-              products={saleItems}
-              columns={{ mobile: 2, tablet: 3, desktop: 3 }}
-              tone="inverse"
-            />
-          </Section>
-        </Container>
-      </section>
+      {/* 9 — Sale, visually distinct on ink. Hidden when empty above all the
+          others: an empty grid on the ink background is not a gap, it is a
+          full-width black band with a heading floating in it. */}
+      {showSale ? (
+        <section className="bg-kc-ink">
+          <Container>
+            <Section>
+              <SectionHeader
+                eyebrow={sale.eyebrow}
+                title={sale.headline}
+                description={sale.body}
+                action={{ label: sale.cta.label, href: sale.cta.href }}
+                tone="inverse"
+              />
+              <ProductGrid
+                products={saleItems}
+                columns={{ mobile: 2, tablet: 3, desktop: 3 }}
+                tone="inverse"
+              />
+            </Section>
+          </Container>
+        </section>
+      ) : null}
 
       {/* 10 — Follow Khawaja Collection */}
       <Container>

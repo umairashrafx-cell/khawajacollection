@@ -89,7 +89,7 @@ export const sale = {
 export const socialSection = {
   eyebrow: "Follow",
   headline: "Follow Khawaja Collection",
-  body: "Studio notes, new cloth and fittings, as they happen.",
+  body: "New cloth, new arrivals and what is in the shop this week.",
 } as const;
 
 /** Section 11.1 item 11. */

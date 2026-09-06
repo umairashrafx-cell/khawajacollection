@@ -59,6 +59,25 @@ export const social = {
   youtube: "https://www.youtube.com/@khawajacollection-e6l",
 } as const;
 
+/**
+ * Photographs for the "Follow Khawaja Collection" grid on the homepage.
+ *
+ * EMPTY, AND THAT IS WHY THE GRID IS GONE. It used to be six hardcoded
+ * `/placeholders/product-NN-3x4.svg` tiles — the generated grey KC blocks —
+ * sitting under a heading inviting people to follow the shop. Six identical
+ * "PRODUCT IMAGE" squares do not invite anyone to follow anything; they say
+ * the site is unfinished, which was the single most unfinished-looking thing
+ * left on the homepage.
+ *
+ * A photograph cannot be invented the way a paragraph can be rewritten, so the
+ * honest fix is to show the four real channel buttons and no tiles at all,
+ * rather than filler. Put real image paths here — shop shots, product shots,
+ * anything genuinely KC's — and the grid returns on its own.
+ *
+ * Paths are relative to /public, or absolute Storage URLs.
+ */
+export const socialTiles: readonly string[] = [];
+
 export const contact = {
   /**
    * Supplied 2026-09-04. Stored in the +92 form Section 16 normalises to, so

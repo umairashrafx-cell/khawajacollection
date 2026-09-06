@@ -1,24 +1,23 @@
 /**
  * Follow Khawaja Collection. See docs/BUILD-SPEC.pdf Section 11.1 item 10.
  *
- * Six square tiles. Guardrail 2: the Instagram URL is a PLACEHOLDER, so only
- * the channels that have a real URL render as links. The tiles themselves are
- * generated placeholders until the studio feed exists.
+ * NO TILES UNTIL THERE ARE REAL PHOTOGRAPHS. The grid was six hardcoded
+ * generated SVGs — grey blocks reading "KC / PRODUCT IMAGE" — under a heading
+ * asking people to follow the shop. Placeholder imagery is the one kind of
+ * placeholder that cannot be quietly lived with: a customer reads it instantly
+ * as a site that is not finished, and it sat directly above the newsletter
+ * sign-up, which is the last thing they see before deciding to trust us.
+ *
+ * All four channels are real (supplied 2026-09-04), so the section still has
+ * something true to show. The `PLACEHOLDER` guard stays anyway — a URL can be
+ * cleared as easily as it was filled, and a dead "Follow us" link is worse
+ * than an absent one.
  */
 
 import { Facebook, Instagram, Music2, Youtube } from "lucide-react";
 
 import { Image } from "@/components/media/Image";
-import { PLACEHOLDER, site, social } from "@/config/site";
-
-const TILES = [
-  "product-02",
-  "product-05",
-  "product-08",
-  "product-11",
-  "product-03",
-  "product-07",
-] as const;
+import { PLACEHOLDER, site, social, socialTiles } from "@/config/site";
 
 export function SocialGrid() {
   const channels: { label: string; href: string; Icon: typeof Facebook }[] = [
@@ -31,25 +30,27 @@ export function SocialGrid() {
 
   return (
     <div>
-      <ul className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-4">
-        {TILES.map((tile, index) => (
-          <li key={tile} className="overflow-hidden bg-kc-sand">
-            <Image
-              src={`/placeholders/${tile}-3x4.svg`}
-              alt=""
-              width={900}
-              height={1200}
-              sizes="(min-width: 768px) 16vw, 33vw"
-              className="aspect-square w-full object-cover"
-              style={{ aspectRatio: "1 / 1" }}
-            />
-            <span className="sr-only">Studio image {index + 1}</span>
-          </li>
-        ))}
-      </ul>
+      {socialTiles.length > 0 ? (
+        <ul className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-4">
+          {socialTiles.map((tile, index) => (
+            <li key={tile} className="overflow-hidden bg-kc-sand">
+              <Image
+                src={tile}
+                alt=""
+                width={900}
+                height={1200}
+                sizes="(min-width: 768px) 16vw, 33vw"
+                className="aspect-square w-full object-cover"
+                style={{ aspectRatio: "1 / 1" }}
+              />
+              <span className="sr-only">Khawaja Collection image {index + 1}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {live.length > 0 ? (
-        <ul className="mt-6 flex flex-wrap gap-3">
+        <ul className={`flex flex-wrap gap-3 ${socialTiles.length > 0 ? "mt-6" : ""}`}>
           {live.map(({ label, href, Icon }) => (
             <li key={label}>
               <a
