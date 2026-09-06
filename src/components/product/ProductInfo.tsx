@@ -15,7 +15,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Banknote, Heart, MessageCircle, RefreshCw, Star, Truck } from "lucide-react";
 
-import { PLACEHOLDER, commerce, contact, hasRealReviews, site } from "@/config/site";
+import { commerce, hasRealReviews } from "@/config/site";
 import { formatPKR, labelFromSlug } from "@/lib/format";
 import {
   colorOptions,
@@ -24,6 +24,7 @@ import {
   findVariant,
   sizesForColor,
 } from "@/lib/product-variants";
+import { productEnquiryUrl, whatsappReady as whatsappIsReady } from "@/lib/whatsapp";
 import { announce } from "@/store/announcer";
 import { addToCart } from "@/store/cart-store";
 import { openOverlay } from "@/store/ui-store";
@@ -60,8 +61,8 @@ export function ProductInfo({ product }: { product: Product }) {
     product.categorySlug,
   );
   const saved = wishlistHydrated && wishlisted;
-  const whatsapp: string = contact.whatsapp;
-  const whatsappReady = whatsapp !== PLACEHOLDER;
+  const whatsappReady = whatsappIsReady();
+  const enquiryUrl = productEnquiryUrl(product.name, `/products/${product.slug}`);
 
   function onColorChange(next: string) {
     setColor(next);
@@ -133,7 +134,7 @@ export function ProductInfo({ product }: { product: Product }) {
 
       <div ref={ctaRef} className="mt-8 space-y-3">
         {product.isMadeToOrder ? (
-          <MadeToOrderCta ready={whatsappReady} number={whatsapp} productName={product.name} />
+          <MadeToOrderCta ready={whatsappReady} href={enquiryUrl} />
         ) : (
           <>
             <button
@@ -166,6 +167,32 @@ export function ProductInfo({ product }: { product: Product }) {
           <p className="text-sm text-kc-charcoal">
             Size {size} is out of stock in {color}. Try another size or colour.
           </p>
+        ) : null}
+
+        {/*
+          ENQUIRE ON WHATSAPP, under the buy buttons rather than beside them.
+          On a cash-on-delivery shop most questions arrive before the order,
+          not after it — a colour, a length, whether the last one is really
+          the last one — and WhatsApp is the channel this shop's customers
+          already use. It sits BELOW Add to bag and Buy now, and is bordered
+          rather than filled, because it must not compete with the two actions
+          that end in a sale.
+
+          Made-to-order pieces do not get it: their primary CTA is already a
+          WhatsApp enquiry, and two buttons doing one thing is a choice a
+          customer has to stop and make for no reason.
+        */}
+        {!product.isMadeToOrder && enquiryUrl ? (
+          <a
+            href={enquiryUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="flex min-h-13 w-full items-center justify-center gap-2 border border-kc-line py-4 text-[12px] font-medium uppercase tracking-[0.08em] text-kc-ink transition-colors hover:border-kc-ink"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            Enquire on WhatsApp
+            <span className="sr-only">about {product.name} (opens WhatsApp in a new tab)</span>
+          </a>
         ) : null}
 
         <button
@@ -226,23 +253,15 @@ function Stars({ rating }: { rating: number }) {
 
 /**
  * Section 16 — bridal is made to order, so Add to Cart becomes an enquiry.
- * The WhatsApp number is a PLACEHOLDER in config, and a wa.me link built from
- * a placeholder is a broken link, so the CTA states plainly that the channel is
- * not connected yet instead of pretending. It becomes a live link the moment
- * `contact.whatsapp` is set.
+ *
+ * The number is real as of 2026-09-04, so this is a live link. The disabled
+ * branch stays because a wa.me link built from an unset number opens WhatsApp
+ * on a number that does not exist, and a button that silently fails is worse
+ * than one that says why. `productEnquiryUrl` returns null in that case and
+ * this renders the explanation instead.
  */
-function MadeToOrderCta({
-  ready,
-  number,
-  productName,
-}: {
-  ready: boolean;
-  number: string;
-  productName: string;
-}) {
-  const message = `Hello ${site.name}, I would like to enquire about "${productName}".`;
-
-  if (!ready) {
+function MadeToOrderCta({ ready, href }: { ready: boolean; href: string | null }) {
+  if (!ready || !href) {
     return (
       <div>
         <button
@@ -264,7 +283,7 @@ function MadeToOrderCta({
   return (
     <div>
       <a
-        href={`https://wa.me/${number.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(message)}`}
+        href={href}
         target="_blank"
         rel="noreferrer noopener"
         className="flex min-h-13 w-full items-center justify-center bg-kc-ink py-4 text-[12px] font-medium uppercase tracking-[0.08em] text-kc-paper transition-colors hover:bg-kc-charcoal"
