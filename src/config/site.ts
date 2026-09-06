@@ -112,6 +112,29 @@ export const contact = {
   },
 } as const;
 
+/**
+ * The Google Business Profile, live and verified 2026-09-07.
+ *
+ * ONLY THE REVIEW URL LIVES HERE. The map embed, the directions link and the
+ * listing link are all derived from `contact.address` in src/lib/maps.ts,
+ * because an address written down twice is an address that gets corrected
+ * once. This one cannot be derived from anything: Google keys a review link to
+ * the Place ID, which is not a function of the shop name or its address.
+ *
+ * ⚠ WHILE THIS IS null THE SITE ASKS NOBODY FOR A REVIEW. That is the single
+ * biggest lever on local ranking left unpulled, and it is one click to fix:
+ * Business Profile -> "Ask for reviews" copies a link of the form
+ * https://g.page/r/<id>/review. Paste it here.
+ *
+ * It is deliberately NOT rendered as a "Placeholder:" badge like the legal
+ * facts are. A missing refund window is something a customer is owed and the
+ * badge is the right pressure; a review button that announces itself as broken
+ * just makes the shop look unfinished. So it renders nothing at all.
+ */
+export const googleBusiness = {
+  reviewUrl: null as string | null,
+} as const;
+
 /** The shop address as display lines, in the order they should be read. */
 export const addressLines: readonly string[] = [
   contact.address.name,

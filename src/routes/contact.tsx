@@ -1,11 +1,11 @@
 /**
  * Contact. docs/BUILD-SPEC.pdf Phase 9 item 4.
  *
- * Every channel on this page is read from src/config/site.ts, and every one of
- * them is currently PLACEHOLDER. Rather than print "PLACEHOLDER" as if it were
- * an email address, each unset channel renders a visible marker and the page
- * still tells the visitor what they *can* do today — track an order, or use
- * the details once they exist.
+ * Every channel on this page is read from src/config/site.ts. They were all
+ * PLACEHOLDER when this was written, which is why each one still renders a
+ * visible marker rather than printing "PLACEHOLDER" as if it were an email
+ * address — the guard stays because a value can be cleared as easily as it was
+ * filled. As of 2026-09-04 every channel here is real.
  *
  * The one channel that always works is order tracking, because that needs no
  * business fact we do not have.
@@ -15,6 +15,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, MessageCircle, PackageSearch } from "lucide-react";
 
 import { ContentPage, Inline, Section, TBC } from "@/components/content/ContentPage";
+import { ShopMap } from "@/components/content/ShopMap";
 import { PLACEHOLDER, addressLines, contact } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
@@ -131,6 +132,18 @@ function ContactPage() {
             </span>
           </li>
         </ul>
+      </Section>
+
+      {/*
+        The map sits AFTER the contact channels, not above them. Someone on
+        /contact is far more often chasing an order than planning a journey,
+        and the several hundred kilobytes of Google's embed should not stand
+        between them and a phone number. Putting it here also means the lazy
+        iframe is below the fold on every screen size, so it costs nothing
+        unless it is wanted.
+      */}
+      <Section heading="Find the shop">
+        <ShopMap />
       </Section>
 
       <Section heading="What to include">
