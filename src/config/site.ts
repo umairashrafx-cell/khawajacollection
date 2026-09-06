@@ -18,7 +18,7 @@ export const site = {
   shortMark: "KC",
   tagline: "Premium Pakistani fashion",
   description:
-    "Khawaja Collection: premium Pakistani fashion for women and men, made in limited runs in Lahore.",
+    "Khawaja Collection: premium Pakistani fashion for women and men — unstitched, ready to wear, formals, bridal and bedding. Cash on delivery across Pakistan.",
   /** Set VITE_SITE_URL on the host. Canonicals and the sitemap depend on it. */
   url: import.meta.env.VITE_SITE_URL ?? PLACEHOLDER,
   locale: "en-PK",
@@ -82,6 +82,8 @@ export const contact = {
     street: "Katchery Road, Main Sadar Bazar",
     city: "Mandi Bahauddin",
     region: "Punjab",
+    /** From the Google Business Profile listing, 2026-09-07. */
+    postalCode: "50400",
     country: "PK",
   },
 

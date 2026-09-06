@@ -61,8 +61,8 @@ function TermsPage() {
       <Section heading="Stock and confirmation">
         <p>
           Placing an order is an offer to buy, not a completed sale. We check stock at the moment
-          you order and again when we confirm. Because pieces are cut in limited runs, the last one
-          can go between your order and our confirmation.
+          you order and again when we confirm. Because stock is held in limited quantities, the last
+          one can go between your order and our confirmation.
         </p>
         <p>
           If that happens we will tell you and cancel the order. Where you have already paid, the{" "}

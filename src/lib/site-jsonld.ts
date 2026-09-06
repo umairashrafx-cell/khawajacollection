@@ -54,6 +54,7 @@ function postalAddress() {
     streetAddress: contact.address.street,
     addressLocality: contact.address.city,
     addressRegion: contact.address.region,
+    postalCode: contact.address.postalCode,
     addressCountry: contact.address.country,
   } as const;
 }

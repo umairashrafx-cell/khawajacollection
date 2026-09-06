@@ -97,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Khawaja Collection: premium Pakistani fashion for women and men, made in limited runs in Lahore.",
+          "Khawaja Collection: premium Pakistani fashion for women and men — unstitched, ready to wear, formals, bridal and bedding. Cash on delivery across Pakistan.",
       },
       { property: "og:site_name", content: "Khawaja Collection" },
       { property: "og:type", content: "website" },

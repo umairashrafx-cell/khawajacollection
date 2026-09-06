@@ -24,7 +24,7 @@ export const Route = createFileRoute("/track-order")({
       {
         name: "description",
         content:
-          "Follow your Khawaja Collection order from our studio to your door. Enter your order number and the phone number on the order.",
+          "Follow your Khawaja Collection order from the shop to your door. Enter your order number and the phone number on the order.",
       },
     ],
     links: [{ rel: "canonical", href: "/track-order" }],

@@ -27,7 +27,7 @@ import { categoryRepository, productRepository } from "@/lib/repositories";
 
 const title = "Khawaja Collection — Premium Pakistani Fashion";
 const description =
-  "Hand-finished lawn, silk and velvet for women and men, cut in limited runs in Lahore. Cash on delivery across Pakistan.";
+  "Lawn, silk, velvet and khaddar for women and men: unstitched, ready to wear, formals and bridal. Cash on delivery across Pakistan.";
 
 export const Route = createFileRoute("/")({
   loader: async () => {

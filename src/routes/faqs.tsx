@@ -127,9 +127,9 @@ function FaqsPage() {
 
       <Section heading="Will a piece be restocked?">
         <p>
-          Usually not. Pieces are cut in limited runs from fabric bought for that run, so when a
-          colourway sells through it is generally gone rather than reordered. If you are watching
-          something, that is a reason not to wait.
+          Usually not. Stock is bought in limited quantities, so when a colourway sells through it
+          is generally gone rather than reordered. If you are watching something, that is a reason
+          not to wait.
         </p>
       </Section>
 

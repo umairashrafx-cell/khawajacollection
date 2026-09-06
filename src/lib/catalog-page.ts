@@ -297,7 +297,7 @@ export async function loadSubcategory(
       : `${parent.label}'s ${category.name} | Khawaja Collection`,
     description:
       category.description ??
-      `${category.name} from Khawaja Collection, made in limited runs in Lahore.`,
+      `${category.name} from Khawaja Collection, with cash on delivery across Pakistan.`,
     base: { category: parent.slug, subcategory: category.slug },
     ancestors: [{ label: parent.label, href: parent.href }],
   };
@@ -322,7 +322,7 @@ export async function loadCollectionListing(
     description:
       collection.metaDescription ??
       collection.tagline ??
-      `The ${collection.name} collection from Khawaja Collection, made in limited runs in Lahore.`,
+      `The ${collection.name} collection from Khawaja Collection, with cash on delivery across Pakistan.`,
     base: { collection: collection.slug },
     ancestors: [{ label: "Collections", href: "/new-arrivals" }],
   };

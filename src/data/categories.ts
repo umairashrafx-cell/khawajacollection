@@ -24,7 +24,7 @@ export const categories: Category[] = [
   {
     slug: "women",
     name: "Women",
-    description: "Unstitched lawn, ready-to-wear and hand-finished formals, cut in limited runs.",
+    description: "Unstitched lawn, ready-to-wear and formals, in a considered range of colours.",
     image: card("women", "Khawaja Collection womenswear"),
     sortOrder: 1,
   },
@@ -52,7 +52,7 @@ export const categories: Category[] = [
   {
     slug: "women-bridal",
     name: "Bridal",
-    description: "Made-to-order bridal and walima pieces, hand-embroidered in Lahore.",
+    description: "Bridal and walima pieces in embroidered silk, chiffon and organza.",
     parentSlug: "women",
     sortOrder: 4,
   },

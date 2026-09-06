@@ -15,7 +15,7 @@ export const womenCatalog: CatalogDescriptor = {
   h1: "Women",
   metaTitle: "Women's Collection | Khawaja Collection",
   description:
-    "Unstitched lawn, ready-to-wear kurtas, chiffon formals and made-to-order bridal, cut in limited runs in Lahore. Cash on delivery across Pakistan.",
+    "Unstitched lawn, ready-to-wear kurtas, chiffon formals and bridal. Cash on delivery across Pakistan, with delivery in three to five working days.",
   base: { category: "women" },
 };
 
@@ -69,7 +69,7 @@ export const bridalCatalog: CatalogDescriptor = {
   h1: "Bridal",
   metaTitle: "Bridal & Walima | Khawaja Collection",
   description:
-    "Made-to-order bridal lehengas, shararas and walima gowns, hand-embroidered in our Lahore studio and cut to your own measurements.",
+    "Bridal lehengas, shararas and walima gowns in embroidered silk, chiffon and organza. Cash on delivery across Pakistan, with easy exchange within 7 days.",
   base: { tags: ["bridal"] },
 };
 

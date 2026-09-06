@@ -102,7 +102,7 @@ function ContactPage() {
           <li className="flex gap-3">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-kc-muted" aria-hidden="true" />
             <span>
-              <strong className="font-medium text-kc-ink">Studio</strong>
+              <strong className="font-medium text-kc-ink">Shop</strong>
               <br />
               {addressLines.map((line) => (
                 <span key={line} className="block">

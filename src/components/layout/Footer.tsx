@@ -75,8 +75,8 @@ export default function Footer() {
               <span className="text-kc-gold">.</span>
             </p>
             <p className="mt-4 max-w-xs text-sm text-kc-charcoal">
-              Premium Pakistani fashion, made in limited runs in Lahore. Considered cloth,
-              hand-finished detail, honest pricing.
+              Premium Pakistani fashion for women and men. Considered cloth, honest pricing, and
+              cash on delivery across Pakistan.
             </p>
 
             {socialLinks.length > 0 ? (

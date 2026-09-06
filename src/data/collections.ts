@@ -23,7 +23,7 @@ export const collections: Collection[] = [
     name: "The New Season",
     tagline: "Softly structured pieces for the turn of the year.",
     metaDescription:
-      "Softly structured lawn, khaddar and silk for the turn of the year, cut in limited runs in Lahore. Cash on delivery across Pakistan, easy exchange within 7 days.",
+      "Softly structured lawn, khaddar and silk for the turn of the year. Cash on delivery across Pakistan, with easy exchange within 7 days.",
     heroImage: hero("the-new-season", "The New Season collection"),
     isActive: true,
   },
@@ -32,7 +32,7 @@ export const collections: Collection[] = [
     name: "Wedding Season",
     tagline: "Chiffon, organza and raw silk for the months of celebration.",
     metaDescription:
-      "Chiffon, organza and raw silk for mehndi, nikkah and walima, with hand-embroidered bridal made to order. Cash on delivery across Pakistan from Khawaja Collection.",
+      "Chiffon, organza and raw silk for mehndi, nikkah and walima, with embroidered bridal pieces. Cash on delivery across Pakistan from Khawaja Collection.",
     heroImage: hero("wedding-season", "Wedding Season collection"),
     isActive: true,
   },

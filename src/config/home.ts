@@ -19,8 +19,8 @@ import catUnstitched from "@/assets/cat-unstitched.jpg";
 
 export const hero = {
   eyebrow: "Autumn / Winter Edit",
-  headline: "Quiet luxury, tailored in Lahore",
-  body: "Hand-finished lawn, silk and velvet, cut in limited runs for people who dress with intent.",
+  headline: "Quiet luxury, honestly priced",
+  body: "Lawn, silk and velvet for people who dress with intent.",
   primary: { label: "Shop Women", href: "/women" },
   secondary: { label: "Shop Men", href: "/men" },
   image: {

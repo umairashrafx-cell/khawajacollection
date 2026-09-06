@@ -171,7 +171,7 @@ const seeds: Seed[] = [
     sizes: UNSTITCHED,
     tags: ["unstitched", "winter", "everyday"],
     blurb:
-      "Charcoal khaddar with a self-woven stripe, matched to a wool-blend shawl. Built for a Lahore January.",
+      "Charcoal khaddar with a self-woven stripe, matched to a wool-blend shawl. Built for a cold January.",
   },
   {
     id: "kc-w-008",
@@ -606,7 +606,7 @@ const seeds: Seed[] = [
     collections: ["wedding-season"],
     madeToOrder: true,
     blurb:
-      "Emerald velvet sharara with a gold-worked kameez and net dupatta, hand-embroidered in our Lahore studio.",
+      "Emerald velvet sharara with a gold-worked kameez and net dupatta, with fine gold-thread embroidery.",
   },
 
   /* --- Women / Shawls & Wraps ----------------------------------------- */
@@ -1314,7 +1314,7 @@ function buildProduct(seed: Seed, index: number): Product {
     seed.blurb,
     bedding
       ? `Woven in ${seed.fabric.toLowerCase()}${setPiece}, with a deep hem cut to stay tucked.`
-      : `Cut from ${seed.fabric.toLowerCase()}${setPiece} and finished by hand in our Lahore studio.`,
+      : `Cut from ${seed.fabric.toLowerCase()}${setPiece}.`,
     // A bedsheet has no model in the photograph, and saying it does is the
     // kind of copy that survives into production and reads as carelessness.
     bedding
