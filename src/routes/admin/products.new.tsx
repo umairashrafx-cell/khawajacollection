@@ -53,6 +53,7 @@ function NewProduct() {
   return (
     <ProductForm
       categories={data.categories}
+      collections={data.collections}
       initial={EMPTY_PRODUCT}
       editing={false}
       saving={mutation.isPending}

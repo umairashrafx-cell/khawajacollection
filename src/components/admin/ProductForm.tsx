@@ -62,10 +62,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
 import { ImageUploader } from "./ImageUploader";
-import type { AdminCategory, ProductFormValues } from "@/lib/auth/admin-api";
+import type { AdminCategory, AdminCollection, ProductFormValues } from "@/lib/auth/admin-api";
 
 interface Props {
   categories: AdminCategory[];
+  collections: AdminCollection[];
   initial: ProductFormValues;
   /** Present when editing; the heading and button copy change with it. */
   editing: boolean;
@@ -88,8 +89,10 @@ export const EMPTY_PRODUCT: ProductFormValues = {
   pieces: "",
   care: "",
   tags: "",
+  collectionSlugs: [],
   isFeatured: false,
   isNewArrival: true,
+  isBestSeller: false,
   isMadeToOrder: false,
   isActive: true,
   images: [],
@@ -180,6 +183,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function ProductForm({
   categories,
+  collections,
   initial,
   editing,
   saving,
@@ -805,6 +809,11 @@ export function ProductForm({
               { key: "isNewArrival", label: "New arrival", hint: "Shows in New In." },
               { key: "isFeatured", label: "Featured", hint: "Eligible for the homepage." },
               {
+                key: "isBestSeller",
+                label: "Best seller",
+                hint: "Shows in Trending now on the homepage. That rail is hidden while nothing is ticked.",
+              },
+              {
                 key: "isMadeToOrder",
                 label: "Made to order",
                 hint: "Swaps Add to Bag for Enquire on WhatsApp.",
@@ -828,6 +837,51 @@ export function ProductForm({
             </label>
           ))}
         </div>
+
+        {/*
+          COLLECTIONS. Checkboxes rather than a multi-select, because there are
+          four of them and a <select multiple> on a phone is a scrolling list
+          that needs a modifier key nobody has. The same reason the sizes
+          editor stopped being a table below `md`.
+
+          Nothing renders when there are no collections, rather than an empty
+          fieldset under a heading — the same judgement as the homepage rails.
+        */}
+        {collections.length > 0 ? (
+          <fieldset className="mt-6">
+            <legend className="text-sm text-kc-ink">Collections</legend>
+            <p className="mt-1 text-xs text-kc-muted">
+              A product can sit in more than one. A collection with nothing in it is hidden from the
+              shop, so the first product filed into one is what brings its page back.
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {collections.map((collection) => {
+                const checked = values.collectionSlugs.includes(collection.slug);
+                return (
+                  <label
+                    key={collection.slug}
+                    className="flex min-h-11 cursor-pointer items-center gap-3 border border-kc-line p-3"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(event) =>
+                        set(
+                          "collectionSlugs",
+                          event.target.checked
+                            ? [...values.collectionSlugs, collection.slug]
+                            : values.collectionSlugs.filter((slug) => slug !== collection.slug),
+                        )
+                      }
+                      className="h-5 w-5 accent-kc-ink"
+                    />
+                    <span className="text-sm text-kc-ink">{collection.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+        ) : null}
       </Section>
 
       <div className="flex justify-end gap-2 pb-4">

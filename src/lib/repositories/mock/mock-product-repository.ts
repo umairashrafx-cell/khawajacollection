@@ -150,7 +150,7 @@ export class MockProductRepository implements ProductRepository {
       ...(input.salePrice !== null ? { salePrice: input.salePrice } : {}),
       categorySlug: input.categorySlug,
       ...(input.subcategorySlug ? { subcategorySlug: input.subcategorySlug } : {}),
-      collectionSlugs: existing?.collectionSlugs ?? [],
+      collectionSlugs: input.collectionSlugs,
       images: input.images.map((image, index) => ({
         url: image.url,
         alt: image.alt,
@@ -174,7 +174,7 @@ export class MockProductRepository implements ProductRepository {
       reviewCount: existing?.reviewCount ?? 0,
       isFeatured: input.isFeatured,
       isNewArrival: input.isNewArrival,
-      isBestSeller: existing?.isBestSeller ?? false,
+      isBestSeller: input.isBestSeller,
       isOnSale: input.salePrice !== null,
       createdAt: existing?.createdAt ?? new Date().toISOString(),
       ...(input.isMadeToOrder ? { isMadeToOrder: true } : {}),

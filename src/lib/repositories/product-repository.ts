@@ -160,8 +160,24 @@ export interface ProductInput {
   pieces: number | null;
   care: string | null;
   tags: string[];
+  /**
+   * Collections this product belongs to. Replaced wholesale, like images —
+   * the form always submits the complete set, and a merge would leave no way
+   * to take a product OUT of a collection.
+   *
+   * The read path for these has existed since Phase 8 and nothing could write
+   * them, so every collection was permanently empty: `/collections/*` listed
+   * nothing, and the homepage's featured-collection block advertised a page
+   * with no products on it.
+   */
+  collectionSlugs: string[];
   isFeatured: boolean;
   isNewArrival: boolean;
+  /**
+   * Drives the homepage "Trending now" rail. Unsettable until now, which is
+   * why that rail was empty on a shop whose only product was never marked.
+   */
+  isBestSeller: boolean;
   isMadeToOrder: boolean;
   isActive: boolean;
   images: { url: string; alt: string }[];

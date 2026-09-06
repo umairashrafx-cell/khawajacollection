@@ -23,7 +23,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { adminFromRequest } from "@/lib/auth/verify";
-import { categoryRepository, productRepository } from "@/lib/repositories";
+import { categoryRepository, collectionRepository, productRepository } from "@/lib/repositories";
 import type { ProductInput } from "@/lib/repositories";
 
 function json(body: unknown, status = 200) {
@@ -90,7 +90,7 @@ interface Parsed {
   id: string | undefined;
 }
 
-function parse(body: unknown): Parsed | string {
+function parse(body: unknown, validCollections: ReadonlySet<string>): Parsed | string {
   const raw = (body ?? {}) as Record<string, unknown>;
 
   const name = str(raw["name"]);
@@ -133,6 +133,26 @@ function parse(body: unknown): Parsed | string {
   const tags = Array.isArray(raw["tags"])
     ? raw["tags"].map((tag) => normaliseSlug(str(tag))).filter(Boolean)
     : [];
+
+  /*
+   * Collections are CHECKED AGAINST THE REAL LIST, not just cleaned up like
+   * tags. A tag is free text and an unknown one is merely a tag nobody
+   * searches for; a collection slug is a foreign key into `collections`, so an
+   * unknown one fails the insert deep inside saveProduct with a Postgres
+   * constraint message no shopkeeper can act on. Better to refuse it here,
+   * naming the thing that was wrong.
+   */
+  const collectionSlugs: string[] = [];
+  if (Array.isArray(raw["collectionSlugs"])) {
+    for (const entry of raw["collectionSlugs"]) {
+      const slug = normaliseSlug(str(entry));
+      if (!slug) continue;
+      if (!validCollections.has(slug)) return `There is no collection called "${slug}".`;
+      // De-duplicated: the join table has one row per pair, and sending the
+      // same slug twice would violate its primary key.
+      if (!collectionSlugs.includes(slug)) collectionSlugs.push(slug);
+    }
+  }
 
   const imagesRaw = Array.isArray(raw["images"]) ? raw["images"] : [];
   const images: ProductInput["images"] = [];
@@ -198,8 +218,10 @@ function parse(body: unknown): Parsed | string {
       pieces,
       care: nullableStr(raw["care"]),
       tags,
+      collectionSlugs,
       isFeatured: raw["isFeatured"] === true,
       isNewArrival: raw["isNewArrival"] === true,
+      isBestSeller: raw["isBestSeller"] === true,
       isMadeToOrder: raw["isMadeToOrder"] === true,
       // Defaults to published. A shopkeeper who filled in this form meant to
       // sell the thing; the checkbox is there to take it down later.
@@ -218,9 +240,18 @@ export const Route = createFileRoute("/api/admin/product")({
         if (!admin) return json({ ok: false, error: "Admin access required." }, 403);
 
         const id = new URL(request.url).searchParams.get("id");
-        const categories = await categoryRepository.tree();
+        const [categories, allCollections] = await Promise.all([
+          categoryRepository.tree(),
+          collectionRepository.list(),
+        ]);
+        // Only what the checkboxes need, and only collections that are live —
+        // offering a retired one would let a product be filed somewhere the
+        // shop does not show.
+        const collections = allCollections
+          .filter((collection) => collection.isActive)
+          .map((collection) => ({ slug: collection.slug, name: collection.name }));
 
-        if (!id) return json({ ok: true, categories });
+        if (!id) return json({ ok: true, categories, collections });
 
         // getByIdForAdmin: unticking Published must not make a product
         // unreachable from its own editor. That trap is why the checkbox
@@ -228,7 +259,7 @@ export const Route = createFileRoute("/api/admin/product")({
         const product = await productRepository.getByIdForAdmin(id);
         if (!product) return json({ ok: false, error: "Product not found." }, 404);
 
-        return json({ ok: true, categories, product });
+        return json({ ok: true, categories, collections, product });
       },
 
       /**
@@ -297,7 +328,12 @@ export const Route = createFileRoute("/api/admin/product")({
           return fail("Send a JSON body.");
         }
 
-        const parsed = parse(body);
+        const live = await collectionRepository.list();
+        const validCollections = new Set(
+          live.filter((collection) => collection.isActive).map((collection) => collection.slug),
+        );
+
+        const parsed = parse(body, validCollections);
         if (typeof parsed === "string") return fail(parsed);
 
         try {

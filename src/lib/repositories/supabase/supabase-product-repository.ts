@@ -390,6 +390,7 @@ export class SupabaseProductRepository implements ProductRepository {
       tags: input.tags,
       is_featured: input.isFeatured,
       is_new_arrival: input.isNewArrival,
+      is_best_seller: input.isBestSeller,
       is_made_to_order: input.isMadeToOrder,
       is_active: input.isActive,
     };
@@ -458,6 +459,32 @@ export class SupabaseProductRepository implements ProductRepository {
         })),
       );
       if (error) throw new Error(`Could not save the images: ${error.message}`);
+    }
+
+    /*
+     * Collection membership, replaced wholesale for the same reason images
+     * are: the form submits the complete set, so a merge could never remove
+     * one. The rows are just (product_id, collection_slug) pairs, so there is
+     * nothing in them worth preserving across a save.
+     */
+    const { error: unlinkError } = await supabase
+      .from("product_collections")
+      .delete()
+      .eq("product_id", productId);
+    if (unlinkError) {
+      throw new Error(`Could not update the collections: ${unlinkError.message}`);
+    }
+    if (input.collectionSlugs.length > 0) {
+      const { error } = await supabase.from("product_collections").insert(
+        input.collectionSlugs.map((slug) => ({
+          product_id: productId,
+          collection_slug: slug,
+        })),
+      );
+      // A slug with no matching collections row trips the foreign key. The
+      // API validates against the real list first, so this is the belt to
+      // that braces.
+      if (error) throw new Error(`Could not save the collections: ${error.message}`);
     }
 
     const product = await this.getById(productId);

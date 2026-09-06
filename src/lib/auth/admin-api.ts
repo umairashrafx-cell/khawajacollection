@@ -222,6 +222,12 @@ export async function fetchAdminAccess(): Promise<AdminWhoami> {
 
 /* --- Product editing -------------------------------------------------- */
 
+/** A collection the product form can file a product into. */
+export interface AdminCollection {
+  slug: string;
+  name: string;
+}
+
 export interface AdminCategory {
   slug: string;
   name: string;
@@ -250,8 +256,11 @@ export interface ProductFormValues {
   pieces: string;
   care: string;
   tags: string;
+  /** Slugs, not names. `saveProduct` spreads these straight into the body. */
+  collectionSlugs: string[];
   isFeatured: boolean;
   isNewArrival: boolean;
+  isBestSeller: boolean;
   isMadeToOrder: boolean;
   isActive: boolean;
   images: { url: string; alt: string }[];
@@ -267,6 +276,7 @@ export interface ProductFormValues {
 
 export interface ProductFormData {
   categories: AdminCategory[];
+  collections: AdminCollection[];
   product?: {
     id: string;
     slug: string;
@@ -281,8 +291,10 @@ export interface ProductFormData {
     pieces?: number;
     care?: string;
     tags: string[];
+    collectionSlugs: string[];
     isFeatured: boolean;
     isNewArrival: boolean;
+    isBestSeller: boolean;
     isMadeToOrder?: boolean;
     /** Absent means published; see Product.isActive. */
     isActive?: boolean;

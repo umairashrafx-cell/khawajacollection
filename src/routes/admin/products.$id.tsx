@@ -47,8 +47,10 @@ function toFormValues(product: NonNullable<ProductFormData["product"]>): Product
     pieces: product.pieces === undefined ? "" : String(product.pieces),
     care: product.care ?? "",
     tags: product.tags.join(", "),
+    collectionSlugs: product.collectionSlugs,
     isFeatured: product.isFeatured,
     isNewArrival: product.isNewArrival,
+    isBestSeller: product.isBestSeller,
     isMadeToOrder: product.isMadeToOrder === true,
     // Read from the product now that the admin has a path that can see an
     // unpublished one. Absent means published — see Product.isActive.
@@ -122,6 +124,7 @@ function EditProduct() {
     <div className="space-y-5">
       <ProductForm
         categories={data.categories}
+        collections={data.collections}
         initial={toFormValues(data.product)}
         editing
         saving={mutation.isPending}
