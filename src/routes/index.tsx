@@ -21,8 +21,8 @@ import { SocialGrid } from "@/components/home/SocialGrid";
 import { ProductCarousel } from "@/components/product/ProductCarousel";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { edits, featuredCollection, hero, sale, socialSection } from "@/config/home";
-import { site } from "@/config/site";
 import { seoHead } from "@/lib/seo";
+import { storeJsonLd } from "@/lib/site-jsonld";
 import { categoryRepository, productRepository } from "@/lib/repositories";
 
 const title = "Khawaja Collection — Premium Pakistani Fashion";
@@ -71,17 +71,11 @@ export const Route = createFileRoute("/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Store",
-          name: site.name,
-          description,
-          // No address, phone or opening hours: those are PLACEHOLDER in
-          // src/config/site.ts and Guardrail 2 forbids inventing them.
-          currenciesAccepted: "PKR",
-          paymentAccepted: "Cash on Delivery",
-          areaServed: "PK",
-        }),
+        // Built in site-jsonld.ts beside the Organization it references, not
+        // inline here: the two describe the same shop and were allowed to
+        // disagree about its address for three days precisely because they
+        // lived in different files.
+        children: JSON.stringify(storeJsonLd(description)),
       },
     ],
   }),

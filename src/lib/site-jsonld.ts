@@ -35,6 +35,76 @@ function realSocialProfiles(): string[] {
   return urls.filter((url) => url !== "#" && url !== PLACEHOLDER && url.length > 0);
 }
 
+/**
+ * The shop, as schema.org sees it.
+ *
+ * Real as of 2026-09-04, so it belongs in the markup. It was omitted while it
+ * was a placeholder — an invented address in structured data is a claim made
+ * directly to a search engine, and for a single-location shop it is the claim
+ * that decides whether Google can place you on a map.
+ *
+ * ONE COPY, because two would be one too many. The homepage `Store` node and
+ * the site-wide `Organization` describe the same physical shop, and an address
+ * written out twice is an address that will eventually be corrected once.
+ */
+function postalAddress() {
+  return {
+    "@type": "PostalAddress",
+    name: contact.address.name,
+    streetAddress: contact.address.street,
+    addressLocality: contact.address.city,
+    addressRegion: contact.address.region,
+    addressCountry: contact.address.country,
+  } as const;
+}
+
+/** `#organization`, absolute when the origin is known. */
+function nodeId(fragment: string): string {
+  return `${hasRealOrigin() ? absoluteUrl("") : ""}/#${fragment}`;
+}
+
+/**
+ * The homepage's `Store` node.
+ *
+ * WHY IT IS NOT JUST THE ORGANIZATION. `Store` is a `LocalBusiness`, and
+ * LocalBusiness is the type Google reads for the map pack, the knowledge panel
+ * and "near me" results — the searches a shop on Katchery Road actually wants.
+ * `Organization` is the brand behind the website. They are two true statements
+ * about one business, so the Store carries `parentOrganization` pointing at
+ * the Organization's `@id`: without that link they read as two unrelated
+ * businesses with the same address, which is the shape of a spam signal
+ * rather than a shop.
+ *
+ * IT CARRIED NO ADDRESS OR TELEPHONE UNTIL 2026-09-07, and the comment saying
+ * why cited a PLACEHOLDER that had been filled in three days earlier. The
+ * Organization markup was updated at the time and this was missed, which is
+ * exactly the drift that `postalAddress()` now exists to prevent.
+ *
+ * STILL NO `openingHoursSpecification`, and that is not an oversight. Umair
+ * supplied the daily window (10am to 8pm) but never WHICH DAYS, and
+ * schema.org requires a dayOfWeek. Guessing "every day" would tell Google the
+ * shop is open on a day it may be shut, and a customer who travels to a closed
+ * shop is a worse outcome than one who has to ring first. Supply the days and
+ * the markup can follow.
+ */
+export function storeJsonLd(description: string): unknown {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "@id": nodeId("store"),
+    name: site.name,
+    description,
+    address: postalAddress(),
+    telephone: contact.phone,
+    ...(hasRealOrigin() ? { url: absoluteUrl("/") } : {}),
+    image: absoluteUrl("/og/khawaja-collection.png"),
+    parentOrganization: { "@id": nodeId("organization") },
+    currenciesAccepted: "PKR",
+    paymentAccepted: "Cash on Delivery",
+    areaServed: "PK",
+  };
+}
+
 export function organizationAndWebsiteJsonLd(): unknown {
   const profiles = realSocialProfiles();
   // Widened before comparing, for the same reason as realSocialProfiles():
@@ -45,28 +115,15 @@ export function organizationAndWebsiteJsonLd(): unknown {
   const supportEmail: string = contact.supportEmail;
   const email = supportEmail === PLACEHOLDER || !supportEmail ? null : supportEmail;
 
-  // Real as of 2026-09-04, so they belong in the markup. They were omitted
-  // while they were placeholders — an invented address in structured data is
-  // a claim made directly to a search engine, and for a single-location shop
-  // it is the claim that decides whether Google can place you on a map.
-  const postalAddress = {
-    "@type": "PostalAddress",
-    name: contact.address.name,
-    streetAddress: contact.address.street,
-    addressLocality: contact.address.city,
-    addressRegion: contact.address.region,
-    addressCountry: contact.address.country,
-  };
-
   const organization: Record<string, unknown> = {
     "@type": "Organization",
-    "@id": `${hasRealOrigin() ? absoluteUrl("") : ""}/#organization`,
+    "@id": nodeId("organization"),
     name: site.name,
     description: site.description,
     ...(hasRealOrigin() ? { url: absoluteUrl("/") } : {}),
     logo: absoluteUrl("/og/khawaja-collection.png"),
     ...(profiles.length > 0 ? { sameAs: profiles } : {}),
-    address: postalAddress,
+    address: postalAddress(),
     telephone: contact.phone,
     ...(email
       ? {
@@ -84,10 +141,10 @@ export function organizationAndWebsiteJsonLd(): unknown {
 
   const website: Record<string, unknown> = {
     "@type": "WebSite",
-    "@id": `${hasRealOrigin() ? absoluteUrl("") : ""}/#website`,
+    "@id": nodeId("website"),
     name: site.name,
     ...(hasRealOrigin() ? { url: absoluteUrl("/") } : {}),
-    publisher: { "@id": `${hasRealOrigin() ? absoluteUrl("") : ""}/#organization` },
+    publisher: { "@id": nodeId("organization") },
     inLanguage: site.locale,
     potentialAction: {
       "@type": "SearchAction",
