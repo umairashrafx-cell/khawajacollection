@@ -24,6 +24,7 @@ import {
   productRepository,
   type ProductQuery,
 } from "@/lib/repositories";
+import { matches } from "@/lib/repositories/shared/catalogue-query";
 import type { Facets, Product } from "@/types";
 
 export interface Crumb {
@@ -91,6 +92,30 @@ export async function loadCatalog(
   };
 }
 
+/**
+ * Does this listing have anything in it?
+ *
+ * TWO PLACES HAVE TO AGREE ABOUT THIS AND THEY MUST NOT EACH DECIDE IT.
+ * `catalogHead` marks an empty listing `noindex`; sitemap.xml leaves it out.
+ * A sitemap that asks Google to index a URL the page itself refuses is the
+ * same self-contradiction as one listing a robots-blocked URL, and Search
+ * Console reports it as an error rather than quietly picking a winner.
+ *
+ * So neither side reimplements "is it empty". Both call this, and this calls
+ * `matches` -- the very function both repositories filter with, so the answer
+ * here is by construction the answer the page will produce. A hand-rolled
+ * `product.categorySlug === slug` would be right today and wrong the first
+ * time a query field is added.
+ *
+ * `names` is only consulted for free-text `q`, which no listing base query
+ * carries, so an empty map is correct rather than merely convenient.
+ */
+const NO_TAXONOMY_NAMES = new Map<string, string>();
+
+export function listingHasProducts(products: Product[], base: ProductQuery): boolean {
+  return products.some((product) => matches(product, base, NO_TAXONOMY_NAMES));
+}
+
 /** Absolute when the production domain is known, path-relative until then. */
 export function absoluteUrl(path: string): string {
   // An absolute URL is returned untouched — see the long note on the twin of
@@ -126,6 +151,35 @@ export function catalogHead(
   const page = data?.page ?? 1;
   const totalPages = data?.totalPages ?? 1;
 
+  /*
+   * AN EMPTY LISTING ASKS NOT TO BE INDEXED.
+   *
+   * A category page with no products is a page with nothing on it to rank --
+   * the h1 and the intro line, then whitespace. Letting a crawler index a
+   * dozen of those is how a shop that is still filling its shelves teaches
+   * Google it is thin, and that impression takes far longer to undo than it
+   * takes to avoid. It self-heals: the tag comes off by itself the moment the
+   * listing has stock, with no code change beyond the usual deploy.
+   *
+   * THREE CONDITIONS, and each is load-bearing:
+   *
+   * - `data === undefined` is NOT emptiness. `head()` runs before the loader
+   *   has resolved, and absence of an answer must never be read as "nothing
+   *   here" -- that would noindex every listing on its first render.
+   *
+   * - `!filtered`, because a filtered view already canonicalises to the bare
+   *   listing. `noindex` on a page whose canonical points elsewhere is a
+   *   contradictory pair of signals, and Google may resolve it by carrying the
+   *   noindex across to the target -- which would drop the very page we want
+   *   kept. The canonical is the right tool for an empty filter combination
+   *   and it is already doing that job.
+   *
+   * - `follow`, not `nofollow`. The page is not worth indexing; the header,
+   *   nav and footer links leading off it still are. `nofollow` would strand
+   *   the crawler on a dead end for no gain.
+   */
+  const empty = data !== undefined && data.total === 0 && !filtered;
+
   const canonicalPath = filtered ? descriptor.path : pagedPath(descriptor.path, page);
   const title = page > 1 ? `${descriptor.metaTitle} — Page ${page}` : descriptor.metaTitle;
 
@@ -145,6 +199,7 @@ export function catalogHead(
     meta: [
       { title },
       { name: "description", content: descriptor.description },
+      ...(empty ? [{ name: "robots", content: "noindex, follow" }] : []),
       // en_PK on all three head builders. THERE ARE THREE, which is the real
       // finding here — seoHead, catalogHead and the PDP each assemble their own
       // meta, so a tag added to one silently misses two thirds of the site.

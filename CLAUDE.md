@@ -194,6 +194,57 @@ Practical consequences:
   can regenerate the bedsheets; the other 60 come from
   `scripts/seed-supabase.mjs`.
 
+## Empty listings are kept out of the index
+
+After the seed catalogue was deleted, /sitemap.xml went on advertising 39 URLs
+of which 38 rendered nothing: asking Google to index a shop and then showing it
+an empty room. A thin-site impression is far slower to live down than to avoid.
+
+Two halves, and they are driven by ONE predicate:
+
+- `catalogHead` emits `noindex, follow` when the listing is unfiltered and
+  `data.total === 0`. `follow` and not `nofollow`, because the page is not
+  worth indexing but the nav and footer links leaving it still are.
+- sitemap.xml leaves the URL out entirely.
+
+These MUST agree. A sitemap asking for a URL the page itself refuses is the
+same self-contradiction as one asking for a robots-blocked URL, and Search
+Console reports it rather than quietly picking a winner. So neither side
+decides it alone: both call `listingHasProducts` in src/lib/catalog-page.ts,
+which calls `matches` -- the function both repositories filter with -- so the
+sitemap's answer is by construction the answer the page will give.
+
+Three conditions in `catalogHead`, each load-bearing:
+
+- `data === undefined` is NOT emptiness. `head()` runs before the loader has
+  resolved, and reading absence of an answer as "nothing here" would noindex
+  every listing on its first render.
+- `!filtered`. A filtered view already canonicalises to the bare listing, and
+  `noindex` on a page whose canonical points elsewhere is a contradictory pair
+  of signals that can carry the noindex across to the target -- dropping the
+  very page we want kept. The canonical already handles empty filter
+  combinations.
+- The evergreen routes (/, /about, /contact, /faqs, the policy pages) are
+  exempt. They are pages in their own right, not shelves.
+
+The sitemap also stopped being a query per product: it was `getAllSlugs()` then
+`getBySlug()` per slug, and is now a single `list({ perPage: 100_000 })`, which
+it needs anyway to decide which listings have anything in them.
+
+WATCH THE PRERENDER. Listing pages are prerendered, so the noindex is baked
+into the static HTML -- the same limitation recorded under "Admin panel" for
+unpublishing. **Adding the first bedsheet does not make /bedsheets indexable
+until the site is rebuilt.** /sitemap.xml is a server route and updates
+immediately, so between the two there is a window where the sitemap lists a URL
+whose static HTML still says noindex. Deploy after any catalogue change, which
+the section above already tells you to do for its own reasons.
+
+Verified at both extremes. Under `supabase` (1 product) the sitemap fell from
+39 URLs to 15, and all 20 pages checked agreed with it in both directions --
+every listed URL indexable, every omitted one noindex. Under `mock` (72
+products) it is 110 URLs and nothing is noindex, so the mock repository is
+unaffected.
+
 ## Bedsheets
 
 A fourth department, added on request. `/bedsheets` plus
