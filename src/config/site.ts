@@ -86,13 +86,28 @@ export const contact = {
   },
 
   /**
-   * Supplied 2026-09-04 as the daily trading window. WHICH DAYS was not
-   * given, so this is the only place hours appear: the Organization JSON-LD
-   * deliberately carries no `openingHoursSpecification`, because schema.org
-   * requires a dayOfWeek and guessing "every day" would tell Google the shop
-   * is open on a day it might be shut. Add the days and the markup can follow.
+   * Trading hours. The window came 2026-09-04, the days on 2026-09-07.
+   *
+   * STRUCTURED RATHER THAN ONE STRING, because two consumers need two shapes:
+   * the contact page wants a sentence a person reads, and the `Store` JSON-LD
+   * wants schema.org's `dayOfWeek` names with 24-hour `opens`/`closes`. While
+   * this was the string "10:00 am to 8:00 pm" the markup had to omit opening
+   * hours entirely — schema.org requires a dayOfWeek, and guessing "every day"
+   * would have told Google the shop was open on a day it is shut.
+   *
+   * FRIDAY IS ABSENT ON PURPOSE and is the whole reason the days matter.
+   * Google renders a day with no specification as Closed, which is correct
+   * here; a seventh entry would put customers outside a shut shop.
    */
-  hours: "10:00 am to 8:00 pm",
+  hours: {
+    /** Display copy. */
+    label: "Saturday to Thursday, 10:00 am to 8:00 pm (closed Friday)",
+    /** schema.org day names, in trading-week order. */
+    days: ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"] as readonly string[],
+    /** 24-hour, as schema.org requires. */
+    opens: "10:00",
+    closes: "20:00",
+  },
 } as const;
 
 /** The shop address as display lines, in the order they should be read. */

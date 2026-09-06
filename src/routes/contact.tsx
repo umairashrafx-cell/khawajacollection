@@ -110,8 +110,8 @@ function ContactPage() {
                 </span>
               ))}
               <br />
-              {isSet(contact.hours) ? (
-                <span className="text-xs text-kc-muted">{contact.hours}</span>
+              {isSet(contact.hours.label) ? (
+                <span className="text-xs text-kc-muted">{contact.hours.label}</span>
               ) : (
                 <TBC what="opening hours" />
               )}

@@ -80,12 +80,11 @@ function nodeId(fragment: string): string {
  * Organization markup was updated at the time and this was missed, which is
  * exactly the drift that `postalAddress()` now exists to prevent.
  *
- * STILL NO `openingHoursSpecification`, and that is not an oversight. Umair
- * supplied the daily window (10am to 8pm) but never WHICH DAYS, and
- * schema.org requires a dayOfWeek. Guessing "every day" would tell Google the
- * shop is open on a day it may be shut, and a customer who travels to a closed
- * shop is a worse outcome than one who has to ring first. Supply the days and
- * the markup can follow.
+ * OPENING HOURS ARE HERE AS OF 2026-09-07, when the days arrived. They were
+ * withheld for three days with the window already known, because schema.org
+ * requires a dayOfWeek and guessing "every day" would have told Google the
+ * shop is open on a day it is shut. Friday carries no specification and that
+ * is the point: Google reads an absent day as Closed.
  */
 export function storeJsonLd(description: string): unknown {
   return {
@@ -98,6 +97,17 @@ export function storeJsonLd(description: string): unknown {
     telephone: contact.phone,
     ...(hasRealOrigin() ? { url: absoluteUrl("/") } : {}),
     image: absoluteUrl("/og/khawaja-collection.png"),
+    // One specification covering six identical days rather than six of them:
+    // `dayOfWeek` takes an array precisely so a uniform week states its hours
+    // once, and six copies is six chances to change five of them.
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [...contact.hours.days],
+        opens: contact.hours.opens,
+        closes: contact.hours.closes,
+      },
+    ],
     parentOrganization: { "@id": nodeId("organization") },
     currenciesAccepted: "PKR",
     paymentAccepted: "Cash on Delivery",
