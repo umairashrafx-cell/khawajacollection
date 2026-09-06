@@ -35,6 +35,7 @@ import {
   site,
   social,
 } from "@/config/site";
+import { Image } from "@/components/media/Image";
 import { formatPKR } from "@/lib/format";
 import { AppLink } from "./AppLink";
 
@@ -187,12 +188,27 @@ export default function Footer() {
           */}
           <p>
             Built by{" "}
+            {/*
+              The mark and the name are ONE link, not two. Two adjacent links
+              to the same destination are two tab stops and two announcements
+              of the same thing to a screen reader, which is why the image is
+              inside the anchor and carries an empty alt: the anchor's own text
+              already names it.
+            */}
             <a
               href={builtBy.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-block py-1 text-kc-charcoal underline-offset-4 transition-colors hover:text-kc-ink hover:underline"
+              className="inline-flex items-center gap-1.5 py-1 align-middle text-kc-charcoal underline-offset-4 transition-colors hover:text-kc-ink hover:underline"
             >
+              <Image
+                src={builtBy.mark.src}
+                alt=""
+                width={builtBy.mark.width}
+                height={builtBy.mark.height}
+                sizes={`${builtBy.mark.width}px`}
+                className="shrink-0"
+              />
               {builtBy.name}
             </a>
           </p>

@@ -36,6 +36,25 @@ export const site = {
 export const builtBy = {
   name: "Automa8",
   url: "https://www.automa8.co",
+  /**
+   * The A8 mark, supplied 2026-09-07.
+   *
+   * THE MARK ALONE, not the full lockup, and the reason is the credit bar it
+   * sits in: 12px text in a 20px-tall row. The supplied artwork is a square
+   * stacked lockup — mark, then "Automa8", then "AUTOMATE · CONNECT · GROW" —
+   * and at any height that row can carry, the wordmark under the mark renders
+   * about five pixels tall and the tagline about three. Shrinking a logo until
+   * its own words are unreadable is worse for the agency than not showing it.
+   *
+   * So the mark is cropped out and the NAME STAYS AS TEXT beside it. Nothing
+   * is lost: the words are still there, still selectable, still read aloud by
+   * a screen reader, and the mark is doing the job a mark is for.
+   *
+   * Cropped from the original at 3x the display size and re-encoded: the
+   * supplied PNG is 1254x1254 and 450KB, which is a large asset to put in the
+   * footer of every page for a 38x20 credit.
+   */
+  mark: { src: "/automa8-mark.png", width: 38, height: 20 },
 } as const;
 
 /** Section 11.1 item 1 — max three, rotating, dismissible for the session. */
