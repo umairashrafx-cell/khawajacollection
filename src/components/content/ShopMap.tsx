@@ -61,7 +61,10 @@ export function ShopMap() {
             src={mapEmbedUrl}
             className="h-full w-full border-0"
             loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
+            // Matching what Google's own Share -> Embed snippet now ships.
+            // It sends the origin but not the path, so Google is not told
+            // which page of this site the visitor was reading.
+            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           />
         </div>

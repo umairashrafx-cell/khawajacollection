@@ -115,21 +115,22 @@ export const contact = {
 /**
  * The Google Business Profile, live and verified 2026-09-07.
  *
- * ONLY THE REVIEW URL LIVES HERE. The map embed, the directions link and the
- * listing link are all derived from `contact.address` in src/lib/maps.ts,
- * because an address written down twice is an address that gets corrected
- * once. This one cannot be derived from anything: Google keys a review link to
- * the Place ID, which is not a function of the shop name or its address.
+ * EVERY VALUE HERE IS ONE GOOGLE PRODUCED FOR THIS LISTING. None is derived,
+ * and there was briefly a src/lib/maps.ts that derived all of them from
+ * `contact.address` on the reasonable-sounding grounds that an address written
+ * down twice gets corrected once. It shipped, and Google resolved the address
+ * to a different business in a different mall. The file is gone.
  *
- * ⚠ WHILE THIS IS null THE SITE ASKS NOBODY FOR A REVIEW. That is the single
- * biggest lever on local ranking left unpulled, and it is one click to fix:
- * Business Profile -> "Ask for reviews" copies a link of the form
- * https://g.page/r/<id>/review. Paste it here.
+ * What replaced the reasoning: an address is a SEARCH TERM to Google, and a
+ * search term can return anything. These three are identifiers. They are also
+ * cross-checked against each other — all three carry the CID
+ * 0x5a4ab4352acaa893 — because one reference cannot confirm itself.
  *
- * It is deliberately NOT rendered as a "Placeholder:" badge like the legal
- * facts are. A missing refund window is something a customer is owed and the
- * badge is the right pressure; a review button that announces itself as broken
- * just makes the shop look unfinished. So it renders nothing at all.
+ * Any of them being null is handled: ShopMap renders only the parts it has,
+ * and nothing at all if it has none. Deliberately no "Placeholder:" badge like
+ * the legal facts get. A missing refund window is something a customer is owed
+ * and the badge is the right pressure there; a map or review button announcing
+ * itself as broken just makes the shop look unfinished.
  */
 export const googleBusiness = {
   /**
@@ -145,17 +146,34 @@ export const googleBusiness = {
    * addressing it is a bad one. A Place ID is an identity; an address string
    * is a search term, and a search term can return anything.
    */
-  mapEmbedUrl: null as string | null,
-  /** Google Maps -> Share -> Copy link. A https://maps.app.goo.gl/... link. */
-  placeUrl: null as string | null,
+  mapEmbedUrl:
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4345.651836604552!2d73.48992767403696!3d32.585186051293114!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391f7d6ce2df93ad%3A0x5a4ab4352acaa893!2sKhawaja%20Collection!5e0!3m2!1sen!2s!4v1788728637594!5m2!1sen!2s" as
+      string | null,
   /**
-   * Business Profile -> "Ask for reviews". A https://g.page/r/<id>/review link.
+   * Google Maps -> Share -> Copy link.
    *
-   * ⚠ WHILE THIS IS null THE SITE ASKS NOBODY FOR A REVIEW, which is the
-   * biggest lever on local ranking left unpulled. It cannot be derived: Google
-   * keys it to the Place ID, which is not a function of the name or address.
+   * Supplied 2026-09-07 and CHECKED AGAINST THE EMBED before being used: it
+   * redirects to /maps/place/Khawaja+Collection/@32.5851861,73.4899277 and
+   * carries the identifier 0x391f7d6ce2df93ad:0x5a4ab4352acaa893, which is the
+   * same one inside `mapEmbedUrl`. Two references Google produced separately,
+   * agreeing on one listing. That check is the whole difference between these
+   * values and the address string they replaced.
    */
-  reviewUrl: null as string | null,
+  placeUrl: "https://maps.app.goo.gl/3vCgfGL9SXwmVSVQ8" as string | null,
+  /**
+   * Business Profile -> "Ask for reviews". Supplied 2026-09-07.
+   *
+   * PROVEN TO BE THE SAME SHOP, not assumed. The id in a g.page/r link is
+   * base64url of a small protobuf whose first field is the listing's CID as a
+   * little-endian fixed64. `CZOoyio1tEpaEBM` decodes to
+   * 09 93a8ca2a35b44a5a 1013, so the CID is 0x5a4ab4352acaa893 — the identifier
+   * that also appears inside `mapEmbedUrl` and in what `placeUrl` redirects to.
+   * Three references Google produced independently, all resolving to one
+   * listing. After the geocoder confidently returned a stranger's shop for the
+   * address string, agreement between independent references is the standard
+   * anything pointing at a place has to meet here.
+   */
+  reviewUrl: "https://g.page/r/CZOoyio1tEpaEBM/review" as string | null,
 } as const;
 
 /** The shop address as display lines, in the order they should be read. */
