@@ -18,6 +18,17 @@
  * no privacy policy: this one is checkable, which is the only thing that makes
  * it worth anything.
  *
+ * IT HAPPENED TWICE THE SAME DAY. The replacement paragraph said there was no
+ * advertising retargeting, and hours later "Import Google Analytics audiences"
+ * was switched on in Google Ads — which is retargeting. That claim came out
+ * too, and the opt-out links went in.
+ *
+ * THE LESSON IS NOT ABOUT ANALYTICS. Every sentence here that says what we do
+ * NOT do is a claim with a shelf life, and the settings that falsify it live
+ * in someone else's console where no diff will ever show up. Before switching
+ * anything on in Ads, Analytics, Supabase or a payment gateway, read this page
+ * first and ask which sentence it just made false.
+ *
  * Where the answer depends on a business decision instead — a data controller
  * address, a retention period, who to complain to — it is a visible
  * placeholder, because inventing those is both a Hard Rule 9 violation and a
@@ -29,7 +40,14 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Bullets, ContentPage, Fact, Inline, Section } from "@/components/content/ContentPage";
+import {
+  Bullets,
+  ContentPage,
+  Fact,
+  Inline,
+  Outbound,
+  Section,
+} from "@/components/content/ContentPage";
 import { legal, legalEntityLine } from "@/config/site";
 import { pageDescription, pageTitle, seoHead } from "@/lib/seo";
 
@@ -128,17 +146,38 @@ function PrivacyPage() {
         </p>
         <p>
           {/*
-            NOT "Do Not Track". A draft of this paragraph said that setting
-            would stop the script. It does not: DNT is a request in an HTTP
-            header that a site may ignore, and Google Analytics ignores it. A
-            content blocker actually blocks the request, and some browsers ship
-            one turned on. Those are the two true statements, so those are the
-            two made — a privacy policy that overstates the reader's protection
-            is worse than one that promises less.
+            THIS PARAGRAPH SAID THERE WAS NO RETARGETING until 2026-09-08, when
+            "Import Google Analytics audiences" was switched on in Google Ads.
+            That publishes the audiences Analytics builds here to the Ads
+            account so they can be advertised to, which is exactly the thing
+            the old sentence promised was not happening.
+
+            Google's own personalised-advertising policy requires this
+            disclosure and an opt-out route, so the paragraph is not merely
+            honest, it is the condition of being allowed to run the ads.
+
+            NOT "Do Not Track", which an earlier draft claimed would stop the
+            script. It does not: DNT is a request in an HTTP header that a site
+            may ignore, and Google Analytics ignores it. A content blocker
+            actually blocks the request, and some browsers ship one turned on.
+            Those are the true statements, so those are the ones made — a
+            privacy policy that overstates the reader's protection is worse
+            than one that promises less.
           */}
-          There is no Meta Pixel and no advertising retargeting on this site. Any content blocker
-          you use will stop this script loading, as will a browser that blocks trackers by default,
-          and the shop works exactly the same without it.
+          The audiences Analytics builds from these visits are also shared with Google Ads, so you
+          may later see our ads on Google or on sites that carry its advertising. That is based on
+          the pages you looked at, never on anything you typed into a form. There is no Meta Pixel
+          and no other advertising network on this site.
+        </p>
+        <p>
+          You can turn personalised ads off at{" "}
+          <Outbound href="https://myadcenter.google.com">Google&rsquo;s My Ad Center</Outbound>, and
+          you can stop the measurement itself with{" "}
+          <Outbound href="https://tools.google.com/dlpage/gaoptout">
+            Google&rsquo;s opt-out add-on
+          </Outbound>
+          . Any content blocker you use will stop this script loading, as will a browser that blocks
+          trackers by default, and the shop works exactly the same without it.
         </p>
       </Section>
 
@@ -146,6 +185,7 @@ function PrivacyPage() {
         <Bullets
           items={[
             "Google Analytics — measurement, as described above.",
+            "Google Ads — the advertising audiences built from that measurement.",
             "Supabase — our database and sign-in provider, where orders and accounts are stored.",
             "Our hosting provider, which processes the requests your browser makes.",
             "The courier delivering your parcel, who receives your name, address and phone number and nothing else.",

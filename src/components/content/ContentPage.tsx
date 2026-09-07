@@ -98,3 +98,30 @@ export function Inline({ href, children }: { href: string; children: ReactNode }
     </AppLink>
   );
 }
+
+/**
+ * A link off this site, inside body copy.
+ *
+ * `Inline` goes through AppLink, which is the router — pointed at another
+ * origin it would try to resolve a route that does not exist. The distinction
+ * matters most where it first came up: the opt-out links in the privacy
+ * policy, which are the one kind of link a policy cannot afford to have
+ * silently broken.
+ *
+ * `rel="noreferrer"` and not merely `noopener`: an opt-out link leaks which
+ * page of this shop the reader was on when they decided to opt out, which is
+ * a poor thing to hand the company they are opting out of.
+ */
+export function Outbound({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="underline underline-offset-4 hover:text-kc-gold"
+    >
+      {children}
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
+  );
+}
