@@ -30,6 +30,7 @@ import { accessToken } from "@/lib/auth/session-store";
 import { checkoutSchema, type CheckoutInput } from "@/lib/checkout-schema";
 import { formatPKR } from "@/lib/format";
 import { announce } from "@/store/announcer";
+import { trackPurchase } from "@/lib/analytics";
 import { clearCart, useCartHydrated, useCartLines, useCartSubtotal } from "@/store/cart-store";
 import type { PaymentMethodId } from "@/types";
 
@@ -98,6 +99,13 @@ function CheckoutPage() {
         ok?: boolean;
         error?: string;
         orderNumber?: string;
+        /**
+         * The server's own total for the order, including delivery. It has
+         * always been in this response and was simply not declared here.
+         * Guardrail 5 makes it the only total worth reporting: the cart's
+         * subtotal is a preview computed from prices the browser was holding.
+         */
+        total?: number;
         /** Set only by the redirect gateways. See /api/orders. */
         redirectUrl?: string;
       };
@@ -107,6 +115,21 @@ function CheckoutPage() {
         announce(result.error ?? "The order could not be placed.");
         return;
       }
+
+      /*
+       * Read before `clearCart()`, which is two lines below and would
+       * otherwise leave nothing to report. Cheap to get wrong and silent when
+       * it is: the event would fire with an empty basket and the revenue
+       * figure would still look right.
+       */
+      const purchased = lines.map((line) => ({
+        productId: line.productId,
+        name: line.name,
+        size: line.size,
+        colorName: line.colorName,
+        unitPrice: line.unitPrice,
+        quantity: line.quantity,
+      }));
 
       clearCart();
 
@@ -121,9 +144,34 @@ function CheckoutPage() {
        * and a bag that survived would let them buy the same thing twice.
        */
       if (result.redirectUrl) {
+        /*
+         * NO `purchase` EVENT ON THIS PATH, and that is not an oversight.
+         *
+         * A gateway order exists before a rupee has moved — that is the whole
+         * reason /api/orders writes the row first, so the order number can be
+         * the payment reference. Reporting a sale here would count every
+         * abandoned wallet payment as revenue, and the number that gets
+         * inflated is the one campaign decisions are made on.
+         *
+         * Neither wallet is enabled today, so nothing reaches this branch.
+         * When one is switched on, the conversion has to fire where payment is
+         * actually confirmed: the gateway callback, which runs on the server
+         * with no browser attached, so it needs the Measurement Protocol
+         * rather than gtag. That is a job for the sandbox run, not a guess
+         * made now.
+         */
         announce(`Order ${result.orderNumber} created. Taking you to the payment page.`);
         window.location.assign(result.redirectUrl);
         return;
+      }
+
+      // Cash on delivery: the order is placed and the sale is real.
+      if (typeof result.total === "number") {
+        trackPurchase({
+          orderNumber: result.orderNumber,
+          total: result.total,
+          items: purchased,
+        });
       }
 
       announce(`Order ${result.orderNumber} placed.`);
