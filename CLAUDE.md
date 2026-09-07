@@ -245,6 +245,171 @@ every listed URL indexable, every omitted one noindex. Under `mock` (72
 products) it is 110 URLs and nothing is noindex, so the mock repository is
 unaffected.
 
+## A section with nothing in it does not render
+
+The listing-level twin of the section above, one layer up. Every homepage
+product rail drew its heading and its "View all" whether or not the query
+returned anything, so on a one-product shop the page had two captioned holes:
+Trending now over roughly 400px of nothing, because the one product is not
+flagged a best seller, and the men's edit over the same, because it is a
+women's piece. Neither was a data bug - the queries were right and the answers
+were empty.
+
+Two things fell out of fixing it:
+
+- `pt-0` ON SECTIONS 7 AND 8 HAD TO BECOME CONDITIONAL. It exists to avoid
+  stacking two Sections' padding and silently assumed the section above always
+  rendered. Left hardcoded it would have jammed the women's edit against the
+  editorial split - a spacing bug introduced by the fix rather than the data.
+- The FEATURED COLLECTION block escaped the first pass, because it runs on no
+  product query at all: it is a static photograph and an "Explore the
+  collection" button. It pointed at `/collections/the-new-season`, which had
+  nothing in it and answers `noindex`. A full-width dead end.
+
+A NAVIGATION LINK AND A PROMISE ARE NOT THE SAME THING, which is why the
+"Shop by category" strip stays even though most of its tiles currently lead to
+empty listings. That strip is how someone browses the shop, it mirrors the
+header nav, and an empty listing answers honestly with its own empty state. A
+photograph with "Explore the collection" under it is an advertisement.
+
+The "Follow Khawaja Collection" grid lost its six hardcoded placeholder SVGs
+for the same reason: six identical grey "KC / PRODUCT IMAGE" squares under a
+heading asking people to follow the shop, directly above the newsletter
+sign-up. `socialTiles` in site.ts takes real photographs and the grid returns.
+
+## Nothing claims the clothes are made in Lahore
+
+Umair confirmed on 2026-09-08 that nothing is. The claim was in SEVENTEEN
+files: the homepage meta description, `site.description`, the root default, the
+web manifest, the footer, the hero headline, two PLP descriptions, two category
+descriptions, two collection descriptions, both catalogue-page fallbacks, the
+about page and three mock product descriptions - plus, by then, the `Store`
+structured data, which made it a machine-readable claim to a search engine.
+
+It came from the Lovable prototype's placeholder copy and survived nine phases.
+
+Removing the word alone would have left "made in limited runs", which is the
+same claim, so the copy says what is verifiable instead: a clothing and fabric
+shop in Mandi Bahauddin, what it stocks, how it delivers. "What we make" on the
+about page is "What we sell".
+
+FOUR "studio" REFERENCES SURVIVED THE FIRST PASS, because the grep was for
+"Lahore" and "limited runs": the social strapline, the new-arrivals
+description, the order-tracking Processing step and an image alt. Two more said
+"pieces are cut in limited runs" in the FAQs and Terms. When removing a claim,
+grep for the idea, not the phrase.
+
+Made to order was removed and put straight back. It is a per-product flag the
+admin sets, and Terms, Returns, Shipping, FAQs and the PDP all describe it; it
+never claimed a studio. Still open: the men's copy says "Cut clean, finished by
+hand" in four places, which describes the garment rather than who made it.
+
+**PLACEHOLDER MARKETING COPY IS MORE DANGEROUS THAN A PLACEHOLDER PHONE
+NUMBER.** A wrong number is obviously wrong. An invented brand story reads
+perfectly, and this one was caught only because it was about to be repeated to
+Google.
+
+## The shop is a place, not just a brand
+
+The Google Business Profile went live 2026-09-07 and the site now agrees with
+it. `Store` JSON-LD on the homepage carries the address, phone, postcode 50400
+and opening hours, and points at the Organization by `@id` so the two do not
+read as unrelated businesses sharing an address. `Store` is a `LocalBusiness`,
+which is what Google reads for the map pack and near-me results; `Organization`
+is the brand behind the website.
+
+Opening hours went in once the DAYS arrived (Saturday to Thursday, 10:00 to
+20:00). Friday carries no specification and that is the point - Google reads an
+absent day as Closed. The window alone was known for three days and the markup
+stayed out, because schema.org requires a `dayOfWeek` and guessing "every day"
+would have told Google the shop was open on a day it is shut.
+
+WARNING: **AN ADDRESS IS A SEARCH TERM TO GOOGLE, NOT AN IDENTIFIER.** There
+was briefly a `src/lib/maps.ts` that derived the map embed, the directions link
+and the listing link from `contact.address`, on the reasonable-sounding grounds
+that a location written down twice gets corrected once. It shipped. Google
+resolved that string to "K. Khadija & Kumail", Ground Floor Al-Asar Mall - a
+different business on a different street, whose name and 4.0 rating rendered on
+our own contact page under the heading "Find the shop". The file is deleted.
+
+`googleBusiness` in site.ts now holds three values Google itself produced -
+Share to Embed a map, Share to Copy link, and Ask for reviews - and they were
+cross-checked against each other before use: all three carry the CID
+`0x5a4ab4352acaa893`. The `g.page/r` id is base64url of a protobuf whose first
+field is that CID as a little-endian fixed64, so it can be verified offline.
+ONE REFERENCE CANNOT CONFIRM ITSELF.
+
+`ShopMap` renders only the parts it has, and nothing at all if it has none. No
+"Placeholder:" badge, unlike the legal facts: a missing refund window is
+something a customer is owed, but a map or review button announcing itself as
+broken just makes the shop look unfinished.
+
+`ReviewPrompt` asks for a review ONLY on a `delivered` order, on /track-order
+and the account order detail. A review request is a favour asked of someone
+holding the goods; earlier it asks a customer to vouch for a parcel they are
+still waiting for. On a cash-on-delivery shop `delivered` also means they have
+paid and seen what they paid for. `cancelled` is off that sequence and excluded
+by the same check. Deliberately NOT on the confirmation page, the obvious
+high-traffic spot: there the customer has a receipt and nothing else.
+
+Every product also has an "Enquire on WhatsApp" link under the buy buttons,
+prefilled with the product name and its URL - a customer types "is this
+available?" with no indication of which piece, and the shop has to ask before
+it can answer. Bordered rather than filled so it does not compete with Add to
+bag. Made-to-order pieces do not get it: their primary CTA is already a
+WhatsApp enquiry.
+
+## Analytics
+
+Google tag `G-7LDKK13XSX`, installed 2026-09-08 in the root route so it is on
+every page including the prerendered ones.
+
+WARNING: **/privacy PROMISED THIS DID NOT EXIST**, in as many words: "There is
+no Meta Pixel and no Google Analytics on this site today. If that changes, this
+page changes first." So it changed in the same commit. Anything added that sets
+a cookie or reports a visitor must do the same - that page is unusual in being
+checkable against the source, naming the real localStorage keys and database
+columns, and a privacy policy behind the code is worse than none.
+
+One sentence in that new section was wrong and was caught before it shipped: it
+said Do Not Track would stop the script. It does not - DNT is a header a site
+may ignore, and Google Analytics ignores it. Content blockers do.
+
+WARNING: **PRODUCTION BUILDS ONLY.** `import.meta.env.PROD` is statically
+replaced, so in a dev build the branch is eliminated rather than skipped. Local
+page views never reach the property, which matters most in its first weeks:
+that data is the baseline every later comparison uses, and localhost traffic
+cannot be unpicked from it afterwards.
+
+The measurement ID is in committed config, not `.env.local`. It is emitted in
+the HTML of every page that loads the tag, so it is public by construction and
+nothing can be done with it except send data to this property. It is not a
+credential and does not belong beside one.
+
+`trackPurchase` in src/lib/analytics.ts fires GA4 `purchase` from the CHECKOUT
+handler, not the confirmation page - that route takes only an order number from
+the URL, has no total or items, and can be refreshed. Three things to keep:
+
+- `value` IS THE SERVER'S TOTAL. /api/orders has always returned
+  `order.totals.total`; the client simply never declared it. Guardrail 5 makes
+  it the only total worth reporting - the cart subtotal excludes delivery, so
+  reporting it would make every campaign look less profitable than it was, and
+  silently. Verified: a PKR 2,600 order under the free-delivery threshold
+  reported 2,850.
+- NO EVENT ON THE GATEWAY PATH. A wallet order exists before a rupee has moved,
+  which is why /api/orders writes the row first. Reporting there would count
+  every abandoned payment as revenue. When a wallet goes live the conversion
+  must fire from the gateway callback, which is server-side with no browser and
+  so needs the Measurement Protocol, not gtag.
+- The cart lines are read BEFORE `clearCart()`, two lines below. Cheap to get
+  wrong and silent when it is: the event would fire with an empty basket and
+  the revenue figure would still look right.
+
+Every call no-ops when `window.gtag` is absent - dev, SSR, and any visitor
+running a content blocker. Verified by deleting `window.gtag` and placing an
+order: it completed and threw nothing. An analytics failure must never break
+the one page where an exception costs real money.
+
 ## Bedsheets
 
 A fourth department, added on request. `/bedsheets` plus
@@ -421,6 +586,38 @@ Gotchas worth knowing before the sandbox run:
 0008_payment_reference.sql adds `orders.payment_reference` so a customer saying
 "I paid" can be checked against the gateway's own records. Not yet applied.
 
+**CASH ON DELIVERY IS THE ONLY METHOD OFFERED** as of 2026-09-08. The footer
+and checkout listed five, four labelled "Coming soon" - a promise with no date
+behind it, on every page. Card and bank transfer had no implementation at all
+and are gone outright. The two wallets are UNLISTED, NOT DELETED: they return
+the moment their env flag is on, which is what the flag is for.
+
+`PAYMENT_LABELS` is separate from `paymentMethods` for a reason worth keeping.
+The offer list shrinks; what a stored `payment_method` MEANS must not, or a past
+order shows a customer the raw column value. Both order-detail screens used to
+label from the offer list. `paymentLabel()` takes a `string` and returns it
+unchanged when unrecognised - the compiler pointed out that an order carries a
+plain column value, not the union, which was correct.
+
+## The piece limit was written for suits
+
+`MAX_PIECES` in src/config/filters.ts, raised from 5 to 12 on 2026-09-08. A
+comforter set is sold as six, eight or twelve pieces, so Bedsheets could not
+describe its own stock: the form input refused the number and the API refused
+it again, because the limit was written twice and neither copy knew about the
+other.
+
+It replaced a `pieceCounts` list of 1/2/3 that NOTHING IMPORTED - the piece
+facet is tallied from products that actually exist, so a hardcoded option list
+was never consulted, and had it been it would have hidden every 5-piece suit in
+the catalogue.
+
+Expect more of these. Section 16 was written for a clothing shop, and bedding
+breaks its assumptions one at a time: sizes (a bed, not an S/M/L), the size
+guide (no chest or waist), the possessive heading template, and now piece
+counts. When something in Bedsheets looks wrong, check whether the rule behind
+it was written for suits.
+
 ## Sizes are optional, because most of this shop has none
 
 Unstitched cloth is sold by the length, a dupatta has no size, and a bedsheet's
@@ -484,7 +681,22 @@ byte on every product page; not worth it.
 Known gaps, deliberate:
 - Removing an image from a product leaves the file in Storage. Orphaned bytes
   are cheaper than deleting a photo that a failed save then needed back.
-- No collections field.
+
+COLLECTIONS AND BEST SELLER ARE IN THE FORM as of 2026-09-08, added together
+because they were the same gap: two homepage sections had been hidden for being
+empty and the admin gave no way to fill them. `collectionSlugs` writes
+`product_collections`, whose read path had existed since Phase 8 with nothing
+able to write it, so every collection was permanently empty. `isBestSeller`
+drives the Trending now rail.
+
+Adding both to `ProductInput` made the compiler name every place that had to
+change - both repositories, the API, the types, the form, both routes - which
+is Phase 8 item 6 doing its job.
+
+Collection slugs are validated against the live list rather than merely cleaned
+like tags: a tag is free text, a collection slug is a foreign key, and an
+unknown one would otherwise fail deep inside `saveProduct` with a Postgres
+constraint message no shopkeeper can act on.
 
 **Deleting a product does NOT damage order history**, and this file said the
 opposite twice before it was checked. `order_items` holds `product_id` and
