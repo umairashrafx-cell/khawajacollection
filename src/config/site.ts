@@ -303,12 +303,27 @@ export const legal = {
   governingLaw: "Pakistan" as string | null,
   /** Renders as "disputes fall to the courts of {X}". */
   courtJurisdiction: null as string | null,
-  /** The date each policy takes effect. One date; they are published together. */
-  effectiveDate: null as string | null,
+  /**
+   * The date each policy takes effect. One date; they are published together.
+   *
+   * From the privacy policy Umair supplied on 2026-09-08, which carried
+   * "Last updated: September 8, 2026". IT ALSO CLEARS THE BADGE ON /terms AND
+   * /refund-policy, because this field is shared and those pages are published
+   * alongside it. If either is ever revised on its own, this stops being one
+   * date and needs splitting rather than nudging.
+   */
+  effectiveDate: "8 September 2026" as string | null,
   /** From approving a refund to the money leaving. e.g. "7 to 10 working days". */
   refundProcessingTime: null as string | null,
-  /** How long order records are kept. Tax rules usually decide this. */
-  orderRetention: null as string | null,
+  /**
+   * How long order records are kept. Tax rules usually decide this, and here
+   * they did: the privacy policy supplied 2026-09-08 cites FBR's requirement
+   * that certain sales-tax records be retained for six years after the
+   * relevant tax period.
+   *
+   * "six years" and not "6 years" — it renders mid-sentence, after "up to".
+   */
+  orderRetention: "six years" as string | null,
 } as const;
 
 /** Name and address as one phrase, for the data-controller line in /privacy. */
