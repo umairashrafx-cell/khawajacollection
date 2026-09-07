@@ -43,12 +43,27 @@ export const fabrics = [
   { value: "flannel", label: "Flannel" },
 ] as const;
 
-/** Section 16 — 1/2/3-piece suits are a first-class filter. */
-export const pieceCounts = [
-  { value: 1, label: "1 Piece" },
-  { value: 2, label: "2 Piece" },
-  { value: 3, label: "3 Piece" },
-] as const;
+/**
+ * The largest piece count a product may declare.
+ *
+ * TWELVE, RAISED FROM FIVE ON 2026-09-08 because bedding broke the assumption.
+ * Section 16 wrote this rule for suits, where 1/2/3-piece covers the shop and
+ * five is generous. A comforter set is sold as six, eight or twelve pieces, so
+ * the Bedsheets department could not describe its own stock — the admin form
+ * refused the number and the API refused it again.
+ *
+ * ONE CONSTANT, because the limit was written twice: `max={5}` on the form
+ * input and `pieces > 5` in the API. Two copies of a rule is how a form starts
+ * accepting something the server then rejects, and the message a shopkeeper
+ * sees for that is a sentence about a field they filled in correctly.
+ *
+ * It replaces a `pieceCounts` list of 1/2/3 that NOTHING IMPORTED. The piece
+ * facet is tallied from the products that actually exist
+ * (`buildFacets` in catalogue-query.ts), so a hardcoded list of options was
+ * never consulted — and had it been, it would have hidden every 5-piece suit
+ * already in the catalogue.
+ */
+export const MAX_PIECES = 12;
 
 /**
  * Section 15 — colour alone must never be the only way to distinguish a

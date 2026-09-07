@@ -61,6 +61,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
+import { MAX_PIECES } from "@/config/filters";
 import { ImageUploader } from "./ImageUploader";
 import type { AdminCategory, AdminCollection, ProductFormValues } from "@/lib/auth/admin-api";
 
@@ -444,7 +445,7 @@ export function ProductForm({
               id="pf-pieces"
               type="number"
               min={1}
-              max={5}
+              max={MAX_PIECES}
               value={values.pieces}
               onChange={(event) => set("pieces", event.target.value)}
               placeholder="3"

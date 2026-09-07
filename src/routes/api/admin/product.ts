@@ -22,6 +22,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { MAX_PIECES } from "@/config/filters";
 import { adminFromRequest } from "@/lib/auth/verify";
 import { categoryRepository, collectionRepository, productRepository } from "@/lib/repositories";
 import type { ProductInput } from "@/lib/repositories";
@@ -126,8 +127,8 @@ function parse(body: unknown, validCollections: ReadonlySet<string>): Parsed | s
   const piecesRaw = raw["pieces"];
   const hasPieces = piecesRaw !== null && piecesRaw !== undefined && str(piecesRaw) !== "";
   const pieces = hasPieces ? money(piecesRaw) : null;
-  if (hasPieces && (pieces === null || pieces < 1 || pieces > 5)) {
-    return "Pieces must be a number from 1 to 5, or empty.";
+  if (hasPieces && (pieces === null || pieces < 1 || pieces > MAX_PIECES)) {
+    return `Pieces must be a number from 1 to ${MAX_PIECES}, or empty.`;
   }
 
   const tags = Array.isArray(raw["tags"])
