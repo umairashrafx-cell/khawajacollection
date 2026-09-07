@@ -301,8 +301,19 @@ export const legal = {
   registeredAddress: "Katchery Road, Main Sadar Bazar, Mandi Bahauddin" as string | null,
   /** Renders as "governed by the laws of {X}". */
   governingLaw: "Pakistan" as string | null,
-  /** Renders as "disputes fall to the courts of {X}". */
-  courtJurisdiction: null as string | null,
+  /**
+   * Renders as "disputes fall to the courts of {X}". Supplied 2026-09-08.
+   *
+   * "competent jurisdiction in ..." rather than a named court, which is the
+   * usual drafting: it survives a court being renamed, reorganised or found to
+   * be the wrong forum, where naming one specific bench does not.
+   *
+   * THE LAST PLACEHOLDER. With this set, no page on the site renders a
+   * "Placeholder:" badge. If a new one is ever added, `Fact` in
+   * ContentPage.tsx makes it loud on purpose — do not swap that for a quiet
+   * fallback.
+   */
+  courtJurisdiction: "competent jurisdiction in Mandi Bahauddin, Punjab, Pakistan" as string | null,
   /**
    * The date each policy takes effect. One date; they are published together.
    *
