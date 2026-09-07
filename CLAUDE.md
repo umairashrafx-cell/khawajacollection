@@ -584,7 +584,24 @@ Gotchas worth knowing before the sandbox run:
   merchant portal before dispatching a prepaid order.**
 
 0008_payment_reference.sql adds `orders.payment_reference` so a customer saying
-"I paid" can be checked against the gateway's own records. Not yet applied.
+"I paid" can be checked against the gateway's own records. APPLIED — this file
+claimed otherwise until 2026-09-08, when `list_migrations` was actually checked.
+Every migration 0001-0009 is on the live project.
+
+0009_stock_function_search_path.sql pins an empty `search_path` on both stock
+functions and schema-qualifies their bodies, which is what 0003 had already done
+for `next_order_number` and 0007 did not repeat. Supabase's linter flagged both.
+
+The risk was small and worth closing anyway. Neither function is SECURITY
+DEFINER and execute is granted to `service_role` alone, so nobody could walk
+through it today — but that is one word away from being untrue, and on the day
+somebody adds SECURITY DEFINER for a plausible reason they will not re-read this
+paragraph first.
+
+Verified after applying: the setting is on both, `anon` and `authenticated` are
+still refused, and a reserve/release round trip inside a rolled-back transaction
+went 4 -> 3 -> 4 and returned NULL when asked for more than the shelf holds —
+which is the refusal semantics the whole oversell fix depends on.
 
 **CASH ON DELIVERY IS THE ONLY METHOD OFFERED** as of 2026-09-08. The footer
 and checkout listed five, four labelled "Coming soon" - a promise with no date
