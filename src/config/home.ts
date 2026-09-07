@@ -65,7 +65,7 @@ export const edits = [
     id: "men",
     eyebrow: "The Men's Edit",
     headline: "Considered everyday kurtas",
-    body: "Cotton, linen and khaddar in charcoal, ivory and sand. Cut clean, finished by hand, priced honestly.",
+    body: "Cotton, linen and khaddar in charcoal, ivory and sand. Clean straight cuts, priced honestly.",
     cta: { label: "Shop men", href: "/men" },
     query: { category: "men" },
     image: {

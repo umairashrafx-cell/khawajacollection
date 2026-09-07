@@ -41,7 +41,7 @@ export const collections: Collection[] = [
     name: "Everyday Essentials",
     tagline: "Quiet cloth, cut clean. Made to be worn often.",
     metaDescription:
-      "Cotton, linen and khaddar cut clean and finished by hand — the pieces you reach for on an ordinary Tuesday. Cash on delivery across Pakistan, delivered in 3 to 5 days.",
+      "Cotton, linen and khaddar in clean, straight cuts — the pieces you reach for on an ordinary Tuesday. Cash on delivery across Pakistan, delivered in 3 to 5 days.",
     heroImage: hero("everyday-essentials", "Everyday Essentials collection"),
     isActive: true,
   },

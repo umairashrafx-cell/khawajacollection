@@ -458,7 +458,7 @@ const seeds: Seed[] = [
     tags: ["ready-to-wear", "festive", "wedding"],
     collections: ["wedding-season"],
     blurb:
-      "Gold tissue organza over an ivory slip, with a hand-finished scalloped hem. Catches light without shouting.",
+      "Gold tissue organza over an ivory slip, with a scalloped hem. Catches light without shouting.",
   },
   {
     id: "kc-w-026",
@@ -928,7 +928,7 @@ const seeds: Seed[] = [
     sizes: ONE_SIZE,
     tags: ["festive", "wedding"],
     blurb:
-      "Gold tissue with a hand-finished edge, sized long enough to drape twice. The quickest way to lift a plain suit.",
+      "Gold tissue with a narrow turned edge, sized long enough to drape twice. The quickest way to lift a plain suit.",
   },
   {
     id: "kc-a-002",

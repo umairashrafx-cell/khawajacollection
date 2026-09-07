@@ -73,7 +73,7 @@ export const categories: Category[] = [
   {
     slug: "men-kurtas",
     name: "Kurtas",
-    description: "Cotton, linen and khaddar kurtas cut clean and finished by hand.",
+    description: "Cotton, linen and khaddar kurtas in clean, straight cuts.",
     parentSlug: "men",
     sortOrder: 1,
   },

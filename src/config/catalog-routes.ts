@@ -24,7 +24,7 @@ export const menCatalog: CatalogDescriptor = {
   h1: "Men",
   metaTitle: "Men's Collection | Khawaja Collection",
   description:
-    "Cotton and linen kurtas, wash and wear shalwar suits, jacquard waistcoats and suiting by the metre. Cut clean, finished by hand, priced honestly.",
+    "Cotton and linen kurtas, wash and wear shalwar suits, jacquard waistcoats and suiting by the metre. Clean straight cuts, honest prices, cash on delivery.",
   base: { category: "men" },
 };
 
