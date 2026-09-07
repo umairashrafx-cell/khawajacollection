@@ -97,6 +97,30 @@ export const social = {
  */
 export const socialTiles: readonly string[] = [];
 
+/**
+ * The Google tag. Supplied 2026-09-08 from Google Ads.
+ *
+ * A MEASUREMENT ID IS NOT A SECRET. It is emitted in the HTML of every page
+ * that loads the tag, so anyone can read it — which is exactly why it belongs
+ * in committed config and not in the env file beside the service role key.
+ * Nothing can be done with it except send data to this property.
+ *
+ * ⚠ LOADED IN PRODUCTION BUILDS ONLY. A dev server hitting the same property
+ * mixes local page views into real numbers, and the numbers are the entire
+ * point of installing it — the first week of data is the baseline everything
+ * later gets compared against, and there is no way to unpick localhost traffic
+ * from it afterwards.
+ *
+ * ⚠ /privacy PROMISED THIS DID NOT EXIST, in as many words: "There is no Meta
+ * Pixel and no Google Analytics on this site today. If that changes, this page
+ * changes first." So it changed in the same commit. Anything added here that
+ * sets a cookie or reports a visitor must do the same.
+ */
+export const analytics = {
+  /** Google tag ID, e.g. G-XXXXXXXXXX. Empty string disables the tag. */
+  measurementId: "G-7LDKK13XSX",
+} as const;
+
 export const contact = {
   /**
    * Supplied 2026-09-04. Stored in the +92 form Section 16 normalises to, so

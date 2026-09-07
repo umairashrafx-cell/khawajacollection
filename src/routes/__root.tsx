@@ -20,6 +20,7 @@ import { Announcer } from "../components/a11y/Announcer";
 import { useAccountSync } from "@/hooks/useAccountSync";
 import { useSearchHotkey } from "../hooks/useSearchHotkey";
 import { useOverlay } from "../store/ui-store";
+import { analytics } from "@/config/site";
 import { OG_IMAGE, organizationAndWebsiteJsonLd } from "@/lib/site-jsonld";
 
 // Phase 6 requires these two to be dynamically imported: neither is on screen
@@ -147,6 +148,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify(organizationAndWebsiteJsonLd()),
       },
+      /*
+       * The Google tag, in the root so it is on every page including the
+       * prerendered ones — a tag on the homepage alone measures a shop nobody
+       * navigates.
+       *
+       * PRODUCTION BUILDS ONLY. `import.meta.env.PROD` is statically replaced
+       * by Vite, so in a dev build these two entries are not merely skipped at
+       * runtime, the branch is eliminated. Local page views never reach the
+       * property, which matters most in its first weeks: that data is the
+       * baseline, and localhost traffic cannot be unpicked from it later.
+       *
+       * `async` on the loader is what keeps it off the critical path. This
+       * site's Lighthouse performance is already the weakest of its four
+       * scores (Section 14), and a synchronous third-party script would take
+       * it further down for a measurement that is not urgent.
+       */
+      ...(analytics.measurementId && import.meta.env.PROD
+        ? [
+            {
+              async: true,
+              src: `https://www.googletagmanager.com/gtag/js?id=${analytics.measurementId}`,
+            },
+            {
+              // Joined with a space, not a newline: every statement is
+              // semicolon-terminated, so the separator is cosmetic, and a
+              // one-line body is one less thing for an HTML escaper to get
+              // wrong on its way into the document head.
+              children: [
+                "window.dataLayer = window.dataLayer || [];",
+                "function gtag(){dataLayer.push(arguments);}",
+                "gtag('js', new Date());",
+                `gtag('config', '${analytics.measurementId}');`,
+              ].join(" "),
+            },
+          ]
+        : []),
     ],
   }),
   shellComponent: RootShell,

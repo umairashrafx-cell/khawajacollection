@@ -9,7 +9,14 @@
  *   - the localStorage keys in src/store/ (kc-cart-v1, kc-wishlist-v1)
  *   - the columns in supabase/migrations/0001_schema.sql
  *   - Supabase Auth as the only place a password lives
- *   - the fact that no analytics or advertising script is loaded today
+ *   - which measurement scripts the root route actually loads
+ *
+ * THE "WHAT WE DO NOT DO" LIST PROMISED THERE WAS NO GOOGLE ANALYTICS, and
+ * added "if that changes, this page changes first". It changed on 2026-09-08,
+ * so the claim came out and a Measurement section went in, in the same commit
+ * that added the tag. A privacy policy that is behind the code is worse than
+ * no privacy policy: this one is checkable, which is the only thing that makes
+ * it worth anything.
  *
  * Where the answer depends on a business decision instead — a data controller
  * address, a retention period, who to complain to — it is a visible
@@ -104,7 +111,6 @@ function PrivacyPage() {
       <Section heading="What we do not do">
         <Bullets
           items={[
-            "We load no analytics, advertising or social tracking scripts. There is no Meta Pixel and no Google Analytics on this site today. If that changes, this page changes first.",
             "We do not sell, rent or share your details with anyone for marketing.",
             "We do not store card numbers, because we do not accept cards yet. Cash on delivery means no payment details reach us at all.",
             "We do not email you unless you asked us to, or unless it is about an order you placed.",
@@ -112,9 +118,34 @@ function PrivacyPage() {
         />
       </Section>
 
+      <Section heading="Measurement">
+        <p>
+          We use Google Analytics to count visits and see which pages people read, so we know what
+          to stock and what to fix. It sets its own cookies in your browser and tells Google your
+          approximate location, the pages you opened and the device you used. It is not told your
+          name, your address or your phone number, and nothing you type into an order form is sent
+          to it.
+        </p>
+        <p>
+          {/*
+            NOT "Do Not Track". A draft of this paragraph said that setting
+            would stop the script. It does not: DNT is a request in an HTTP
+            header that a site may ignore, and Google Analytics ignores it. A
+            content blocker actually blocks the request, and some browsers ship
+            one turned on. Those are the two true statements, so those are the
+            two made — a privacy policy that overstates the reader's protection
+            is worse than one that promises less.
+          */}
+          There is no Meta Pixel and no advertising retargeting on this site. Any content blocker
+          you use will stop this script loading, as will a browser that blocks trackers by default,
+          and the shop works exactly the same without it.
+        </p>
+      </Section>
+
       <Section heading="Who else handles your data">
         <Bullets
           items={[
+            "Google Analytics — measurement, as described above.",
             "Supabase — our database and sign-in provider, where orders and accounts are stored.",
             "Our hosting provider, which processes the requests your browser makes.",
             "The courier delivering your parcel, who receives your name, address and phone number and nothing else.",
