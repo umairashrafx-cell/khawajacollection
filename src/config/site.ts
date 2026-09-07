@@ -313,8 +313,14 @@ export const legal = {
    * date and needs splitting rather than nudging.
    */
   effectiveDate: "8 September 2026" as string | null,
-  /** From approving a refund to the money leaving. e.g. "7 to 10 working days". */
-  refundProcessingTime: null as string | null,
+  /**
+   * From approving a refund to the money leaving. Supplied 2026-09-08.
+   *
+   * It is the time until WE SEND IT, not until it lands — the sentence it sits
+   * in says so, and the distinction is the point: how long a bank then takes
+   * is not a promise this shop is in a position to make.
+   */
+  refundProcessingTime: "7 business days" as string | null,
   /**
    * How long order records are kept. Tax rules usually decide this, and here
    * they did: the privacy policy supplied 2026-09-08 cites FBR's requirement

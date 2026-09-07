@@ -59,10 +59,21 @@ function RefundPolicyPage() {
       </Section>
 
       <Section heading="How the money comes back">
+        {/*
+          UMAIR'S WORDING, supplied 2026-09-08, and it fixes a real gap rather
+          than just reading better. The old sentence described how a refund
+          reaches a paid order and said nothing about the case this shop is
+          almost entirely made of: cash on delivery, where the money is handed
+          over at the door and the goods come back afterwards. Stating that the
+          item is received and inspected first is the whole condition on which
+          a COD refund depends, and it was missing.
+        */}
         <p>
-          Where a refund is due on a paid order, we return it to you by bank transfer to an account
-          in your name. We will ask for those details after the refund is approved, never before,
-          and never by any channel other than the one you contacted us on.
+          Where a refund is due on a paid order, we will return the approved refund by bank transfer
+          to a bank account in the customer&rsquo;s name. For Cash on Delivery orders, a refund is
+          processed only after the returned item has been received and inspected. We will ask for
+          those details after the refund is approved, never before, and never by any channel other
+          than the one you contacted us on.
         </p>
         <p>
           We aim to send it within{" "}
