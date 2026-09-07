@@ -28,12 +28,17 @@
  * about card numbers, which stops being trivially true the day a gateway goes
  * live.
  *
- * WHAT WAS LOST, deliberately, by adopting the supplied text: the old page
- * named the actual localStorage keys, the RLS behaviour behind order lookup,
- * and the fact that prices are recomputed server-side. Those made it checkable
- * against the source, which is a real virtue, but they were my words and this
- * is Umair's document. Section 3's mention of cookies for shopping-cart
- * functionality covers the same ground in his register.
+ * THE CHECKABLE DETAIL IS BACK, at Umair's request, in his register rather
+ * than the wording it had before: the localStorage keys in section 1, the
+ * server-recomputed price beside them, and in section 5 the password hashing
+ * and the rule that decides who can read an order. Every one is verifiable
+ * against the source — src/store/, Guardrail 5 in /api/orders, 0002_rls.sql —
+ * which is what makes this page worth more than a policy that merely sounds
+ * thorough. All of it is in the reader's favour: it says less reaches us.
+ *
+ * Keep that property. If a future change means the bag DOES reach the server,
+ * or an order becomes readable another way, these paragraphs are the first
+ * thing that turns into a lie.
  *
  * The retention period and the policy date come from this document and now
  * live in `legal` in src/config/site.ts, so /terms and /refund-policy pick the
@@ -99,6 +104,28 @@ function PrivacyPage() {
           ]}
         />
         <p>We only request information that is reasonably necessary to provide our services.</p>
+        {/*
+          ADDED TO THE SUPPLIED TEXT, in its register rather than mine. These
+          two paragraphs are the part of this page that can be checked against
+          the source — the keys are the ones in src/store/, and the recomputed
+          price is Guardrail 5 in /api/orders. A policy anyone can verify is
+          worth more than one that only sounds thorough, and this detail is
+          strictly in the reader's favour: it says less reaches us, not more.
+        */}
+        <p>
+          <strong className="font-medium text-kc-ink">What stays on your device.</strong> Your
+          shopping bag and wishlist are stored by your own browser, under the keys{" "}
+          <code className="kc-price text-xs">kc-cart-v1</code> and{" "}
+          <code className="kc-price text-xs">kc-wishlist-v1</code>. While you are signed out, that
+          information is not sent to us at all. Clearing your browser data erases it and we cannot
+          recover it for you. If you sign in, your wishlist is also saved to your account so it
+          follows you between devices; your bag is not.
+        </p>
+        <p>
+          <strong className="font-medium text-kc-ink">Prices.</strong> The amount recorded against
+          an order is recalculated on our server when the order is placed, rather than taken from
+          your browser, so the figure stored against your order is always the real one.
+        </p>
         <p>
           <strong className="font-medium text-kc-ink">Payment information.</strong> If you make a
           payment through an online payment provider, your payment information may be processed
@@ -201,6 +228,24 @@ function PrivacyPage() {
           information against unauthorised access, alteration, disclosure, or destruction. However,
           no internet transmission or electronic storage system can be guaranteed to be completely
           secure.
+        </p>
+        {/*
+          ALSO ADDED. "Reasonable technical measures" is what every policy
+          says; these are the two this shop can actually name, and naming them
+          is the difference between a claim and a description. Both are
+          checkable: the lookup rule is 0002_rls.sql and the order repository,
+          the hashing is Supabase Auth.
+        */}
+        <p>
+          Two specifics worth naming. Your password is stored by Supabase Auth as a hash — we never
+          see it, and nobody with access to our database can read it.
+        </p>
+        <p>
+          Order records are not readable by the website running in anyone&rsquo;s browser; the
+          database refuses those requests outright. Reading an order requires either being signed in
+          as the account that placed it, or knowing both the order number and the phone number on
+          that order. A wrong pairing returns the same &ldquo;not found&rdquo; as an order number
+          that does not exist, so the tracking page cannot be used to discover which orders exist.
         </p>
         <p>You should also protect your account password and avoid sharing it with others.</p>
       </Section>
